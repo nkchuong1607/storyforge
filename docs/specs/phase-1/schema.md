@@ -339,7 +339,7 @@ Rollback on any failure.
 
 ## Deferred tables (do not create in Phase 1)
 
-From [schema-draft.md](../../schema-draft.md): `scene_beats`, `prose_versions`, `ledger_events`, `character_provisional`, `twist_plans`, `continuity_reports`, `canon_embeddings`.
+From [schema-draft.md](../../schema-draft.md): `scene_beats`, `prose_versions`, `ledger_events`, `character_provisional`, `twist_plans`, `continuity_reports`, `canon_embeddings` — see [Phase 2 schema](../phase-2/schema.md) for the first four continuity-related tables.
 
 ---
 

@@ -21,7 +21,7 @@ flowchart LR
 | **3. Tests** | Unit + integration (Testcontainers for API) | All pass |
 | **4. Coverage** | pytest-cov / vitest coverage | Line ≥ **90%** hard fail in CI |
 
-**Do not skip specs.** Phase 1 contract: [docs/specs/phase-1/README.md](../specs/phase-1/README.md).
+**Do not skip specs.** Phase contracts: [Phase 1](../specs/phase-1/README.md), [Phase 2](../specs/phase-2/README.md).
 
 ---
 
@@ -51,7 +51,7 @@ Config: `apps/api/pyproject.toml` → `[tool.coverage.*]`
 ### Frontend (`apps/web`)
 
 - **Tool:** Vitest + `@vitest/coverage-v8` (implementation PR)
-- **Scope:** Phase 1 UI modules — see [web-screens.md](../specs/phase-1/web-screens.md)
+- **Scope:** Phase 1 UI modules — see [web-screens.md](../specs/phase-1/web-screens.md); Phase 2 — [web-screens.md](../specs/phase-2/web-screens.md)
 - **Hard gate:** line coverage ≥ **90%** for scoped paths
 
 ---
@@ -62,7 +62,7 @@ Config: `apps/api/pyproject.toml` → `[tool.coverage.*]`
 - **Redis:** Not required Phase 1
 - **Required test:** cross-tenant isolation (`404` for foreign `project_id`)
 
-See [test-strategy.md](../specs/phase-1/test-strategy.md).
+See [Phase 1 test strategy](../specs/phase-1/test-strategy.md) and [Phase 2 test strategy](../specs/phase-2/test-strategy.md).
 
 ---
 
@@ -95,3 +95,4 @@ See [test-strategy.md](../specs/phase-1/test-strategy.md).
 - [AGENTS.md](../../AGENTS.md)
 - [agent-setup.md](../agent-setup.md)
 - [Phase 1 test strategy](../specs/phase-1/test-strategy.md)
+- [Phase 2 test strategy](../specs/phase-2/test-strategy.md)

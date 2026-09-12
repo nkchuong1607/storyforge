@@ -3,7 +3,8 @@
 Entity list and key tables for Postgres. **Not migrated yet** — reference for later phases and exploratory design.
 
 > **Phase 1 canonical schema:** [docs/specs/phase-1/schema.md](specs/phase-1/schema.md)  
-> Use the Phase 1 spec for migrations and API implementation. This draft remains for Phase 2+ tables (ledgers, prose, continuity) not yet specified in detail.
+> **Phase 2 canonical schema:** [docs/specs/phase-2/schema.md](specs/phase-2/schema.md) — prose, beats, ledger, continuity, settle  
+> This draft remains for Phase 3+ tables not yet specified in detail.
 
 ## Naming Conventions
 

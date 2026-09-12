@@ -1,0 +1,1724 @@
+openapi: 3.1.0
+info:
+  title: StoryForge API
+  version: 0.3.0-phase2
+  description: |
+    Phase 2 contract — extends Phase 1 with chapter editor, prose versions, scene beats,
+    deterministic continuity, and chapter settle (ledger + bible_version++).
+
+    **Auth (MVP stub):** Send `X-User-Id: <uuid>` on every request except `/health`.
+
+    **Canon rule:** Bible edits write to staging only. `bible_versions` snapshots are immutable.
+    Settle via `POST .../chapters/{chapter_id}/settle` (atomic transaction). Phase 1
+    `POST .../bible/settle` is removed.
+
+servers:
+  - url: http://localhost:8000
+    description: Local API dev
+
+tags:
+  - name: Health
+  - name: Projects
+  - name: Bible
+  - name: Chapters
+  - name: Characters
+  - name: Continuity
+  - name: Settle
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /projects:
+    get:
+      tags: [Projects]
+      operationId: listProjects
+      summary: List projects for current user
+      parameters:
+        - $ref: "#/components/parameters/UserIdHeader"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ProjectStatus"
+          description: Default `active` (excludes archived)
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Case-insensitive title search
+      responses:
+        "200":
+          description: Paginated project list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags: [Projects]
+      operationId: createProject
+      summary: Create project (wizard submit)
+      parameters:
+        - $ref: "#/components/parameters/UserIdHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectCreateRequest"
+      responses:
+        "201":
+          description: Project created with bible v0 seed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Slug conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Projects]
+      operationId: getProject
+      summary: Get project detail
+      responses:
+        "200":
+          description: Project detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Projects]
+      operationId: updateProject
+      summary: Update project metadata
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdateRequest"
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectDetail"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Projects]
+      operationId: archiveProject
+      summary: Archive project (soft delete)
+      responses:
+        "204":
+          description: Project archived
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/bible/entries:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Bible]
+      operationId: listBibleEntries
+      summary: List bible staging entries
+      parameters:
+        - name: section
+          in: query
+          schema:
+            $ref: "#/components/schemas/BibleSection"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Staging entries for project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BibleEntryListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags: [Bible]
+      operationId: createBibleEntry
+      summary: Create staging bible entry
+      description: |
+        Writes to `bible_entry_staging` only. Does not mutate `bible_versions`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BibleEntryCreateRequest"
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BibleEntry"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: entry_key already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/bible/entries/{entry_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/EntryId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Bible]
+      operationId: getBibleEntry
+      summary: Get staging bible entry by id
+      responses:
+        "200":
+          description: Staging entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BibleEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Bible]
+      operationId: updateBibleEntry
+      summary: Update staging bible entry
+      description: |
+        Updates staging content only. Never updates settled `bible_versions.snapshot_json`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BibleEntryUpdateRequest"
+      responses:
+        "200":
+          description: Updated entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BibleEntry"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    delete:
+      tags: [Bible]
+      operationId: deleteBibleEntry
+      summary: Delete staging bible entry
+      responses:
+        "204":
+          description: Entry deleted from staging
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/bible/versions:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Bible]
+      operationId: listBibleVersions
+      summary: List settled bible versions (metadata)
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Version list (newest first)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BibleVersionListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/bible/versions/{version}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/BibleVersion"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Bible]
+      operationId: getBibleVersion
+      summary: Get immutable bible snapshot
+      responses:
+        "200":
+          description: Full snapshot at version
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BibleVersionDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Chapters]
+      operationId: listChapters
+      summary: List chapter metadata
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Chapters ordered by number
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChapterListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags: [Chapters]
+      operationId: createChapter
+      summary: Create stub chapter (optional Phase 1)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChapterCreateRequest"
+      responses:
+        "201":
+          description: Chapter created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Chapter number conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/chapters/{chapter_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Chapters]
+      operationId: getChapter
+      summary: Get chapter detail
+      responses:
+        "200":
+          description: Chapter detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    patch:
+      tags: [Chapters]
+      operationId: updateChapter
+      summary: Update chapter title or status
+      description: |
+        Valid status transitions per Phase 2 schema. Locked chapters reject mutations with 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChapterUpdateRequest"
+      responses:
+        "200":
+          description: Updated chapter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Locked chapter or invalid transition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/chapters/{chapter_id}/beats:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Chapters]
+      operationId: listSceneBeats
+      summary: List scene beats for chapter
+      responses:
+        "200":
+          description: Beats ordered by sort_order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneBeatListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags: [Chapters]
+      operationId: createSceneBeat
+      summary: Create scene beat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SceneBeatCreateRequest"
+      responses:
+        "201":
+          description: Beat created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneBeat"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Locked chapter or beat_key conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/chapters/{chapter_id}/beats/{beat_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/BeatId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    patch:
+      tags: [Chapters]
+      operationId: updateSceneBeat
+      summary: Update scene beat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SceneBeatUpdateRequest"
+      responses:
+        "200":
+          description: Updated beat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneBeat"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Locked chapter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags: [Chapters]
+      operationId: deleteSceneBeat
+      summary: Delete scene beat
+      responses:
+        "204":
+          description: Beat deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Locked chapter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/chapters/{chapter_id}/prose-versions:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Chapters]
+      operationId: listProseVersions
+      summary: List prose version metadata
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Versions newest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProseVersionListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      tags: [Chapters]
+      operationId: createProseVersion
+      summary: Save new prose version (human)
+      description: |
+        Append-only insert. Updates chapter word_count and may transition planned → drafting.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProseVersionCreateRequest"
+      responses:
+        "201":
+          description: Version saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProseVersionDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Locked chapter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/chapters/{chapter_id}/prose-versions/compare:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+
+    get:
+      tags: [Chapters]
+      operationId: compareProseVersions
+      summary: Compare prose version metadata
+      responses:
+        "200":
+          description: Metadata diff
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProseVersionCompareResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters/{chapter_id}/prose-versions/{version}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/ProseVersion"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Chapters]
+      operationId: getProseVersion
+      summary: Get full prose version content
+      responses:
+        "200":
+          description: Prose version with content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProseVersionDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters/{chapter_id}/continuity-check:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    post:
+      tags: [Continuity]
+      operationId: runContinuityCheck
+      summary: Run deterministic continuity check (sync)
+      description: |
+        Persists `continuity_reports` row. Sets chapter status to `reviewing` when was `drafting`.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContinuityCheckRequest"
+      responses:
+        "200":
+          description: Continuity report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContinuityReport"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Locked chapter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/chapters/{chapter_id}/continuity-reports/latest:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Continuity]
+      operationId: getLatestContinuityReport
+      summary: Get latest continuity report for chapter
+      responses:
+        "200":
+          description: Latest report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContinuityReport"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters/{chapter_id}/continuity-reports/{report_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/ReportId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Continuity]
+      operationId: getContinuityReport
+      summary: Get continuity report by id
+      responses:
+        "200":
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContinuityReport"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters/{chapter_id}/continuity-overrides:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    post:
+      tags: [Continuity]
+      operationId: createContinuityOverride
+      summary: Mark continuity issue as intentional
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContinuityOverrideCreateRequest"
+      responses:
+        "201":
+          description: Override created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContinuityOverride"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters/{chapter_id}/state-diff:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+      - name: prose_version
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+
+    get:
+      tags: [Continuity]
+      operationId: getStateDiff
+      summary: Get state diff preview for chapter
+      responses:
+        "200":
+          description: State diff preview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateDiff"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters/{chapter_id}/settle:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+      - $ref: "#/components/parameters/IdempotencyKey"
+
+    post:
+      tags: [Settle]
+      operationId: settleChapter
+      summary: Settle chapter (atomic ledger + bible version++)
+      description: |
+        Atomic transaction: append ledger_events, INSERT bible_versions N+1 from staging merge,
+        bump projects.bible_version_current, reconcile staging, lock chapter.
+        FAIL continuity blocks settle unless overridden.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettleChapterRequest"
+      responses:
+        "200":
+          description: Chapter settled and locked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettleChapterResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: FAIL blocks settle, invalid status, or locked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Missing continuity report or approval
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/characters:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+
+    get:
+      tags: [Characters]
+      operationId: listCharacters
+      summary: List T0 characters
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Characters ordered by display_name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CharacterListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    UserIdHeader:
+      type: apiKey
+      in: header
+      name: X-User-Id
+      description: MVP stub auth — UUID of acting user
+
+  security:
+    - UserIdHeader: []
+
+  parameters:
+    UserIdHeader:
+      name: X-User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Required on all routes except /health
+
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    EntryId:
+      name: entry_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    BibleVersion:
+      name: version
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    PageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    ChapterId:
+      name: chapter_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    BeatId:
+      name: beat_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    ProseVersion:
+      name: version
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+
+    ReportId:
+      name: report_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+        format: uuid
+      description: Idempotent settle — duplicate key returns cached success
+
+  responses:
+    BadRequest:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    Unauthorized:
+      description: Missing or invalid X-User-Id
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+    NotFound:
+      description: Resource not found or not accessible
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              description: Stable machine-readable code
+              examples:
+                - validation_error
+                - not_found
+                - slug_conflict
+                - unauthorized
+                - not_implemented
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+
+    PaginationMeta:
+      type: object
+      required: [page, page_size, total_items, total_pages]
+      properties:
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total_items:
+          type: integer
+        total_pages:
+          type: integer
+
+    ProjectStatus:
+      type: string
+      enum: [active, archived]
+
+    ProjectLanguage:
+      type: string
+      enum: [vi, en, mixed]
+
+    GenreProfile:
+      type: string
+      enum: [xianxia, mystery, literary, romance, custom]
+
+    ProjectTemplate:
+      type: string
+      enum: [blank, xianxia_starter, mystery_starter]
+
+    BibleSection:
+      type: string
+      enum:
+        - world_rules
+        - locations
+        - factions
+        - glossary
+        - timeline
+        - characters
+        - objects
+
+    ChapterStatus:
+      type: string
+      enum: [planned, drafting, reviewing, settled, locked]
+
+    ProjectSummary:
+      type: object
+      required:
+        - id
+        - slug
+        - title
+        - genre_profile
+        - status
+        - bible_version_current
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        language:
+          $ref: "#/components/schemas/ProjectLanguage"
+        genre_profile:
+          $ref: "#/components/schemas/GenreProfile"
+        template:
+          $ref: "#/components/schemas/ProjectTemplate"
+        status:
+          $ref: "#/components/schemas/ProjectStatus"
+        bible_version_current:
+          type: integer
+        progress_percent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Stub 0 in Phase 1 until chapter metrics exist
+        updated_at:
+          type: string
+          format: date-time
+
+    ProjectDetail:
+      allOf:
+        - $ref: "#/components/schemas/ProjectSummary"
+        - type: object
+          required: [created_by, created_at, chapter_count, bible_entry_count]
+          properties:
+            created_by:
+              type: string
+              format: uuid
+            created_at:
+              type: string
+              format: date-time
+            settings:
+              type: object
+              additionalProperties: true
+            chapter_count:
+              type: integer
+            bible_entry_count:
+              type: integer
+
+    ProjectCreateRequest:
+      type: object
+      required: [title, language, genre_profile, template]
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 2000
+        language:
+          $ref: "#/components/schemas/ProjectLanguage"
+        genre_profile:
+          $ref: "#/components/schemas/GenreProfile"
+        template:
+          $ref: "#/components/schemas/ProjectTemplate"
+        slug:
+          type: string
+          pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          description: Optional; auto-generated from title if omitted
+
+    ProjectUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 2000
+          nullable: true
+        status:
+          $ref: "#/components/schemas/ProjectStatus"
+        settings:
+          type: object
+          additionalProperties: true
+
+    ProjectListResponse:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectSummary"
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    BibleEntry:
+      type: object
+      required:
+        - id
+        - project_id
+        - entry_key
+        - section
+        - title
+        - content_md
+        - metadata
+        - base_bible_version
+        - created_by
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        entry_key:
+          type: string
+        section:
+          $ref: "#/components/schemas/BibleSection"
+        title:
+          type: string
+        content_md:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+          description: e.g. type, status, linked_entities
+        base_bible_version:
+          type: integer
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    BibleEntryCreateRequest:
+      type: object
+      required: [entry_key, section, title]
+      properties:
+        entry_key:
+          type: string
+          pattern: "^[a-z0-9_]+(?:\\.[a-z0-9_]+)*$"
+        section:
+          $ref: "#/components/schemas/BibleSection"
+        title:
+          type: string
+          minLength: 1
+        content_md:
+          type: string
+          default: ""
+        metadata:
+          type: object
+          additionalProperties: true
+
+    BibleEntryUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        content_md:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+        section:
+          $ref: "#/components/schemas/BibleSection"
+
+    BibleEntryListResponse:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BibleEntry"
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    BibleVersionSummary:
+      type: object
+      required: [version, created_at]
+      properties:
+        version:
+          type: integer
+        settled_from_chapter_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        entry_count:
+          type: integer
+
+    BibleVersionDetail:
+      allOf:
+        - $ref: "#/components/schemas/BibleVersionSummary"
+        - type: object
+          required: [project_id, snapshot_json]
+          properties:
+            project_id:
+              type: string
+              format: uuid
+            snapshot_json:
+              type: object
+              additionalProperties: true
+
+    BibleVersionListResponse:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/BibleVersionSummary"
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    Chapter:
+      type: object
+      required:
+        - id
+        - project_id
+        - number
+        - title
+        - status
+        - word_count
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        number:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+        status:
+          $ref: "#/components/schemas/ChapterStatus"
+        word_count:
+          type: integer
+        bible_version_at_draft:
+          type: integer
+          nullable: true
+        current_prose_version:
+          type: integer
+          nullable: true
+        settled_at:
+          type: string
+          format: date-time
+          nullable: true
+        locked_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ChapterUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        status:
+          $ref: "#/components/schemas/ChapterStatus"
+
+    SceneBeat:
+      type: object
+      required:
+        - id
+        - project_id
+        - chapter_id
+        - beat_key
+        - summary
+        - sort_order
+        - completed
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        chapter_id:
+          type: string
+          format: uuid
+        beat_key:
+          type: string
+        summary:
+          type: string
+        sort_order:
+          type: integer
+        completed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SceneBeatCreateRequest:
+      type: object
+      required: [beat_key, summary, sort_order]
+      properties:
+        beat_key:
+          type: string
+        summary:
+          type: string
+        sort_order:
+          type: integer
+          minimum: 0
+        completed:
+          type: boolean
+          default: false
+
+    SceneBeatUpdateRequest:
+      type: object
+      properties:
+        beat_key:
+          type: string
+        summary:
+          type: string
+        sort_order:
+          type: integer
+        completed:
+          type: boolean
+
+    SceneBeatListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SceneBeat"
+
+    ProseVersionSummary:
+      type: object
+      required: [version, word_count, source, created_by, created_at]
+      properties:
+        version:
+          type: integer
+        word_count:
+          type: integer
+        source:
+          $ref: "#/components/schemas/ProseSource"
+        created_by:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+
+    ProseVersionDetail:
+      allOf:
+        - $ref: "#/components/schemas/ProseVersionSummary"
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: string
+
+    ProseVersionCreateRequest:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          minLength: 1
+
+    ProseVersionListResponse:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProseVersionSummary"
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    ProseVersionCompareResponse:
+      type: object
+      required: [from_version, to_version, word_count_delta]
+      properties:
+        from_version:
+          type: integer
+        to_version:
+          type: integer
+        word_count_delta:
+          type: integer
+        created_at_from:
+          type: string
+          format: date-time
+        created_at_to:
+          type: string
+          format: date-time
+
+    ProseSource:
+      type: string
+      enum: [human, ai_writer, ai_editor]
+
+    ContinuityResult:
+      type: string
+      enum: [pass, warn, fail]
+
+    ContinuitySeverity:
+      type: string
+      enum: [pass, warn, fail]
+
+    ContinuityCategory:
+      type: string
+      enum: [character, timeline, location, world_rule, bible_staging]
+
+    ContinuityIssue:
+      type: object
+      required: [fingerprint, severity, category, code, message]
+      properties:
+        fingerprint:
+          type: string
+        severity:
+          $ref: "#/components/schemas/ContinuitySeverity"
+        category:
+          $ref: "#/components/schemas/ContinuityCategory"
+        code:
+          type: string
+        message:
+          type: string
+        chapter_refs:
+          type: array
+          items:
+            type: integer
+        entity_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        evidence:
+          type: object
+          additionalProperties: true
+
+    StateDiff:
+      type: object
+      properties:
+        ledger_proposals:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        bible_patch_candidates:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+
+    ContinuityReport:
+      type: object
+      required:
+        - report_id
+        - chapter_id
+        - prose_version
+        - result
+        - stats
+        - issues
+        - state_diff
+      properties:
+        report_id:
+          type: string
+          format: uuid
+        chapter_id:
+          type: string
+          format: uuid
+        prose_version:
+          type: integer
+        result:
+          $ref: "#/components/schemas/ContinuityResult"
+        stats:
+          type: object
+          properties:
+            passed:
+              type: integer
+            warnings:
+              type: integer
+            errors:
+              type: integer
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContinuityIssue"
+        state_diff:
+          $ref: "#/components/schemas/StateDiff"
+        created_at:
+          type: string
+          format: date-time
+
+    ContinuityCheckRequest:
+      type: object
+      properties:
+        prose_version:
+          type: integer
+          minimum: 1
+
+    ContinuityOverrideCreateRequest:
+      type: object
+      required: [issue_fingerprint, reason]
+      properties:
+        issue_fingerprint:
+          type: string
+        reason:
+          type: string
+          minLength: 1
+
+    ContinuityOverride:
+      type: object
+      required: [id, issue_fingerprint, severity_at_override, reason, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        issue_fingerprint:
+          type: string
+        severity_at_override:
+          $ref: "#/components/schemas/ContinuitySeverity"
+        reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    SettleChapterRequest:
+      type: object
+      properties:
+        report_id:
+          type: string
+          format: uuid
+        approve_state_diff:
+          type: boolean
+          default: true
+
+    SettleChapterResponse:
+      type: object
+      required:
+        - chapter_id
+        - status
+        - bible_version_before
+        - bible_version_after
+        - ledger_events_appended
+        - settled_at
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+        status:
+          $ref: "#/components/schemas/ChapterStatus"
+        bible_version_before:
+          type: integer
+        bible_version_after:
+          type: integer
+        ledger_events_appended:
+          type: integer
+        settled_at:
+          type: string
+          format: date-time
+
+    ChapterCreateRequest:
+      type: object
+      required: [number, title]
+      properties:
+        number:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+          minLength: 1
+        status:
+          $ref: "#/components/schemas/ChapterStatus"
+
+    ChapterListResponse:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Chapter"
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
+
+    Character:
+      type: object
+      required:
+        - id
+        - project_id
+        - display_name
+        - tier
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+        role_one_liner:
+          type: string
+          nullable: true
+        tier:
+          type: integer
+          enum: [0]
+        psyche_card:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CharacterListResponse:
+      type: object
+      required: [items, pagination]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Character"
+        pagination:
+          $ref: "#/components/schemas/PaginationMeta"
