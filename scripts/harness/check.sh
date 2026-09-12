@@ -24,6 +24,9 @@ run_step() {
 # Skill frontmatter lint (always)
 run_step "skill frontmatter lint" bash "$ROOT/scripts/harness/lint-skills.sh"
 
+# Phase spec validation (OpenAPI YAML)
+run_step "phase spec validation" bash "$ROOT/scripts/harness/validate-specs.sh"
+
 # API: ruff + pytest when venv or tools available
 if [[ -d "$ROOT/apps/api/.venv" ]] || command -v ruff >/dev/null 2>&1; then
   (
