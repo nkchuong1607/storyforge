@@ -19,8 +19,15 @@ from app.schemas.character import (
     CharacterSearchResponse,
     CharacterUpdateRequest,
 )
+from app.schemas.psychology import (
+    PsycheCardResponse,
+    PsycheCardUpdateRequest,
+    PsychStateListResponse,
+    PsychStateSchema,
+)
 from app.services.character import CharacterService
 from app.services.provisional import ProvisionalService
+from app.services.psychology import PsychologyService
 from app.utils.pagination import clamp_page_params
 
 router = APIRouter(prefix="/projects/{project_id}/characters", tags=["Characters"])
@@ -146,3 +153,71 @@ async def promote_character_tier(
 ) -> Character:
     service = CharacterService(session)
     return await service.promote_tier(project, character_id, payload)
+
+
+@router.get("/{character_id}/psyche-card", response_model=PsycheCardResponse)
+async def get_psyche_card(
+    project: ProjectAccess,
+    character_id: uuid.UUID,
+    session: DbSession,
+) -> PsycheCardResponse:
+    service = PsychologyService(session)
+    return await service.get_psyche_card(project, character_id)
+
+
+@router.patch("/{character_id}/psyche-card", response_model=PsycheCardResponse)
+async def update_psyche_card(
+    payload: PsycheCardUpdateRequest,
+    project: ProjectAccess,
+    character_id: uuid.UUID,
+    session: DbSession,
+) -> PsycheCardResponse:
+    service = PsychologyService(session)
+    return await service.update_psyche_card(project, character_id, payload)
+
+
+@router.get("/{character_id}/psych-states", response_model=PsychStateListResponse)
+async def list_psych_states(
+    project: ProjectAccess,
+    character_id: uuid.UUID,
+    session: DbSession,
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=50, ge=1, le=100),
+    from_chapter_number: int | None = Query(default=None, ge=1),
+    to_chapter_number: int | None = Query(default=None, ge=1),
+) -> PsychStateListResponse:
+    service = PsychologyService(session)
+    page_params = clamp_page_params(page, page_size)
+    return await service.list_psych_states(
+        project,
+        character_id,
+        page_params,
+        from_chapter_number=from_chapter_number,
+        to_chapter_number=to_chapter_number,
+    )
+
+
+@router.get(
+    "/{character_id}/psych-states/by-chapter/{chapter_id}",
+    response_model=PsychStateSchema,
+)
+async def get_psych_state_by_chapter(
+    project: ProjectAccess,
+    character_id: uuid.UUID,
+    chapter_id: uuid.UUID,
+    session: DbSession,
+) -> PsychStateSchema:
+    service = PsychologyService(session)
+    return await service.get_psych_state_by_chapter(project, character_id, chapter_id)
+
+
+@router.patch("/{character_id}/psych-states/{psych_state_id}")
+async def patch_psych_state_rejected(
+    project: ProjectAccess,
+    character_id: uuid.UUID,
+    psych_state_id: uuid.UUID,
+    session: DbSession,
+) -> None:
+    """Settled psych states are immutable — always 409."""
+    service = PsychologyService(session)
+    await service.attempt_update_psych_state(project, character_id, psych_state_id, stress_level=0)

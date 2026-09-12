@@ -30,6 +30,7 @@ from app.models.enums import (
 from app.models.ledger_event import LedgerEvent
 from app.models.project import Project, ProjectMember
 from app.models.prose_version import ProseVersion
+from app.models.psych_state import PsychState
 from app.models.scene_beat import SceneBeat
 from app.models.twist import TwistPayoff, TwistPlan, TwistPlant
 
@@ -62,6 +63,7 @@ __all__ = [
     "ProseSource",
     "ProvisionalStatus",
     "ProseVersion",
+    "PsychState",
     "SceneBeat",
     "SettleIdempotencyKey",
     "TwistPayoff",

@@ -12,7 +12,7 @@ from app.models.bible import BibleEntryStaging
 from app.models.character import Character
 from app.models.enums import ContinuityCategory, ContinuityResult, ContinuitySeverity
 
-RULE_PACK_VERSION = "deterministic-v1+foreshadow-v1"
+RULE_PACK_VERSION = "deterministic-v1+foreshadow-v1+psychology-v1"
 
 DEATH_KEYWORDS = ("chết", "tử vong", "băng hà", "mất mạng")
 TRANSITION_KEYWORDS = ("đến", "tới", "rời", "đi tới", "quay về")
@@ -264,9 +264,14 @@ def build_state_diff_stub(
     prose: str,
     characters: list[Character],
     beats: list[dict],
+    chapter_id: uuid.UUID | None = None,
+    psych_state_proposals: list[dict] | None = None,
+    psyche_card_patches: list[dict] | None = None,
 ) -> dict[str, list]:
     ledger_proposals: list[dict] = []
     bible_patch_candidates: list[dict] = []
+    psych_proposals = list(psych_state_proposals or [])
+    psyche_patches = list(psyche_card_patches or [])
 
     for character in characters:
         name = character.display_name
@@ -304,6 +309,8 @@ def build_state_diff_stub(
     return {
         "ledger_proposals": ledger_proposals,
         "bible_patch_candidates": bible_patch_candidates,
+        "psych_state_proposals": psych_proposals,
+        "psyche_card_patches": psyche_patches,
     }
 
 
@@ -357,8 +364,11 @@ def run_continuity_checks(
     beats: list[dict],
     active_override_fingerprints: set[str],
     foreshadow_issues: list[ContinuityIssue] | None = None,
+    psychology_issues: list[ContinuityIssue] | None = None,
+    psych_state_proposals: list[dict] | None = None,
+    psyche_card_patches: list[dict] | None = None,
 ) -> tuple[list[dict], dict, dict, ContinuityResult]:
-    """Run all Phase 2 + Phase 4 rules; return issues, state_diff, stats, aggregate result."""
+    """Run all Phase 2 + Phase 4 + Phase 5 rules; return issues, state_diff, stats, result."""
     raw_issues: list[ContinuityIssue] = []
 
     for character in characters:
@@ -396,8 +406,17 @@ def run_continuity_checks(
     )
     if foreshadow_issues:
         raw_issues.extend(foreshadow_issues)
+    if psychology_issues:
+        raw_issues.extend(psychology_issues)
 
-    state_diff = build_state_diff_stub(prose=prose, characters=characters, beats=beats)
+    state_diff = build_state_diff_stub(
+        prose=prose,
+        characters=characters,
+        beats=beats,
+        chapter_id=chapter_id,
+        psych_state_proposals=psych_state_proposals,
+        psyche_card_patches=psyche_card_patches,
+    )
     for proposal in state_diff.get("ledger_proposals", []):
         if proposal.get("event_type") == "status_change":
             entity_id = uuid.UUID(proposal["entity_id"])

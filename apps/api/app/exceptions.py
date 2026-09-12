@@ -190,6 +190,36 @@ class InvalidPlantReferenceError(AppError):
         super().__init__(status_code=422, code="invalid_plant_reference", message=message)
 
 
+class InvalidPsycheCardError(AppError):
+    def __init__(
+        self,
+        message: str = "Invalid psyche card shape",
+        details: list[dict[str, Any]] | None = None,
+    ) -> None:
+        super().__init__(
+            status_code=422,
+            code="invalid_psyche_card",
+            message=message,
+            details=details,
+        )
+
+
+class PsychStateImmutableError(AppError):
+    def __init__(self, message: str = "Settled psych state cannot be modified") -> None:
+        super().__init__(status_code=409, code="psych_state_immutable", message=message)
+
+
+class PsychStateAlreadySettledError(AppError):
+    def __init__(
+        self, message: str = "Psych state already settled for this character and chapter"
+    ) -> None:
+        super().__init__(
+            status_code=409,
+            code="psych_state_already_settled",
+            message=message,
+        )
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

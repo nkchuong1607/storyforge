@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.utils.psyche_validation import psyche_has_t2_minimum, psyche_meets_t3_minimum
+
 
 class TierRequirementsError(Exception):
     """Raised when tier promotion requirements are not met."""
@@ -19,26 +21,6 @@ def _has_voice_or_relation(metadata: dict[str, Any]) -> bool:
         return True
     relations = metadata.get("relations")
     return isinstance(relations, list) and len(relations) > 0
-
-
-def _psyche_has_trait_or_goal(psyche_card: dict[str, Any] | None) -> bool:
-    if not psyche_card:
-        return False
-    traits = psyche_card.get("traits")
-    goals = psyche_card.get("goals")
-    has_traits = isinstance(traits, list) and len(traits) > 0
-    has_goals = isinstance(goals, list) and len(goals) > 0
-    return has_traits or has_goals
-
-
-def _psyche_meets_t3_minimum(psyche_card: dict[str, Any] | None) -> bool:
-    if not psyche_card:
-        return False
-    traits = psyche_card.get("traits")
-    boundaries = psyche_card.get("moral_boundaries")
-    has_traits = isinstance(traits, list) and len(traits) > 0
-    has_boundaries = isinstance(boundaries, list) and len(boundaries) > 0
-    return has_traits and has_boundaries
 
 
 def _has_arc_or_secret(metadata: dict[str, Any]) -> bool:
@@ -68,10 +50,10 @@ def validate_tier_promotion(
         return next_tier
 
     if next_tier == 2:
-        if not _psyche_has_trait_or_goal(psyche_card):
+        if not psyche_has_t2_minimum(psyche_card):
             raise TierRequirementsError(
-                "T2 requires psyche_card with at least one trait or goal",
-                [{"field": "psyche_card.traits", "required": True}],
+                "T2 requires psyche_card with at least one trait, goal, drive, or need",
+                [{"field": "psyche_card.drive", "required": True}],
             )
         return next_tier
 
@@ -82,9 +64,9 @@ def validate_tier_promotion(
                 [{"field": "confirm_t3", "required": True}],
             )
         details: list[dict[str, Any]] = []
-        if not _psyche_meets_t3_minimum(psyche_card):
+        if not psyche_meets_t3_minimum(psyche_card):
             details.append({"field": "psyche_card.moral_boundaries", "required": True})
-            details.append({"field": "psyche_card.traits", "required": True})
+            details.append({"field": "psyche_card.value_hierarchy", "required": True})
         if not _has_arc_or_secret(metadata):
             details.append({"field": "metadata.arc_note", "required": True})
         if details:

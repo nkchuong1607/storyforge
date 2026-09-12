@@ -22,12 +22,16 @@ from app.models.enums import (
     LedgerEventType,
 )
 from app.models.ledger_event import LedgerEvent
+from app.models.psych_state import PsychState
 from app.repositories.bible import BibleRepository
+from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
 from app.repositories.ledger import LedgerRepository
+from app.repositories.psych_state import PsychStateRepository
 from app.repositories.twist import TwistRepository
 from app.schemas.continuity import SettleChapterRequest, SettleChapterResponse
 from app.services.continuity.engine import _normalize_content, _snapshot_entries_map
+from app.utils.psyche_validation import merge_psyche_card
 
 
 class SettleService:
@@ -37,6 +41,8 @@ class SettleService:
         self.continuity = ContinuityRepository(session)
         self.ledger = LedgerRepository(session)
         self.twists = TwistRepository(session)
+        self.characters = CharacterRepository(session)
+        self.psych_states = PsychStateRepository(session)
 
     async def _get_cached_response(
         self, chapter_id: uuid.UUID, idempotency_key: uuid.UUID | None
@@ -150,6 +156,7 @@ class SettleService:
         state_diff = report.state_diff_json or {}
         ledger_proposals = state_diff.get("ledger_proposals", [])
         ledger_count = 0
+        psych_count = 0
 
         for proposal in ledger_proposals:
             entity_type = LedgerEntityType(proposal.get("entity_type", "character"))
@@ -187,6 +194,38 @@ class SettleService:
                 await self.ledger.create(event)
                 ledger_count += 1
 
+        for patch_proposal in state_diff.get("psyche_card_patches", []):
+            character_id = uuid.UUID(patch_proposal["character_id"])
+            character = await self.characters.get_by_id(project.id, character_id)
+            if character is None:
+                continue
+            character.psyche_card = merge_psyche_card(
+                character.psyche_card, patch_proposal.get("patch", {})
+            )
+
+        for proposal in state_diff.get("psych_state_proposals", []):
+            character_id = uuid.UUID(proposal["character_id"])
+            proposal_chapter_id = uuid.UUID(proposal.get("chapter_id", chapter.id))
+            if proposal_chapter_id != chapter.id:
+                continue
+            psych_state = PsychState(
+                project_id=project.id,
+                character_id=character_id,
+                chapter_id=chapter.id,
+                stress_level=int(proposal.get("stress_level", 0)),
+                dominant_emotion=str(proposal.get("dominant_emotion", "")),
+                active_goal=str(proposal.get("active_goal", "")),
+                belief_updates=list(proposal.get("belief_updates", [])),
+                relationship_stance=list(proposal.get("relationship_stance", [])),
+                value_pressure=proposal.get("value_pressure"),
+                arc_beat=proposal.get("arc_beat"),
+                trigger_event_refs=list(proposal.get("trigger_event_refs", [])),
+                settled_at=now,
+                created_at=now,
+            )
+            await self.psych_states.create(psych_state)
+            psych_count += 1
+
         await insert_bible_version(
             self.bible,
             project_id=project.id,
@@ -209,6 +248,7 @@ class SettleService:
             bible_version_before=bible_before,
             bible_version_after=bible_after,
             ledger_events_appended=ledger_count,
+            psych_states_appended=psych_count,
             settled_at=now,
         )
 

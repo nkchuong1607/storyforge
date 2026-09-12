@@ -77,6 +77,7 @@ class ContinuityCategory(StrEnum):
     world_rule = "world_rule"
     bible_staging = "bible_staging"
     foreshadow = "foreshadow"
+    psychology = "psychology"
 
 
 class TwistPlanStatus(StrEnum):

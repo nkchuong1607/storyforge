@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db_session
 from app.exceptions import NotFoundError, UnauthorizedError
 from app.models.chapter import Chapter
+from app.models.character import Character
 from app.models.project import Project, ProjectMember
 from app.models.twist import TwistPlan
 
@@ -88,3 +89,22 @@ async def require_twist_access(
 
 
 TwistAccess = Annotated[TwistPlan, Depends(require_twist_access)]
+
+
+async def require_character_access(
+    project: ProjectAccess,
+    character_id: Annotated[uuid.UUID, Path(alias="character_id")],
+    session: DbSession,
+) -> Character:
+    character = await session.scalar(
+        select(Character).where(
+            Character.id == character_id,
+            Character.project_id == project.id,
+        )
+    )
+    if character is None:
+        raise NotFoundError()
+    return character
+
+
+CharacterAccess = Annotated[Character, Depends(require_character_access)]
