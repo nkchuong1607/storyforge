@@ -74,8 +74,7 @@ describe("Phase 2 API client", () => {
 
   it("settle succeeds after override", async () => {
     const report = await getLatestContinuityReport(PROJECT_1_ID, CHAPTER_3_ID);
-    const failIssue = report.issues.find((i) => i.severity === "fail");
-    if (failIssue) {
+    for (const failIssue of report.issues.filter((i) => i.severity === "fail")) {
       await createContinuityOverride(PROJECT_1_ID, CHAPTER_3_ID, {
         issue_fingerprint: failIssue.fingerprint,
         reason: "Override for settle test",

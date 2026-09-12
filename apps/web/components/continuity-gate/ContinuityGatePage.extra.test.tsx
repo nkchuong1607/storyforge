@@ -38,9 +38,11 @@ describe("ContinuityGatePage extra coverage", () => {
     render(<ContinuityGatePage projectId={PROJECT_1_ID} chapterId={CHAPTER_3_ID} />);
     await screen.findByText(/Continuity Report/);
     const markButtons = screen.getAllByRole("button", { name: "Mark intentional" });
-    await user.click(markButtons[0]);
-    await user.type(screen.getByPlaceholderText("Lý do override…"), "Hồi tưởng");
-    await user.click(screen.getByRole("button", { name: "Xác nhận" }));
+    for (const button of markButtons) {
+      await user.click(button);
+      await user.type(screen.getByPlaceholderText("Lý do override…"), "Hồi tưởng");
+      await user.click(screen.getByRole("button", { name: "Xác nhận" }));
+    }
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Approve & Settle" })).not.toBeDisabled();
     });

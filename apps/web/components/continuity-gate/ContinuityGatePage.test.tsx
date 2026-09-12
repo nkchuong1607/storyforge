@@ -15,6 +15,8 @@ describe("ContinuityGatePage", () => {
     expect(await screen.findByText(/Continuity Report/)).toBeInTheDocument();
     expect(screen.getAllByText("FAIL").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Lý Phong/).length).toBeGreaterThan(0);
+    expect(screen.getByText("psychology")).toBeInTheDocument();
+    expect(screen.getByText(/moral boundary/i)).toBeInTheDocument();
   });
 
   it("disables settle when FAIL unresolved", async () => {
@@ -30,9 +32,11 @@ describe("ContinuityGatePage", () => {
     render(<ContinuityGatePage projectId={PROJECT_1_ID} chapterId={CHAPTER_3_ID} />);
     await screen.findByText(/Continuity Report/);
     const markButtons = screen.getAllByRole("button", { name: "Mark intentional" });
-    await user.click(markButtons[0]);
-    await user.type(screen.getByPlaceholderText("Lý do override…"), "Hồi tưởng cố ý");
-    await user.click(screen.getByRole("button", { name: "Xác nhận" }));
+    for (const button of markButtons) {
+      await user.click(button);
+      await user.type(screen.getByPlaceholderText("Lý do override…"), "Hồi tưởng cố ý");
+      await user.click(screen.getByRole("button", { name: "Xác nhận" }));
+    }
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Approve & Settle" })).not.toBeDisabled();
     });
@@ -43,6 +47,7 @@ describe("ContinuityGatePage", () => {
     expect(await screen.findByText("State diff preview")).toBeInTheDocument();
     expect(screen.getByText("Ledger proposals")).toBeInTheDocument();
     expect(screen.getByText("Bible patch candidates")).toBeInTheDocument();
+    expect(screen.getByText("Psych state proposals")).toBeInTheDocument();
   });
 
   it("reject navigates to editor", async () => {

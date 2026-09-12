@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
   getCharacter,
@@ -15,9 +16,9 @@ import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
+import { CharacterPsycheTab } from "@/components/psyche/CharacterPsycheTab";
 import { CharacterOverviewTab } from "./CharacterOverviewTab";
-import { CharacterPsychTabStub } from "./CharacterPsychTabStub";
-import { CharacterRelationshipsTabStub } from "./CharacterRelationshipsTabStub";
+import { CharacterRelationshipsPanel } from "./CharacterRelationshipsPanel";
 
 type LoadState = "loading" | "success" | "error" | "not_found";
 type TabId = "overview" | "psyche" | "relationships";
@@ -33,11 +34,18 @@ const TABS: { id: TabId; label: string }[] = [
   { id: "relationships", label: "Relationships" },
 ];
 
+function parseTab(value: string | null): TabId {
+  if (value === "psyche" || value === "relationships") return value;
+  return "overview";
+}
+
 export function CharacterDetailPage({ projectId, characterId }: CharacterDetailPageProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeTab = parseTab(searchParams.get("tab"));
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [character, setCharacter] = useState<Character | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
-  const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -181,7 +189,10 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  const query = tab.id === "overview" ? "" : `?tab=${tab.id}`;
+                  router.replace(`/projects/${projectId}/characters/${characterId}${query}`);
+                }}
                 className={`border-b-2 px-3 py-2 text-sm font-medium ${
                   activeTab === tab.id
                     ? "border-indigo-600 text-indigo-700"
@@ -201,9 +212,15 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
               onArchive={() => void handleArchive()}
             />
           ) : null}
-          {activeTab === "psyche" ? <CharacterPsychTabStub character={character} /> : null}
+          {activeTab === "psyche" ? (
+            <CharacterPsycheTab
+              projectId={projectId}
+              character={character}
+              onSaved={() => setToast("Đã lưu psyche card")}
+            />
+          ) : null}
           {activeTab === "relationships" ? (
-            <CharacterRelationshipsTabStub character={character} />
+            <CharacterRelationshipsPanel projectId={projectId} character={character} />
           ) : null}
         </>
       ) : null}
