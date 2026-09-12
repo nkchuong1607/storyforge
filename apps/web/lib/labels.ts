@@ -1,4 +1,10 @@
-import type { ChapterStatus, GenreProfile, ProjectTemplate } from "./api/types";
+import type {
+  ChapterStatus,
+  CharacterStatus,
+  CharacterTier,
+  GenreProfile,
+  ProjectTemplate,
+} from "./api/types";
 
 export const GENRE_LABELS: Record<GenreProfile, string> = {
   xianxia: "Tiên hiệp",
@@ -26,6 +32,19 @@ export const CONTINUITY_RESULT_LABELS: Record<string, string> = {
   pass: "PASS",
   warn: "WARN",
   fail: "FAIL",
+};
+
+export const CHARACTER_STATUS_LABELS: Record<CharacterStatus, string> = {
+  established: "Chính thức",
+  provisional: "Tạm thời",
+  archived: "Đã lưu trữ",
+};
+
+export const CHARACTER_TIER_LABELS: Record<CharacterTier, string> = {
+  0: "T0",
+  1: "T1",
+  2: "T2",
+  3: "T3",
 };
 
 export const BIBLE_SECTION_LABELS: Record<string, string> = {

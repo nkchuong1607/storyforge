@@ -27,12 +27,15 @@ describe("chapter-editor components", () => {
         readOnly={false}
         saving={false}
         checkingContinuity={false}
+        extractingCharacters={false}
         onSave={vi.fn()}
         onContinuityCheck={vi.fn()}
+        onExtractCharacters={vi.fn()}
       />,
     );
     expect(screen.getByRole("button", { name: "Lưu phiên bản mới" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Continuity Check" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Quét nhân vật" })).toBeInTheDocument();
   });
 
   it("ChapterEditorHeader shows lock for locked chapter", () => {
@@ -53,8 +56,10 @@ describe("chapter-editor components", () => {
         readOnly
         saving={false}
         checkingContinuity={false}
+        extractingCharacters={false}
         onSave={vi.fn()}
         onContinuityCheck={vi.fn()}
+        onExtractCharacters={vi.fn()}
       />,
     );
     expect(screen.getByText("Đã khóa sau settle")).toBeInTheDocument();

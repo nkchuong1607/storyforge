@@ -2,7 +2,6 @@ import type {
   BibleEntry,
   BibleVersionSummary,
   Chapter,
-  Character,
   ProjectDetail,
   ProjectSummary,
 } from "@/lib/api/types";
@@ -14,6 +13,7 @@ import {
   PROJECT_1_ID,
   resetPhase2MockData,
 } from "./phase2-data";
+import { mockPhase3Characters, resetPhase3MockData } from "./phase3-data";
 
 export const MOCK_USER_ID = DEFAULT_USER_ID;
 export { CHAPTER_1_ID, CHAPTER_2_ID, CHAPTER_3_ID, PROJECT_1_ID };
@@ -137,20 +137,7 @@ export const mockVersions: Record<string, BibleVersionSummary[]> = {
   ],
 };
 
-export const mockCharacters: Record<string, Character[]> = {
-  "660e8400-e29b-41d4-a716-446655440001": [
-    {
-      id: "990e8400-e29b-41d4-a716-446655440001",
-      project_id: "660e8400-e29b-41d4-a716-446655440001",
-      display_name: "Lý Phong",
-      role_one_liner: "Nhân vật chính — kiếm tu",
-      tier: 0,
-      psyche_card: {},
-      created_at: "2026-09-12T10:00:00Z",
-      updated_at: "2026-09-12T10:00:00Z",
-    },
-  ],
-};
+export const mockCharacters = mockPhase3Characters;
 
 export function paginate<T>(items: T[], page = 1, pageSize = 20) {
   const total = items.length;
@@ -171,7 +158,6 @@ const initialProjects = structuredClone(mockProjects);
 const initialChapters = structuredClone(mockChapters);
 const initialBibleEntries = structuredClone(mockBibleEntries);
 const initialVersions = structuredClone(mockVersions);
-const initialCharacters = structuredClone(mockCharacters);
 
 export function resetMockData(): void {
   mockProjects.length = 0;
@@ -188,11 +174,8 @@ export function resetMockData(): void {
     delete mockVersions[key];
   }
   Object.assign(mockVersions, structuredClone(initialVersions));
-  for (const key of Object.keys(mockCharacters)) {
-    delete mockCharacters[key];
-  }
-  Object.assign(mockCharacters, structuredClone(initialCharacters));
   resetPhase2MockData();
+  resetPhase3MockData();
 }
 
 export function toSummary(project: ProjectDetail): ProjectSummary {

@@ -23,6 +23,7 @@ export default defineConfig({
         "components/hub/**/*.tsx",
         "components/bible/**/*.tsx",
         "components/chapter-editor/**/*.tsx",
+        "components/characters/**/*.tsx",
         "components/continuity-gate/**/*.tsx",
         "components/ui/**/*.tsx",
       ],
