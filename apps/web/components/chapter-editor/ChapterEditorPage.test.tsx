@@ -48,6 +48,18 @@ describe("ChapterEditorPage", () => {
     });
   });
 
+  it("extracts characters and navigates to inbox", async () => {
+    const user = userEvent.setup();
+    render(<ChapterEditorPage projectId={PROJECT_1_ID} chapterId={CHAPTER_2_ID} />);
+    await screen.findByText("Chương 2 — Tu luyện");
+    await user.click(screen.getByRole("button", { name: "Quét nhân vật" }));
+    await waitFor(() => {
+      expect(push).toHaveBeenCalledWith(
+        `/projects/${PROJECT_1_ID}/characters?chapter_id=${CHAPTER_2_ID}`,
+      );
+    });
+  });
+
   it("shows not found for unknown chapter", async () => {
     render(
       <ChapterEditorPage

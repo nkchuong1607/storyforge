@@ -268,18 +268,119 @@ export interface ChapterListResponse {
   pagination: PaginationMeta;
 }
 
+export type CharacterStatus = "established" | "provisional" | "archived";
+export type ProvisionalStatus = "pending" | "merged" | "rejected";
+export type ExtractorSource = "heuristic" | "manual" | "llm";
+export type CharacterTier = 0 | 1 | 2 | 3;
+
 export interface Character {
   id: string;
   project_id: string;
   display_name: string;
   role_one_liner?: string | null;
-  tier: 0;
-  psyche_card?: Record<string, unknown>;
+  tier: CharacterTier;
+  status: CharacterStatus;
+  aliases: string[];
+  psyche_card?: Record<string, unknown> | null;
+  first_seen_chapter_id?: string | null;
+  last_seen_chapter_id?: string | null;
+  appearance_count: number;
+  merged_from_provisional_id?: string | null;
+  metadata?: Record<string, unknown>;
+  tier_suggest?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface CharacterCreateRequest {
+  display_name: string;
+  role_one_liner?: string;
+  tier?: 0 | 1 | 2;
+  aliases?: string[];
+  status?: CharacterStatus;
+}
+
+export interface CharacterUpdateRequest {
+  display_name?: string;
+  role_one_liner?: string | null;
+  aliases?: string[];
+  psyche_card?: Record<string, unknown> | null;
+  status?: CharacterStatus;
+  metadata?: Record<string, unknown>;
+}
+
+export interface CharacterPromoteTierRequest {
+  confirm_t3?: boolean;
 }
 
 export interface CharacterListResponse {
   items: Character[];
   pagination: PaginationMeta;
+}
+
+export interface CharacterSearchResult {
+  character: Character;
+  match_type: "display_name" | "alias" | "vector";
+  matched_alias?: string | null;
+  score: number;
+}
+
+export interface CharacterSearchResponse {
+  items: CharacterSearchResult[];
+  search_mode: "keyword" | "vector";
+}
+
+export interface CharacterProvisional {
+  id: string;
+  project_id: string;
+  mention_text: string;
+  mention_fingerprint?: string;
+  chapter_id: string;
+  chapter_number: number;
+  prose_version: number;
+  snippet: string;
+  proposed_fields?: Record<string, unknown>;
+  status: ProvisionalStatus;
+  extractor_source: ExtractorSource;
+  matched_character_id?: string | null;
+  merged_character_id?: string | null;
+  resolved_at?: string | null;
+  created_at: string;
+}
+
+export interface CharacterProvisionalListResponse {
+  items: CharacterProvisional[];
+  pagination: PaginationMeta;
+  pending_count: number;
+}
+
+export interface CharacterProvisionalMergeRequest {
+  target_character_id?: string;
+  create_new?: boolean;
+  display_name?: string;
+  initial_tier?: 0 | 1 | 2;
+  mark_established?: boolean;
+}
+
+export interface CharacterProvisionalMergeResponse {
+  provisional: CharacterProvisional;
+  character: Character;
+  idempotent: boolean;
+}
+
+export interface CharacterProvisionalRejectRequest {
+  reason?: string;
+}
+
+export interface ExtractCharactersRequest {
+  prose_version?: number;
+  extractor_mode?: "heuristic" | "llm";
+  include_beats?: boolean;
+}
+
+export interface ExtractCharactersResponse {
+  created_count: number;
+  skipped_count: number;
+  skipped_reasons?: Record<string, number>;
+  provisionals: CharacterProvisional[];
 }

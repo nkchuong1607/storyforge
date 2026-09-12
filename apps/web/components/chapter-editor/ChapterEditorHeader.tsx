@@ -9,8 +9,10 @@ interface ChapterEditorHeaderProps {
   readOnly: boolean;
   saving: boolean;
   checkingContinuity: boolean;
+  extractingCharacters: boolean;
   onSave: () => void;
   onContinuityCheck: () => void;
+  onExtractCharacters: () => void;
 }
 
 export function ChapterEditorHeader({
@@ -20,8 +22,10 @@ export function ChapterEditorHeader({
   readOnly,
   saving,
   checkingContinuity,
+  extractingCharacters,
   onSave,
   onContinuityCheck,
+  onExtractCharacters,
 }: ChapterEditorHeaderProps) {
   return (
     <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -46,6 +50,16 @@ export function ChapterEditorHeader({
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
           >
             {saving ? "Đang lưu…" : "Lưu phiên bản mới"}
+          </button>
+        ) : null}
+        {chapter.status !== "locked" ? (
+          <button
+            type="button"
+            onClick={onExtractCharacters}
+            disabled={extractingCharacters || readOnly}
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+          >
+            {extractingCharacters ? "Đang quét…" : "Quét nhân vật"}
           </button>
         ) : null}
         {chapter.status !== "locked" ? (

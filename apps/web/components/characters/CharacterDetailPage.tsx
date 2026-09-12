@@ -1,0 +1,212 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getCharacter,
+  listCharacterProvisionals,
+  promoteCharacterTier,
+  updateCharacter,
+} from "@/lib/api/characters";
+import { getProject } from "@/lib/api/projects";
+import type { Character, ProjectDetail } from "@/lib/api/types";
+import { ApiError } from "@/lib/api/client";
+import { AppShell } from "@/components/ui/AppShell";
+import { ErrorBanner } from "@/components/ui/ErrorBanner";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
+import { CharacterOverviewTab } from "./CharacterOverviewTab";
+import { CharacterPsychTabStub } from "./CharacterPsychTabStub";
+import { CharacterRelationshipsTabStub } from "./CharacterRelationshipsTabStub";
+
+type LoadState = "loading" | "success" | "error" | "not_found";
+type TabId = "overview" | "psyche" | "relationships";
+
+interface CharacterDetailPageProps {
+  projectId: string;
+  characterId: string;
+}
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "psyche", label: "Psyche" },
+  { id: "relationships", label: "Relationships" },
+];
+
+export function CharacterDetailPage({ projectId, characterId }: CharacterDetailPageProps) {
+  const [project, setProject] = useState<ProjectDetail | null>(null);
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [loadState, setLoadState] = useState<LoadState>("loading");
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const loadPage = useCallback(async () => {
+    setLoadState("loading");
+    try {
+      const [projectData, characterData, provisionalsData] = await Promise.all([
+        getProject(projectId),
+        getCharacter(projectId, characterId),
+        listCharacterProvisionals(projectId, { status: "pending", page_size: 1 }),
+      ]);
+      setProject(projectData);
+      setCharacter(characterData);
+      setPendingCount(provisionalsData.pending_count);
+      setLoadState("success");
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 404) {
+        setLoadState("not_found");
+      } else {
+        setLoadState("error");
+      }
+    }
+  }, [projectId, characterId]);
+
+  useEffect(() => {
+    void loadPage();
+  }, [loadPage]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 4000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  const handleSave = async (values: {
+    display_name: string;
+    role_one_liner: string;
+    aliases: string;
+  }) => {
+    if (!character) return;
+    setSaving(true);
+    try {
+      const updated = await updateCharacter(projectId, character.id, {
+        display_name: values.display_name,
+        role_one_liner: values.role_one_liner || null,
+        aliases: values.aliases
+          .split(",")
+          .map((alias) => alias.trim())
+          .filter(Boolean),
+      });
+      setCharacter(updated);
+      setToast("Đã lưu nhân vật");
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 409) {
+        setToast("Nhân vật đã lưu trữ");
+      } else {
+        setToast("Không thể lưu");
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePromote = async () => {
+    if (!character) return;
+    try {
+      const updated = await promoteCharacterTier(projectId, character.id, {
+        confirm_t3: character.tier === 2,
+      });
+      setCharacter(updated);
+      setToast("Đã promote tier");
+    } catch {
+      setToast("Không thể promote tier");
+    }
+  };
+
+  const handleArchive = async () => {
+    if (!character) return;
+    try {
+      const updated = await updateCharacter(projectId, character.id, { status: "archived" });
+      setCharacter(updated);
+      setToast("Đã lưu trữ nhân vật");
+    } catch {
+      setToast("Không thể lưu trữ");
+    }
+  };
+
+  if (loadState === "not_found") {
+    return (
+      <AppShell>
+        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
+          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy nhân vật</h1>
+          <Link
+            href={`/projects/${projectId}/characters`}
+            className="mt-4 inline-block text-sm font-medium text-indigo-600"
+          >
+            ← Về danh sách nhân vật
+          </Link>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const sidebar =
+    project ? (
+      <ProjectSidebar
+        projectId={projectId}
+        projectTitle={project.title}
+        active="characters"
+        pendingCount={pendingCount}
+      />
+    ) : null;
+
+  return (
+    <AppShell sidebar={sidebar}>
+      {loadState === "error" ? (
+        <ErrorBanner message="Không tải được nhân vật" onRetry={() => void loadPage()} />
+      ) : null}
+      {toast ? (
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+          {toast}
+        </div>
+      ) : null}
+
+      {loadState === "loading" ? <LoadingSkeleton variant="content" count={2} /> : null}
+
+      {loadState === "success" && character && project ? (
+        <>
+          <div className="mb-4">
+            <Link
+              href={`/projects/${projectId}/characters`}
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+            >
+              ← Nhân vật
+            </Link>
+            <h1 className="mt-2 text-xl font-bold text-slate-900">{character.display_name}</h1>
+          </div>
+          <div className="mb-4 flex flex-wrap gap-2 border-b border-slate-200">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`border-b-2 px-3 py-2 text-sm font-medium ${
+                  activeTab === tab.id
+                    ? "border-indigo-600 text-indigo-700"
+                    : "border-transparent text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          {activeTab === "overview" ? (
+            <CharacterOverviewTab
+              character={character}
+              saving={saving}
+              onSave={(values) => void handleSave(values)}
+              onPromote={() => void handlePromote()}
+              onArchive={() => void handleArchive()}
+            />
+          ) : null}
+          {activeTab === "psyche" ? <CharacterPsychTabStub character={character} /> : null}
+          {activeTab === "relationships" ? (
+            <CharacterRelationshipsTabStub character={character} />
+          ) : null}
+        </>
+      ) : null}
+    </AppShell>
+  );
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { createBeat, listBeats, updateBeat } from "@/lib/api/beats";
+import { extractCharactersFromChapter } from "@/lib/api/characters";
 import { getChapter } from "@/lib/api/chapters";
 import { runContinuityCheck } from "@/lib/api/continuity";
 import { getProseVersion, listProseVersions, saveProseVersion } from "@/lib/api/prose";
@@ -40,6 +41,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
   const [checkingContinuity, setCheckingContinuity] = useState(false);
+  const [extractingCharacters, setExtractingCharacters] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const readOnly = chapter?.status === "locked";
@@ -138,6 +140,26 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
     }
   };
 
+  const handleExtractCharacters = async () => {
+    if (!chapter || readOnly) return;
+    setExtractingCharacters(true);
+    try {
+      const result = await extractCharactersFromChapter(projectId, chapterId, {
+        prose_version: selectedVersion ?? undefined,
+      });
+      setToast(`Đã extract ${result.created_count} nhân vật`);
+      router.push(`/projects/${projectId}/characters?chapter_id=${chapterId}`);
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.code === "chapter_locked") {
+        setToast("Chương đã bị khóa — không thể extract");
+      } else {
+        setToast("Không thể quét nhân vật");
+      }
+    } finally {
+      setExtractingCharacters(false);
+    }
+  };
+
   const handleToggleBeat = async (beatId: string, completed: boolean) => {
     if (readOnly) return;
     try {
@@ -220,8 +242,10 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
             readOnly={readOnly}
             saving={saveState === "saving"}
             checkingContinuity={checkingContinuity}
+            extractingCharacters={extractingCharacters}
             onSave={() => void handleSave()}
             onContinuityCheck={() => void handleContinuityCheck()}
+            onExtractCharacters={() => void handleExtractCharacters()}
           />
           <div className="grid gap-4 lg:grid-cols-[240px_1fr_240px]">
             <SceneBeatsPanel

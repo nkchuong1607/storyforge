@@ -11,6 +11,7 @@ import {
   toSummary,
 } from "./data";
 import { phase2Handlers } from "./phase2-handlers";
+import { phase3Handlers } from "./phase3-handlers";
 
 const BASE = "http://localhost:8000";
 
@@ -114,16 +115,6 @@ export const handlers = [
     const pageSize = Number(url.searchParams.get("page_size") ?? "20");
     const chapters = mockChapters[params.projectId as string] ?? [];
     return HttpResponse.json(paginate(chapters, page, pageSize));
-  }),
-
-  http.get(`${BASE}/projects/:projectId/characters`, ({ request, params }) => {
-    if (!requireUserId(request)) return unauthorized();
-    if (!mockProjects.some((p) => p.id === params.projectId)) return notFound();
-    const url = new URL(request.url);
-    const page = Number(url.searchParams.get("page") ?? "1");
-    const pageSize = Number(url.searchParams.get("page_size") ?? "20");
-    const characters = mockCharacters[params.projectId as string] ?? [];
-    return HttpResponse.json(paginate(characters, page, pageSize));
   }),
 
   http.get(`${BASE}/projects/:projectId/bible/entries`, ({ request, params }) => {
@@ -234,4 +225,5 @@ export const handlers = [
   }),
 
   ...phase2Handlers,
+  ...phase3Handlers,
 ];
