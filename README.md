@@ -33,12 +33,30 @@ make check
 
 ## Documentation
 
+### Product docs (Vietnamese primary)
+
+Full product/engineering documentation for authors and builders:
+
+| Doc | Purpose |
+|-----|---------|
+| **[docs/product/README.md](./docs/product/README.md)** | **Product docs index** — start here for vision, wireframes, build plan |
+| [docs/product/01-vision-and-outcomes.md](./docs/product/01-vision-and-outcomes.md) | Success criteria, outcome → subsystem map |
+| [docs/product/02-architecture.md](./docs/product/02-architecture.md) | Canonical architecture (stack, agents, ledgers, data flow) |
+| [docs/product/03-domain-and-subsystems.md](./docs/product/03-domain-and-subsystems.md) | Deep dive subsystems (characters, twists, psych, power, …) |
+| [docs/product/04-user-stories.md](./docs/product/04-user-stories.md) | User stories by epic |
+| [docs/product/05-wireframes.md](./docs/product/05-wireframes.md) | Wireframe catalog + screen specs |
+| [docs/product/06-build-plan.md](./docs/product/06-build-plan.md) | Phased build plan + MVP scope |
+
+Wireframe images: [`docs/wireframes/images/`](./docs/wireframes/images/)
+
+### Engineering docs
+
 | Doc | Purpose |
 |-----|---------|
 | [AGENTS.md](./AGENTS.md) | **Start here** if you are an AI coding agent |
-| [docs/architecture.md](./docs/architecture.md) | System design, agent pipeline |
+| [docs/architecture.md](./docs/architecture.md) | Short index → [product architecture](./docs/product/02-architecture.md) |
 | [docs/domain-model.md](./docs/domain-model.md) | Entities, ledgers, settlement |
-| [docs/roadmap.md](./docs/roadmap.md) | MVP → later phases |
+| [docs/roadmap.md](./docs/roadmap.md) | Short index → [build plan](./docs/product/06-build-plan.md) |
 | [docs/schema-draft.md](./docs/schema-draft.md) | Postgres sketch (not migrated) |
 | [docs/agent-setup.md](./docs/agent-setup.md) | External skills, local setup |
 | [docs/aas-selection.md](./docs/aas-selection.md) | Vendored AAS stack (Next/FastAPI/Postgres) |
