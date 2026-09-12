@@ -116,6 +116,56 @@ class BeatKeyConflictError(AppError):
         )
 
 
+class CharacterArchivedError(AppError):
+    def __init__(self, message: str = "Character is archived") -> None:
+        super().__init__(status_code=409, code="character_archived", message=message)
+
+
+class DuplicateDisplayNameError(AppError):
+    def __init__(self, display_name: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="duplicate_display_name",
+            message=f"Display name '{display_name}' already exists",
+        )
+
+
+class ProvisionalAlreadyResolvedError(AppError):
+    def __init__(self, message: str = "Provisional mention already resolved") -> None:
+        super().__init__(
+            status_code=409,
+            code="provisional_already_resolved",
+            message=message,
+        )
+
+
+class AlreadyMaxTierError(AppError):
+    def __init__(self, message: str = "Character is already at tier 3") -> None:
+        super().__init__(status_code=409, code="already_max_tier", message=message)
+
+
+class TierRequirementsNotMetError(AppError):
+    def __init__(self, message: str, details: list[dict[str, Any]] | None = None) -> None:
+        super().__init__(
+            status_code=422,
+            code="tier_requirements_not_met",
+            message=message,
+            details=details,
+        )
+
+
+class InvalidMergeRequestError(AppError):
+    def __init__(
+        self, message: str = "Provide target_character_id or create_new, not both"
+    ) -> None:
+        super().__init__(status_code=422, code="invalid_merge_request", message=message)
+
+
+class NotImplementedFeatureError(AppError):
+    def __init__(self, message: str = "Feature not implemented") -> None:
+        super().__init__(status_code=501, code="not_implemented", message=message)
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

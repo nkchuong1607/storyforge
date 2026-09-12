@@ -18,6 +18,7 @@ from app.schemas.chapter import (
     ChapterListResponse,
     ChapterUpdateRequest,
 )
+from app.schemas.character import ExtractCharactersRequest, ExtractCharactersResponse
 from app.schemas.continuity import (
     ContinuityCheckRequest,
     ContinuityOverride,
@@ -35,6 +36,7 @@ from app.schemas.prose import (
 )
 from app.services.beat import BeatService
 from app.services.chapter import ChapterService
+from app.services.character_extract import CharacterExtractService
 from app.services.continuity_service import ContinuityService
 from app.services.prose import ProseService
 from app.services.settle import SettleService
@@ -250,3 +252,14 @@ async def settle_chapter(
     except Exception as exc:
         await session.rollback()
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.post("/{chapter_id}/extract-characters", response_model=ExtractCharactersResponse)
+async def extract_characters(
+    project: ProjectAccess,
+    chapter: ChapterAccess,
+    session: DbSession,
+    payload: ExtractCharactersRequest | None = None,
+) -> ExtractCharactersResponse:
+    service = CharacterExtractService(session)
+    return await service.extract_from_chapter(project, chapter.id, payload)

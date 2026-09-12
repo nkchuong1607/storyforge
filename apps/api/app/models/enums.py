@@ -90,3 +90,21 @@ class LedgerEventType(StrEnum):
     location_change = "location_change"
     timeline_anchor = "timeline_anchor"
     bible_promote = "bible_promote"
+
+
+class CharacterStatus(StrEnum):
+    established = "established"
+    provisional = "provisional"
+    archived = "archived"
+
+
+class ProvisionalStatus(StrEnum):
+    pending = "pending"
+    merged = "merged"
+    rejected = "rejected"
+
+
+class ExtractorSource(StrEnum):
+    heuristic = "heuristic"
+    manual = "manual"
+    llm = "llm"
