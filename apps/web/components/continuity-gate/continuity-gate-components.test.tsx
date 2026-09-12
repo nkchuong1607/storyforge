@@ -49,6 +49,33 @@ describe("continuity-gate components", () => {
     expect(screen.getByText(/New/)).toBeInTheDocument();
   });
 
+  it("ContinuityIssueTable shows power_system badge and link", () => {
+    render(
+      <ContinuityIssueTable
+        projectId="p1"
+        chapterId="c1"
+        issues={[
+          {
+            fingerprint: "power:1",
+            severity: "fail",
+            category: "power_system",
+            code: "power_rank_jump_exceeded",
+            message: "Rank jump too fast",
+            chapter_refs: [3],
+          },
+        ]}
+        overrides={[]}
+        readOnly={false}
+        onMarkIntentional={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("power_system")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Power bible" })).toHaveAttribute(
+      "href",
+      "/projects/p1/bible/power-system",
+    );
+  });
+
   it("ContinuityIssueTable shows psychology badge", () => {
     render(
       <ContinuityIssueTable

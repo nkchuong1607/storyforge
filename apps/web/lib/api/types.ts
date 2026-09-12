@@ -18,7 +18,10 @@ export type ChapterStatus =
   | "locked";
 
 export type ContinuitySeverity = "pass" | "warn" | "fail";
-export type ProseSource = "human" | "ai";
+export type ProseSource = "human" | "ai" | "ai_editor";
+export type PromptEditProvider = "fake" | "litellm";
+export type PromptEditSessionStatus = "active" | "applied" | "discarded";
+export type GenreStrictness = "relaxed" | "standard" | "strict";
 
 export interface ChapterUpdateRequest {
   title?: string;
@@ -221,6 +224,12 @@ export interface ProjectCreateRequest {
   genre_profile: GenreProfile;
   template: ProjectTemplate;
   slug?: string;
+}
+
+export interface ProjectUpdateRequest {
+  title?: string;
+  description?: string;
+  genre_profile?: GenreProfile;
 }
 
 export interface ProjectListResponse {
@@ -671,4 +680,188 @@ export interface TwistBoardColumn {
 
 export interface TwistBoardResponse {
   columns: TwistBoardColumn[];
+}
+
+export interface PowerSystemSettings {
+  project_id: string;
+  enabled: boolean;
+  priority_gap: number;
+  max_rank_jump_per_chapter: number;
+  require_breakthrough_event: boolean;
+  updated_at: string;
+}
+
+export interface PowerSystemSettingsUpdate {
+  enabled?: boolean;
+  priority_gap?: number;
+  max_rank_jump_per_chapter?: number;
+  require_breakthrough_event?: boolean;
+}
+
+export interface PowerRankSubStage {
+  key: string;
+  display_name: string;
+  sort_order: number;
+}
+
+export interface PowerRank {
+  id: string;
+  rank_key: string;
+  display_name: string;
+  sort_order: number;
+  sub_stages: PowerRankSubStage[];
+  constraints_md?: string;
+}
+
+export interface PowerRankListResponse {
+  items: PowerRank[];
+}
+
+export interface PowerRankCreateRequest {
+  rank_key: string;
+  display_name: string;
+  sort_order?: number;
+  sub_stages?: PowerRankSubStage[];
+  constraints_md?: string;
+}
+
+export interface PowerRankUpdateRequest {
+  rank_key?: string;
+  display_name?: string;
+  sort_order?: number;
+  sub_stages?: PowerRankSubStage[];
+  constraints_md?: string;
+}
+
+export interface PowerRankReorderRequest {
+  rank_ids: string[];
+}
+
+export interface PowerTechnique {
+  id: string;
+  technique_key: string;
+  display_name: string;
+  min_rank_id: string;
+  min_rank_display_name?: string;
+  sect_requirement?: string | null;
+  lineage_requirement?: string | null;
+  resource_cost: Record<string, unknown>;
+  notes_md?: string;
+}
+
+export interface PowerTechniqueListResponse {
+  items: PowerTechnique[];
+}
+
+export interface PowerTechniqueCreateRequest {
+  technique_key: string;
+  display_name: string;
+  min_rank_id: string;
+  sect_requirement?: string;
+  lineage_requirement?: string;
+  resource_cost?: Record<string, unknown>;
+  notes_md?: string;
+}
+
+export interface PowerTechniqueUpdateRequest {
+  technique_key?: string;
+  display_name?: string;
+  min_rank_id?: string;
+  sect_requirement?: string | null;
+  lineage_requirement?: string | null;
+  resource_cost?: Record<string, unknown>;
+  notes_md?: string;
+}
+
+export interface GenreModuleConfig {
+  enabled: boolean;
+}
+
+export interface GenreRulePack {
+  schema_version?: number;
+  base_profile?: GenreProfile;
+  display_name?: string;
+  modules?: {
+    power_system?: GenreModuleConfig;
+    foreshadow?: GenreModuleConfig;
+    psychology?: GenreModuleConfig;
+    timeline?: GenreModuleConfig;
+  };
+  strictness?: {
+    foreshadow?: GenreStrictness;
+    power?: GenreStrictness;
+    psychology?: GenreStrictness;
+  };
+  promises?: string[];
+  forbidden?: string[];
+  expected_payoffs?: Record<string, unknown>[];
+  thresholds?: Record<string, unknown>;
+  tone?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface GenreRulePackResponse {
+  project_id: string;
+  genre_profile: GenreProfile;
+  pack: GenreRulePack;
+  updated_at: string;
+}
+
+export interface GenreRulePackPatch {
+  pack?: GenreRulePack;
+}
+
+export interface PromptEditTurn {
+  id: string;
+  turn_index: number;
+  instruction: string;
+  proposed_content?: string | null;
+  model: string;
+  provider: PromptEditProvider;
+  latency_ms?: number | null;
+  token_usage?: Record<string, unknown>;
+  error_code?: string | null;
+  created_at: string;
+}
+
+export interface PromptEditInstructRequest {
+  instruction: string;
+  base_prose_version?: number;
+  beat_key?: string;
+}
+
+export interface PromptEditInstructResponse {
+  session_id: string;
+  turn: PromptEditTurn;
+  base_prose_version: number;
+}
+
+export interface PromptEditRegenerateRequest {
+  session_id: string;
+  turn_id: string;
+}
+
+export interface PromptEditApplyRequest {
+  session_id: string;
+  turn_id: string;
+}
+
+export interface PromptEditApplyResponse {
+  prose_version: ProseVersionDetail;
+  chapter: {
+    current_prose_version?: number;
+    word_count?: number;
+  };
+}
+
+export interface PromptEditSessionSummary {
+  id: string;
+  status: PromptEditSessionStatus;
+  base_prose_version: number;
+  turns: PromptEditTurn[];
+  created_at: string;
+}
+
+export interface PromptEditSessionListResponse {
+  items: PromptEditSessionSummary[];
 }

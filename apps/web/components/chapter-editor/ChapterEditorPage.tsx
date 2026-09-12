@@ -18,7 +18,7 @@ import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
 import { ChapterEditorHeader } from "./ChapterEditorHeader";
 import { EditorFooter } from "./EditorFooter";
-import { PromptEditPanelStub } from "./PromptEditPanelStub";
+import { PromptEditPanel } from "./PromptEditPanel";
 import { ProseEditor } from "./ProseEditor";
 import { SceneBeatsPanel } from "./SceneBeatsPanel";
 import { VersionDropdown } from "./VersionDropdown";
@@ -276,7 +276,20 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
                 />
               </div>
             </div>
-            <PromptEditPanelStub />
+            <PromptEditPanel
+              projectId={projectId}
+              chapterId={chapterId}
+              baseProseVersion={selectedVersion}
+              readOnly={readOnly}
+              onApplied={(version) => {
+                setVersions((prev) => [version, ...prev]);
+                setSelectedVersion(version.version);
+                void getProseVersion(projectId, chapterId, version.version).then((prose) =>
+                  setProseContent(prose.content),
+                );
+              }}
+              onToast={setToast}
+            />
           </div>
         </>
       ) : null}

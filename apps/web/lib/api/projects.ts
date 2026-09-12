@@ -3,6 +3,7 @@ import type {
   ProjectCreateRequest,
   ProjectDetail,
   ProjectListResponse,
+  ProjectUpdateRequest,
 } from "./types";
 
 export async function listProjects(params?: {
@@ -21,6 +22,16 @@ export async function getProject(projectId: string): Promise<ProjectDetail> {
 export async function createProject(body: ProjectCreateRequest): Promise<ProjectDetail> {
   return apiFetch<ProjectDetail>("/projects", {
     method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function updateProject(
+  projectId: string,
+  body: ProjectUpdateRequest,
+): Promise<ProjectDetail> {
+  return apiFetch<ProjectDetail>(`/projects/${projectId}`, {
+    method: "PATCH",
     body: JSON.stringify(body),
   });
 }

@@ -94,12 +94,21 @@ export function ContinuityIssueTable({
                   <td className="px-4 py-3">{issue.chapter_refs.join(", ")}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-2">
-                      <Link
-                        href={`/projects/${projectId}/chapters/${chapterId}?highlight=${issue.fingerprint}`}
-                        className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
-                      >
-                        Fix in editor
-                      </Link>
+                      {issue.category === "power_system" ? (
+                        <Link
+                          href={`/projects/${projectId}/bible/power-system`}
+                          className="text-xs font-medium text-violet-700 hover:text-violet-900"
+                        >
+                          Power bible
+                        </Link>
+                      ) : (
+                        <Link
+                          href={`/projects/${projectId}/chapters/${chapterId}?highlight=${issue.fingerprint}`}
+                          className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                        >
+                          Fix in editor
+                        </Link>
+                      )}
                       {!readOnly && (issue.severity === "fail" || issue.severity === "warn") ? (
                         <button
                           type="button"
