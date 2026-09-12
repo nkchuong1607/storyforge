@@ -71,6 +71,15 @@ scripts/harness/ check.sh, agent-preflight.sh
 - Do not mutate settled canon or ledger history in place
 - Bootstrap scope: no full Writer agents or product UI unless task says so
 
+## Quality workflow (Spec → Implement → Test → Coverage)
+
+1. **Specs first** — API/schema/UI contracts in `docs/specs/phase-N/` before feature code
+2. **Implement** — match OpenAPI and schema; domain skills override generic patterns
+3. **Tests** — unit + integration (API: Testcontainers Postgres)
+4. **Coverage** — line ≥ **90%** hard gate for `apps/api` and Phase 1 web modules
+
+See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md) and [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md).
+
 ## Docs Index
 
 ### Product
@@ -87,5 +96,7 @@ scripts/harness/ check.sh, agent-preflight.sh
 
 - [Architecture stub](docs/architecture.md) → product/02
 - [Roadmap stub](docs/roadmap.md) → product/06
-- [Schema draft](docs/schema-draft.md)
+- [Schema draft](docs/schema-draft.md) → Phase 1 canonical in specs
+- [Phase 1 specs (canonical API/schema)](docs/specs/phase-1/README.md)
+- [Quality gates](docs/engineering/quality-gates.md)
 - [Agent setup](docs/agent-setup.md)

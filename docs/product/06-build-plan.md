@@ -85,11 +85,11 @@ gantt
 
 ### Suggested PR order
 
-1. `db/migrations/001_core_projects_bible`
-2. `api/projects-acl-crud`
-3. `web/dashboard-project-hub`
-4. `web/new-project-wizard`
-5. `web/story-bible-browser`
+1. **`specs/phase-1`** — schema, OpenAPI, web screens, test strategy ([docs/specs/phase-1/README.md](../specs/phase-1/README.md))
+2. **`api/phase-1-implementation`** — Alembic migrations, routers, Testcontainers tests, coverage ≥90%
+3. **`web/phase-1-implementation`** — Dashboard, wizard, hub, bible browser against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
 
 **Skill focus:** `storyforge-db-design`, `storyforge-api-python`, `storyforge-web-next`, `storyforge-domain-canon`
 

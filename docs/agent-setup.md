@@ -103,8 +103,19 @@ Always-on and path-scoped rules in `.cursor/rules/*.mdc`. Agents should read `AG
 
 1. Run `bash scripts/harness/agent-preflight.sh`
 2. Read docs per task (architecture → domain → relevant skill)
-3. Implement with path-scoped rules applied
-4. Run `make check` before claiming done
+3. **If building Phase 1+ features:** read [docs/specs/phase-1/README.md](./specs/phase-1/README.md) before code
+4. Implement with path-scoped rules applied
+5. Run tests + coverage per [quality-gates.md](./engineering/quality-gates.md)
+6. Run `make check` before claiming done
+
+### Quality gates summary
+
+| Step | Requirement |
+|------|-------------|
+| Spec-first | OpenAPI + schema in `docs/specs/` before implementation PRs |
+| API integration tests | Testcontainers Postgres |
+| Coverage | Line ≥ 90% (`make test-api-cov`, `make test-web-cov`) |
+| Isolation | Cross-tenant test required |
 
 ## CI
 

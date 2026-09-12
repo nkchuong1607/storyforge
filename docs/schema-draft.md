@@ -1,6 +1,9 @@
 # Schema Draft (sketch)
 
-Entity list and key tables for Postgres. **Not migrated yet** — reference for Phase 1 implementation.
+Entity list and key tables for Postgres. **Not migrated yet** — reference for later phases and exploratory design.
+
+> **Phase 1 canonical schema:** [docs/specs/phase-1/schema.md](specs/phase-1/schema.md)  
+> Use the Phase 1 spec for migrations and API implementation. This draft remains for Phase 2+ tables (ledgers, prose, continuity) not yet specified in detail.
 
 ## Naming Conventions
 
