@@ -48,6 +48,7 @@ class Project(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     bible_version_current: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     settings: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default="{}")
+    genre_rule_pack_json: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default="{}")
     created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
 
     members: Mapped[list["ProjectMember"]] = relationship(back_populates="project")

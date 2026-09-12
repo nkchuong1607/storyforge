@@ -233,6 +233,13 @@ async def test_continuity_service_run_check() -> None:
     service.twists.list_payoffs_with_twists_for_chapter = AsyncMock(return_value=[])
     service.twists.list_plants_for_project = AsyncMock(return_value=[])
     service.twists.list_all_plans = AsyncMock(return_value=[])
+    service.psych_states.list_latest_for_characters_before_chapter = AsyncMock(return_value={})
+    power_settings = MagicMock(enabled=False)
+    service.power.ensure_settings = AsyncMock(return_value=power_settings)
+    service.power.list_ranks = AsyncMock(return_value=[])
+    service.power.list_techniques = AsyncMock(return_value=[])
+    project.genre_profile = None
+    project.genre_rule_pack_json = {}
     session.refresh = AsyncMock()
     session.flush = AsyncMock()
 
@@ -453,6 +460,8 @@ async def test_settle_service_success_path() -> None:
     service.ledger.create = AsyncMock()
     service.continuity.save_idempotency = AsyncMock()
     service.twists.mark_payoffs_revealed_for_chapter = AsyncMock(return_value=0)
+    power_settings = MagicMock(enabled=False)
+    service.power.ensure_settings = AsyncMock(return_value=power_settings)
     session.flush = AsyncMock()
 
     from app.services import settle as settle_module

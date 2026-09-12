@@ -8,7 +8,8 @@ from app.exceptions import SlugConflictError
 from app.models.bible import BibleEntryStaging, BibleVersion
 from app.models.chapter import Chapter
 from app.models.character import Character
-from app.models.enums import ProjectMemberRole, ProjectStatus
+from app.models.enums import GenreProfile, ProjectMemberRole, ProjectStatus
+from app.models.power_system import PowerSystemSettings
 from app.models.project import Project, ProjectMember
 from app.repositories.bible import BibleRepository
 from app.repositories.chapter import ChapterRepository
@@ -20,6 +21,7 @@ from app.schemas.project import (
     ProjectSummary,
     ProjectUpdateRequest,
 )
+from app.services.genre_defaults import default_genre_rule_pack
 from app.templates.seeds import get_template_seed
 from app.utils.pagination import PageParams, paginated
 from app.utils.slug import next_slug_candidate, slugify_title
@@ -72,6 +74,7 @@ class ProjectService:
             language=payload.language,
             genre_profile=payload.genre_profile,
             template=payload.template,
+            genre_rule_pack_json=default_genre_rule_pack(payload.genre_profile),
             created_by=user_id,
         )
         await self.projects.create(project)
@@ -124,6 +127,9 @@ class ProjectService:
                     role_one_liner=character_seed.role_one_liner,
                 )
             )
+
+        if payload.genre_profile == GenreProfile.xianxia:
+            self.session.add(PowerSystemSettings(project_id=project.id, enabled=True))
 
         await self.session.flush()
         await self.session.refresh(project)

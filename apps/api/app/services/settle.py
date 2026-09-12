@@ -27,10 +27,12 @@ from app.repositories.bible import BibleRepository
 from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
 from app.repositories.ledger import LedgerRepository
+from app.repositories.power import PowerRepository
 from app.repositories.psych_state import PsychStateRepository
 from app.repositories.twist import TwistRepository
 from app.schemas.continuity import SettleChapterRequest, SettleChapterResponse
 from app.services.continuity.engine import _normalize_content, _snapshot_entries_map
+from app.services.continuity.power import build_power_snapshot
 from app.utils.psyche_validation import merge_psyche_card
 
 
@@ -43,6 +45,7 @@ class SettleService:
         self.twists = TwistRepository(session)
         self.characters = CharacterRepository(session)
         self.psych_states = PsychStateRepository(session)
+        self.power = PowerRepository(session)
 
     async def _get_cached_response(
         self, chapter_id: uuid.UUID, idempotency_key: uuid.UUID | None
@@ -146,21 +149,35 @@ class SettleService:
         if current_bible is None:
             raise NotFoundError(message="Current bible version not found")
 
+        state_diff = report.state_diff_json or {}
         staging_rows = await self.bible.list_all_staging(project.id)
         merged_snapshot = self._merge_staging_into_snapshot(
             current_bible.snapshot_json, staging_rows
         )
+        power_settings = await self.power.ensure_settings(project.id)
+        if bool(getattr(power_settings, "enabled", False)) or state_diff.get(
+            "power_system_snapshot_patch"
+        ):
+            power_ranks = await self.power.list_ranks(project.id)
+            power_techniques = await self.power.list_techniques(project.id)
+            world = dict(merged_snapshot.get("world") or {})
+            world["power_system"] = build_power_snapshot(
+                power_settings, power_ranks, power_techniques
+            )
+            merged_snapshot["world"] = world
         bible_after = bible_before + 1
         now = datetime.now(UTC)
-
-        state_diff = report.state_diff_json or {}
         ledger_proposals = state_diff.get("ledger_proposals", [])
         ledger_count = 0
         psych_count = 0
 
         for proposal in ledger_proposals:
             entity_type = LedgerEntityType(proposal.get("entity_type", "character"))
-            event_type = LedgerEventType(proposal.get("event_type", "status_change"))
+            raw_event_type = proposal.get("event_type", "status_change")
+            try:
+                event_type = LedgerEventType(raw_event_type)
+            except ValueError:
+                continue
             event = LedgerEvent(
                 project_id=project.id,
                 entity_type=entity_type,

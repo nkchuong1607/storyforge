@@ -15,6 +15,7 @@ class ProseVersionSummary(BaseModel):
     version: int
     word_count: int
     source: ProseSource
+    prompt_edit_turn_id: uuid.UUID | None = None
     created_by: uuid.UUID
     created_at: datetime
 

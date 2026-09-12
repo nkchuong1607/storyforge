@@ -12,7 +12,7 @@ from app.models.bible import BibleEntryStaging
 from app.models.character import Character
 from app.models.enums import ContinuityCategory, ContinuityResult, ContinuitySeverity
 
-RULE_PACK_VERSION = "deterministic-v1+foreshadow-v1+psychology-v1"
+RULE_PACK_VERSION = "deterministic-v1+foreshadow-v1+psychology-v1+power-v1"
 
 DEATH_KEYWORDS = ("chết", "tử vong", "băng hà", "mất mạng")
 TRANSITION_KEYWORDS = ("đến", "tới", "rời", "đi tới", "quay về")
@@ -267,8 +267,10 @@ def build_state_diff_stub(
     chapter_id: uuid.UUID | None = None,
     psych_state_proposals: list[dict] | None = None,
     psyche_card_patches: list[dict] | None = None,
-) -> dict[str, list]:
-    ledger_proposals: list[dict] = []
+    cultivation_proposals: list[dict] | None = None,
+    power_snapshot_patch: dict | None = None,
+) -> dict[str, list | dict]:
+    ledger_proposals: list[dict] = list(cultivation_proposals or [])
     bible_patch_candidates: list[dict] = []
     psych_proposals = list(psych_state_proposals or [])
     psyche_patches = list(psyche_card_patches or [])
@@ -306,12 +308,15 @@ def build_state_diff_stub(
                         }
                     )
 
-    return {
+    result: dict[str, list | dict] = {
         "ledger_proposals": ledger_proposals,
         "bible_patch_candidates": bible_patch_candidates,
         "psych_state_proposals": psych_proposals,
         "psyche_card_patches": psyche_patches,
     }
+    if power_snapshot_patch is not None:
+        result["power_system_snapshot_patch"] = power_snapshot_patch
+    return result
 
 
 def check_location_teleport_without_transition(
@@ -367,6 +372,10 @@ def run_continuity_checks(
     psychology_issues: list[ContinuityIssue] | None = None,
     psych_state_proposals: list[dict] | None = None,
     psyche_card_patches: list[dict] | None = None,
+    power_issues: list[ContinuityIssue] | None = None,
+    cultivation_proposals: list[dict] | None = None,
+    power_snapshot_patch: dict | None = None,
+    power_module_enabled: bool = False,
 ) -> tuple[list[dict], dict, dict, ContinuityResult]:
     """Run all Phase 2 + Phase 4 + Phase 5 rules; return issues, state_diff, stats, result."""
     raw_issues: list[ContinuityIssue] = []
@@ -394,11 +403,12 @@ def run_continuity_checks(
             chapter_number=chapter_number,
         )
     )
-    raw_issues.extend(
-        check_world_rule_rank_violation_stub(
-            prose=prose, snapshot_json=snapshot_json, chapter_number=chapter_number
+    if not power_module_enabled:
+        raw_issues.extend(
+            check_world_rule_rank_violation_stub(
+                prose=prose, snapshot_json=snapshot_json, chapter_number=chapter_number
+            )
         )
-    )
     raw_issues.extend(
         check_location_teleport_without_transition(
             prose=prose, beats=beats, chapter_number=chapter_number
@@ -408,6 +418,8 @@ def run_continuity_checks(
         raw_issues.extend(foreshadow_issues)
     if psychology_issues:
         raw_issues.extend(psychology_issues)
+    if power_issues:
+        raw_issues.extend(power_issues)
 
     state_diff = build_state_diff_stub(
         prose=prose,
@@ -416,6 +428,8 @@ def run_continuity_checks(
         chapter_id=chapter_id,
         psych_state_proposals=psych_state_proposals,
         psyche_card_patches=psyche_card_patches,
+        cultivation_proposals=cultivation_proposals,
+        power_snapshot_patch=power_snapshot_patch,
     )
     for proposal in state_diff.get("ledger_proposals", []):
         if proposal.get("event_type") == "status_change":

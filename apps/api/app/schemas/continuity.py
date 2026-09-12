@@ -25,6 +25,7 @@ class StateDiff(BaseModel):
     bible_patch_candidates: list[dict[str, Any]] = Field(default_factory=list)
     psyche_card_patches: list[dict[str, Any]] = Field(default_factory=list)
     psych_state_proposals: list[dict[str, Any]] = Field(default_factory=list)
+    power_system_snapshot_patch: dict[str, Any] | None = None
 
 
 class ContinuityReport(BaseModel):
