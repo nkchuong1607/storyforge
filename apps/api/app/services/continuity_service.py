@@ -21,6 +21,7 @@ from app.repositories.chapter import ChapterRepository
 from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
 from app.repositories.ledger import LedgerRepository
+from app.repositories.power import PowerRepository
 from app.repositories.prose import ProseRepository
 from app.repositories.psych_state import PsychStateRepository
 from app.repositories.twist import TwistRepository
@@ -44,10 +45,18 @@ from app.services.continuity.foreshadow import (
     ForeshadowTwistContext,
     run_foreshadow_checks,
 )
+from app.services.continuity.power import (
+    build_cultivation_proposals,
+    is_power_module_enabled,
+    ranks_to_context,
+    run_power_checks,
+    techniques_to_context,
+)
 from app.services.continuity.psychology import (
     build_psych_state_proposals,
     run_psychology_checks,
 )
+from app.services.genre_defaults import merged_genre_pack
 
 
 class ContinuityService:
@@ -62,6 +71,7 @@ class ContinuityService:
         self.ledger = LedgerRepository(session)
         self.twists = TwistRepository(session)
         self.psych_states = PsychStateRepository(session)
+        self.power = PowerRepository(session)
 
     def _report_schema(self, report: ContinuityReport) -> ContinuityReportSchema:
         return ContinuityReportSchema(
@@ -174,6 +184,7 @@ class ContinuityService:
             )
             for t in all_twists
         ]
+        genre_pack = merged_genre_pack(project.genre_rule_pack_json or {}, project.genre_profile)
         foreshadow_raw = run_foreshadow_checks(
             chapter_id=chapter.id,
             chapter_number=chapter.number,
@@ -182,6 +193,7 @@ class ContinuityService:
             payoffs=foreshadow_payoffs,
             plants=foreshadow_plants,
             all_twists=foreshadow_twists,
+            genre_pack=genre_pack,
         )
 
         scene_character_ids = [
@@ -207,12 +219,52 @@ class ContinuityService:
             psych_state_proposals=psych_proposals,
         )
 
+        ledger_tail = await self._ledger_tail(project.id)
+        power_settings = await self.power.ensure_settings(project.id)
+        power_ranks = await self.power.list_ranks(project.id)
+        power_techniques = await self.power.list_techniques(project.id)
+        rank_ctx = ranks_to_context(power_ranks)
+        technique_ctx = techniques_to_context(power_techniques, power_ranks)
+        power_enabled = is_power_module_enabled(power_settings, genre_pack)
+        cultivation_proposals = (
+            build_cultivation_proposals(
+                prose=prose_row.content,
+                characters=characters,
+                ranks=rank_ctx,
+                ledger_tail=ledger_tail,
+            )
+            if power_enabled
+            else []
+        )
+        power_snapshot_patch = None
+        if power_enabled and power_settings.enabled:
+            power_snapshot_patch = {
+                "action": "sync_staging_to_bible",
+                "rank_count": len(power_ranks),
+                "technique_count": len(power_techniques),
+            }
+        power_raw = (
+            run_power_checks(
+                prose=prose_row.content,
+                chapter_number=chapter.number,
+                characters=characters,
+                ranks=rank_ctx,
+                techniques=technique_ctx,
+                settings=power_settings,
+                genre_pack=genre_pack,
+                ledger_tail=ledger_tail,
+                ledger_proposals=cultivation_proposals,
+            )
+            if power_enabled
+            else []
+        )
+
         issues, state_diff, stats, result = run_continuity_checks(
             prose=prose_row.content,
             chapter_number=chapter.number,
             chapter_id=chapter.id,
             characters=characters,
-            ledger_tail=await self._ledger_tail(project.id),
+            ledger_tail=ledger_tail,
             staging_rows=staging,
             snapshot_json=snapshot,
             bible_version_current=project.bible_version_current,
@@ -222,6 +274,10 @@ class ContinuityService:
             psychology_issues=psychology_raw,
             psych_state_proposals=psych_proposals,
             psyche_card_patches=psyche_patches,
+            power_issues=power_raw,
+            cultivation_proposals=cultivation_proposals,
+            power_snapshot_patch=power_snapshot_patch,
+            power_module_enabled=power_enabled,
         )
 
         report = ContinuityReport(

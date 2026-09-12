@@ -220,6 +220,41 @@ class PsychStateAlreadySettledError(AppError):
         )
 
 
+class RankInUseError(AppError):
+    def __init__(self, message: str = "Rank is referenced by techniques") -> None:
+        super().__init__(status_code=409, code="rank_in_use", message=message)
+
+
+class PowerSystemDisabledError(AppError):
+    def __init__(self, message: str = "Power system module is disabled") -> None:
+        super().__init__(status_code=409, code="power_system_disabled", message=message)
+
+
+class InvalidRankLadderError(AppError):
+    def __init__(self, message: str = "Invalid rank ladder ordering") -> None:
+        super().__init__(status_code=422, code="invalid_rank_ladder", message=message)
+
+
+class InvalidGenreRulePackError(AppError):
+    def __init__(self, message: str = "Invalid genre rule pack") -> None:
+        super().__init__(status_code=422, code="invalid_genre_rule_pack", message=message)
+
+
+class LLMProviderError(AppError):
+    def __init__(self, message: str = "LLM provider error") -> None:
+        super().__init__(status_code=502, code="llm_provider_error", message=message)
+
+
+class PromptEditRateLimitedError(AppError):
+    def __init__(self, message: str = "Prompt edit rate limit exceeded") -> None:
+        super().__init__(status_code=429, code="prompt_edit_rate_limited", message=message)
+
+
+class PromptEditAlreadyAppliedError(AppError):
+    def __init__(self, message: str = "Turn already applied") -> None:
+        super().__init__(status_code=409, code="prompt_edit_already_applied", message=message)
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

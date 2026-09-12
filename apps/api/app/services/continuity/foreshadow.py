@@ -48,10 +48,32 @@ def _is_strict(genre_profile: GenreProfile, twist: ForeshadowTwistContext) -> bo
     return genre_profile == GenreProfile.mystery
 
 
-def _genre_default_min(genre_profile: GenreProfile) -> int:
+def _genre_default_min(genre_profile: GenreProfile, genre_pack: dict | None = None) -> int:
+    if genre_pack:
+        thresholds = genre_pack.get("thresholds") or {}
+        value = thresholds.get("foreshadow_min_plants_default")
+        if isinstance(value, int):
+            return value
     if genre_profile == GenreProfile.mystery:
         return 2
     return 1
+
+
+def _payoff_without_plants_severity(genre_profile: GenreProfile, genre_pack: dict | None) -> bool:
+    """Return True if payoff-without-plants should FAIL."""
+    if genre_pack:
+        thresholds = genre_pack.get("thresholds") or {}
+        level = thresholds.get("foreshadow_payoff_without_plants")
+        if level == "fail":
+            return True
+        if level == "warn":
+            return False
+        strictness = (genre_pack.get("strictness") or {}).get("foreshadow")
+        if strictness == "strict":
+            return True
+        if strictness == "relaxed":
+            return False
+    return genre_profile == GenreProfile.mystery
 
 
 def _constraints_min(constraints_json: dict[str, Any]) -> int:
@@ -125,6 +147,7 @@ def run_foreshadow_checks(
     payoffs: list[ForeshadowPayoffContext],
     plants: list[ForeshadowPlantContext],
     all_twists: list[ForeshadowTwistContext],
+    genre_pack: dict | None = None,
 ) -> list[ContinuityIssue]:
     issues: list[ContinuityIssue] = []
 
@@ -133,15 +156,22 @@ def run_foreshadow_checks(
         if twist.status in (TwistPlanStatus.abandoned, TwistPlanStatus.paid_off):
             continue
         strict = _is_strict(genre_profile, twist)
+        if genre_pack and _payoff_without_plants_severity(genre_profile, genre_pack):
+            strict = True
         eligible = count_eligible_plants(plants, twist.twist_id, payoff.target_chapter_number)
         min_required = max(
             payoff.min_plants,
             _constraints_min(twist.constraints_json),
-            _genre_default_min(genre_profile),
+            _genre_default_min(genre_profile, genre_pack),
         )
 
         if eligible < min_required:
-            severity = _severity_for_gate(strict=strict)
+            fail_on_payoff = _payoff_without_plants_severity(genre_profile, genre_pack)
+            severity = (
+                ContinuitySeverity.FAIL.value
+                if fail_on_payoff or strict
+                else ContinuitySeverity.WARN.value
+            )
             code = (
                 "foreshadow_plant_count_below_minimum"
                 if eligible > 0 and payoff.min_plants > 0 and eligible < payoff.min_plants

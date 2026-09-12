@@ -75,6 +75,8 @@ async def test_settle_appends_psych_states(monkeypatch: pytest.MonkeyPatch) -> N
     service.characters.get_by_id = AsyncMock(return_value=character)
     service.psych_states.create = AsyncMock()
     service.twists.mark_payoffs_revealed_for_chapter = AsyncMock()
+    power_settings = MagicMock(enabled=False)
+    service.power.ensure_settings = AsyncMock(return_value=power_settings)
 
     async def fake_insert(*_args, **_kwargs):
         return MagicMock()

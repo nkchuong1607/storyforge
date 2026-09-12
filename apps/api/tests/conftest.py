@@ -44,10 +44,22 @@ def _run_migrations(database_url: str) -> None:
 
 @pytest.fixture(scope="session")
 def postgres_url() -> Generator[str, None, None]:
-    with PostgresContainer("postgres:16-alpine") as postgres:
-        async_url = _to_async_url(postgres.get_connection_url())
+    env_url = os.environ.get("DATABASE_URL")
+    if env_url:
+        async_url = _to_async_url(env_url)
         _run_migrations(async_url)
         yield async_url
+        return
+
+    try:
+        with PostgresContainer("postgres:16-alpine") as postgres:
+            async_url = _to_async_url(postgres.get_connection_url())
+            _run_migrations(async_url)
+            yield async_url
+    except Exception:
+        fallback = "postgresql+asyncpg://storyforge:storyforge@localhost:5432/storyforge"
+        _run_migrations(fallback)
+        yield fallback
 
 
 @pytest_asyncio.fixture

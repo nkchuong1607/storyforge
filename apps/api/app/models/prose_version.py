@@ -33,6 +33,11 @@ class ProseVersion(Base, UUIDPrimaryKeyMixin):
         server_default=ProseSource.human.value,
     )
     created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    prompt_edit_turn_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("prompt_edit_turns.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

@@ -78,6 +78,7 @@ class ContinuityCategory(StrEnum):
     bible_staging = "bible_staging"
     foreshadow = "foreshadow"
     psychology = "psychology"
+    power_system = "power_system"
 
 
 class TwistPlanStatus(StrEnum):
@@ -120,6 +121,9 @@ class LedgerEventType(StrEnum):
     location_change = "location_change"
     timeline_anchor = "timeline_anchor"
     bible_promote = "bible_promote"
+    cultivation_change = "cultivation_change"
+    technique_learned = "technique_learned"
+    resource_consumed = "resource_consumed"
 
 
 class CharacterStatus(StrEnum):

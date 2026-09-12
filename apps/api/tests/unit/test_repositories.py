@@ -8,11 +8,15 @@ import pytest
 from app.models.chapter import Chapter
 from app.models.enums import LedgerEntityType, LedgerEventType
 from app.models.ledger_event import LedgerEvent
+from app.models.power_system import PowerRank
+from app.models.prompt_edit import PromptEditSession, PromptEditTurn
 from app.models.prose_version import ProseVersion
 from app.models.scene_beat import SceneBeat
 from app.repositories.beat import BeatRepository
 from app.repositories.chapter import ChapterRepository
 from app.repositories.ledger import LedgerRepository
+from app.repositories.power import PowerRepository
+from app.repositories.prompt_edit import PromptEditRepository
 from app.repositories.prose import ProseRepository
 from app.utils.pagination import PageParams
 
@@ -90,3 +94,51 @@ async def test_ledger_repository_operations() -> None:
     await repo.create(event)
     session.scalar = AsyncMock(return_value=0)
     assert await repo.count_for_chapter(event.chapter_id) == 0
+
+
+@pytest.mark.unit
+async def test_power_repository_operations() -> None:
+    session = AsyncMock()
+    repo = PowerRepository(session)
+    project_id = uuid.uuid4()
+    session.get = AsyncMock(return_value=None)
+    settings = await repo.ensure_settings(project_id)
+    assert settings.project_id == project_id
+    session.add.assert_called()
+
+    rank = PowerRank(project_id=project_id, rank_key="qi", display_name="Luyện Khí", sort_order=0)
+    rank.id = uuid.uuid4()
+    await repo.create_rank(rank)
+    session.scalar = AsyncMock(return_value=2)
+    assert await repo.max_sort_order(project_id) == 2
+    session.scalar = AsyncMock(return_value=1)
+    assert await repo.count_techniques_for_rank(project_id, rank.id) == 1
+
+
+@pytest.mark.unit
+async def test_prompt_edit_repository_operations() -> None:
+    session = AsyncMock()
+    repo = PromptEditRepository(session)
+    session_row = PromptEditSession(
+        project_id=uuid.uuid4(),
+        chapter_id=uuid.uuid4(),
+        base_prose_version=1,
+        status="active",
+        created_by=uuid.uuid4(),
+    )
+    await repo.create_session(session_row)
+    session.add.assert_called()
+    turn = PromptEditTurn(
+        project_id=session_row.project_id,
+        session_id=uuid.uuid4(),
+        turn_index=1,
+        instruction="x",
+        model="fake-llm",
+        provider="fake",
+        token_usage={},
+    )
+    await repo.create_turn(turn)
+    session.scalar = AsyncMock(return_value=2)
+    assert await repo.max_turn_index(turn.session_id) == 2
+    session.scalar = AsyncMock(return_value=uuid.uuid4())
+    assert await repo.prose_version_exists_for_turn(turn.id) is True
