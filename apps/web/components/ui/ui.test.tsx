@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { renderWithProviders } from "@/lib/test/render-with-providers";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { EmptyState } from "./EmptyState";
@@ -14,7 +15,7 @@ import { GENRE_LABELS, formatDate } from "@/lib/labels";
 describe("shared UI", () => {
   it("ErrorBanner renders and retries", async () => {
     const onRetry = vi.fn();
-    render(<ErrorBanner message="Lỗi test" onRetry={onRetry} />);
+    render(<ErrorBanner message="Lỗi test" retryLabel="Thử lại" onRetry={onRetry} />);
     await userEvent.click(screen.getByRole("button", { name: "Thử lại" }));
     expect(onRetry).toHaveBeenCalled();
   });
@@ -71,7 +72,7 @@ describe("shared UI", () => {
   });
 
   it("ChapterTable empty and populated", () => {
-    const { rerender } = render(<ChapterTable projectId="p" chapters={[]} />);
+    const { rerender } = renderWithProviders(<ChapterTable projectId="p" chapters={[]} />);
     expect(screen.getByText("Chưa có chương")).toBeInTheDocument();
     rerender(
       <ChapterTable

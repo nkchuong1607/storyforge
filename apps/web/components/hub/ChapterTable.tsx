@@ -1,7 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import type { Chapter } from "@/lib/api/types";
-import { CHAPTER_STATUS_LABELS, formatDate } from "@/lib/labels";
+import { useLabelHelpers, formatDate } from "@/lib/labels";
+import { useTranslations, useLocale } from "@/lib/i18n/use-translations";
 import { chapterRowHref } from "@/lib/chapter-routes";
+import { Badge } from "@/components/ui/Badge";
+import { Empty } from "@/components/ui/EmptyState";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 
 interface ChapterTableProps {
   projectId: string;
@@ -9,57 +22,49 @@ interface ChapterTableProps {
 }
 
 export function ChapterTable({ projectId, chapters }: ChapterTableProps) {
+  const t = useTranslations();
+  const { locale } = useLocale();
+  const labels = useLabelHelpers(t);
+
   if (chapters.length === 0) {
-    return (
-      <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-        <p className="text-sm text-slate-600">Chưa có chương</p>
-      </div>
-    );
+    return <Empty title={t("hub.emptyChapters")} />;
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-slate-200">
-        <thead className="bg-slate-50">
-          <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">#</th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-              Tiêu đề
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-              Trạng thái
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-              Từ
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-              Cập nhật
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {chapters.map((chapter) => {
-            const href = chapterRowHref(projectId, chapter.id, chapter.status);
-            return (
-              <tr key={chapter.id} className="text-sm text-slate-700 hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium">{chapter.number}</td>
-                <td className="px-4 py-3">
-                  <Link href={href} className="font-medium text-indigo-600 hover:text-indigo-800">
-                    {chapter.title}
-                  </Link>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs">
-                    {CHAPTER_STATUS_LABELS[chapter.status]}
-                  </span>
-                </td>
-                <td className="px-4 py-3">{chapter.word_count.toLocaleString("vi-VN")}</td>
-                <td className="px-4 py-3 text-slate-500">{formatDate(chapter.updated_at)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeader>{t("hub.chapterNumber")}</TableHeader>
+          <TableHeader>{t("hub.chapterTitle")}</TableHeader>
+          <TableHeader>{t("hub.chapterStatus")}</TableHeader>
+          <TableHeader>{t("hub.chapterWords")}</TableHeader>
+          <TableHeader>{t("hub.chapterUpdated")}</TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {chapters.map((chapter) => {
+          const href = chapterRowHref(projectId, chapter.id, chapter.status);
+          return (
+            <TableRow key={chapter.id}>
+              <TableCell className="font-medium">{chapter.number}</TableCell>
+              <TableCell>
+                <Link href={href} className="font-medium text-sf-accent hover:text-sf-accent-hover">
+                  {chapter.title}
+                </Link>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">{labels.chapterStatus(chapter.status)}</Badge>
+              </TableCell>
+              <TableCell>
+                {chapter.word_count.toLocaleString(locale === "vi" ? "vi-VN" : "en-US")}
+              </TableCell>
+              <TableCell className="text-sf-text-secondary">
+                {formatDate(chapter.updated_at, locale)}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }

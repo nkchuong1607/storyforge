@@ -107,7 +107,7 @@ describe("Twist Board components", () => {
         onCardClick={() => undefined}
       />,
     );
-    expect(document.querySelectorAll(".animate-pulse").length).toBeGreaterThan(0);
+    expect(screen.getByTestId("loading-skeleton-kanban")).toBeInTheDocument();
   });
 
   it("renders outline and timeline stub tabs", () => {

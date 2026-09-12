@@ -7,6 +7,7 @@ import { listChapters } from "@/lib/api/chapters";
 import { getTwistBoard } from "@/lib/api/twists";
 import { countFairnessFails } from "@/lib/twist-utils";
 import type { Chapter, ProjectDetail } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
@@ -23,6 +24,7 @@ interface ProjectHubPageProps {
 }
 
 export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
+  const t = useTranslations();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [fairnessFailCount, setFairnessFailCount] = useState(0);
@@ -56,10 +58,10 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
   if (loadState === "not_found") {
     return (
       <AppShell>
-        <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy dự án</h1>
-          <Link href="/" className="mt-4 inline-block text-sm font-medium text-indigo-600">
-            ← Về Dashboard
+        <div className="rounded-[var(--sf-radius-lg)] border border-sf-border bg-sf-bg-surface p-8 text-center">
+          <h1 className="text-lg font-semibold text-sf-text-primary">{t("hub.notFound")}</h1>
+          <Link href="/" className="mt-4 inline-block text-sm font-medium text-sf-accent">
+            {t("common.backToDashboard")}
           </Link>
         </div>
       </AppShell>
@@ -79,13 +81,17 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
   return (
     <AppShell sidebar={sidebar}>
       {loadState === "error" ? (
-        <ErrorBanner message="Không tải được dự án" onRetry={() => void loadHub()} />
+        <ErrorBanner
+          message={t("hub.errorLoad")}
+          retryLabel={t("common.retry")}
+          onRetry={() => void loadHub()}
+        />
       ) : null}
 
       {loadState === "loading" ? (
         <>
           <LoadingSkeleton variant="content" count={1} />
-          <div className="mt-6">
+          <div className="mt-6 min-h-[200px]">
             <LoadingSkeleton variant="table" count={3} />
           </div>
         </>
@@ -101,7 +107,9 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
           />
           <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
             <div>
-              <h2 className="mb-3 text-lg font-semibold text-slate-900">Danh sách chương</h2>
+              <h2 className="mb-3 text-lg font-semibold text-sf-text-primary">
+                {t("nav.chapters")}
+              </h2>
               <ChapterTable projectId={projectId} chapters={chapters} />
             </div>
             <RecentActivity />

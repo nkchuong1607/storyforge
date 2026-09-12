@@ -53,13 +53,14 @@ else
   echo "SKIP: apps/api/.venv not found (run make setup)"
 fi
 
-# Web: typecheck + lint when node_modules present
+# Web: typecheck + lint + i18n key parity when node_modules present
 if [[ -d "$ROOT/apps/web/node_modules" ]]; then
   (
     cd "$ROOT/apps/web"
     npm run typecheck
     npm run lint
   )
+  run_step "i18n key parity" node "$ROOT/scripts/check-i18n-keys.js"
 else
   echo ""
   echo "--- Web checks"

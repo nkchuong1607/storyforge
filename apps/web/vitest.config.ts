@@ -36,6 +36,11 @@ export default defineConfig({
         "lib/power-utils.ts",
         "lib/prompt-edit-utils.ts",
         "components/ui/**/*.tsx",
+        "components/providers/**/*.tsx",
+        "lib/i18n/**/*.ts",
+        "lib/prefs/**/*.ts",
+        "lib/utils/**/*.ts",
+        "lib/labels.ts",
       ],
       exclude: ["**/*.test.{ts,tsx}", "**/mocks/**"],
       thresholds: {

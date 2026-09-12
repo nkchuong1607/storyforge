@@ -1,0 +1,256 @@
+{
+  "common": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "retry": "Thử lại",
+    "loading": "Đang tải…",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "confirm": "Xác nhận",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "add": "Thêm",
+    "search": "Tìm kiếm",
+    "clearSearch": "Xóa tìm kiếm",
+    "notFound": "Không tìm thấy",
+    "errorLoad": "Không tải được dữ liệu",
+    "backToDashboard": "← Về Dashboard",
+    "skipToMain": "Bỏ qua đến nội dung chính",
+    "offline": "Bạn đang ngoại tuyến. Một số thao tác có thể bị trì hoãn.",
+    "dismiss": "Đóng thông báo",
+    "userAvatar": "Ảnh đại diện người dùng",
+    "creating": "Đang tạo…",
+    "saving": "Đang lưu…",
+    "saved": "Đã lưu",
+    "words": "từ"
+  },
+  "theme": {
+    "toggle": "Giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống",
+    "switchTo": "Chuyển sang {mode}",
+    "current": "Giao diện: {mode}"
+  },
+  "locale": {
+    "toggle": "Ngôn ngữ",
+    "vi": "VI",
+    "en": "EN",
+    "switchTo": "Chuyển sang {locale}",
+    "current": "Ngôn ngữ: {locale}"
+  },
+  "nav": {
+    "projects": "Dự án",
+    "templates": "Mẫu (sắp ra mắt)",
+    "settings": "Cài đặt",
+    "hub": "Tổng quan",
+    "chapters": "Chương",
+    "bible": "Story Bible",
+    "characters": "Nhân vật",
+    "outline": "Dàn ý",
+    "genreSettings": "Thể loại"
+  },
+  "dashboard": {
+    "title": "Dự án của tôi",
+    "empty": "Chưa có dự án",
+    "emptyDescription": "Bắt đầu hành trình sáng tác với dự án đầu tiên của bạn.",
+    "emptyCta": "+ Tạo dự án mới",
+    "errorLoad": "Không tải được dự án",
+    "filteredEmpty": "Không có kết quả cho '{query}'",
+    "newProject": "Dự án mới",
+    "searchPlaceholder": "Tìm dự án…",
+    "searchLabel": "Tìm dự án",
+    "progress": "Tiến độ",
+    "updated": "Cập nhật {date}"
+  },
+  "hub": {
+    "notFound": "Không tìm thấy dự án",
+    "errorLoad": "Không tải được dự án",
+    "emptyChapters": "Chưa có chương",
+    "addChapter": "+ Thêm chương",
+    "continuityWarn": "Cảnh báo continuity",
+    "chapterNumber": "Số",
+    "chapterTitle": "Tiêu đề",
+    "chapterStatus": "Trạng thái",
+    "chapterWords": "Số từ",
+    "chapterUpdated": "Cập nhật",
+    "summaryChapters": "Chương",
+    "summaryBible": "Mục Bible",
+    "summaryProgress": "Tiến độ viết",
+    "recentActivity": "Hoạt động gần đây",
+    "noActivity": "Chưa có hoạt động"
+  },
+  "chapter": {
+    "status": {
+      "planned": "Đã lập kế hoạch",
+      "drafting": "Đang viết",
+      "reviewing": "Đang xem xét",
+      "settled": "Đã viết",
+      "locked": "Bị khóa"
+    },
+    "emptyProse": "Bắt đầu viết hoặc dùng Prompt Edit…",
+    "saving": "Đang lưu…",
+    "saved": "Đã lưu lúc {time}",
+    "lockedBanner": "Chương đã khóa — chỉ đọc",
+    "errorLoad": "Không tải được chương",
+    "backToHub": "← Về Hub",
+    "beats": "Cảnh",
+    "versions": "Phiên bản",
+    "promptEdit": "Prompt Edit"
+  },
+  "bible": {
+    "title": "Story Bible",
+    "noSelection": "Chọn mục từ mục lục",
+    "errorLoad": "Không tải được Bible",
+    "editMode": "Đang chỉnh sửa",
+    "save": "Lưu mục",
+    "sections": {
+      "world_rules": "Quy tắc thế giới",
+      "locations": "Địa điểm",
+      "factions": "Phe phái",
+      "glossary": "Thuật ngữ",
+      "timeline": "Dòng thời gian",
+      "characters": "Nhân vật",
+      "objects": "Vật phẩm"
+    }
+  },
+  "continuity": {
+    "title": "Continuity Gate",
+    "level": {
+      "pass": "PASS",
+      "warn": "WARN",
+      "fail": "FAIL"
+    },
+    "running": "Đang chạy kiểm tra…",
+    "staleBanner": "Draft đã đổi — chạy lại check",
+    "settleDisabled": "Không thể settle — còn FAIL chưa xử lý",
+    "settleSuccess": "Đã settle chương thành công",
+    "settleError": "Không thể settle",
+    "errorLoad": "Không tải được báo cáo",
+    "notFound": "Không tìm thấy chương",
+    "markIntentional": "Đánh dấu có chủ ý",
+    "approveSettle": "Phê duyệt & Settle",
+    "reject": "Từ chối",
+    "requestRevise": "Yêu cầu sửa",
+    "stateDiff": "State diff preview",
+    "issueTable": "Bảng vấn đề continuity"
+  },
+  "wizard": {
+    "title": "Tạo dự án mới",
+    "stepBasics": "Thông tin cơ bản",
+    "stepGenre": "Thể loại",
+    "stepTemplate": "Mẫu",
+    "stepConfirm": "Xác nhận",
+    "next": "Tiếp",
+    "back": "Quay lại",
+    "create": "Tạo dự án",
+    "creating": "Đang tạo…",
+    "slugConflict": "Slug đã tồn tại — thử slug khác",
+    "errorCreate": "Không thể tạo dự án",
+    "validation": {
+      "titleRequired": "Tiêu đề là bắt buộc",
+      "slugRequired": "Slug là bắt buộc",
+      "slugInvalid": "Slug chỉ chứa chữ thường, số và dấu gạch ngang"
+    }
+  },
+  "characters": {
+    "title": "Nhân vật",
+    "empty": "Thêm nhân vật seed hoặc viết prose để extract",
+    "emptyCta": "Thêm nhân vật",
+    "errorLoad": "Không tải được nhân vật",
+    "notFound": "Không tìm thấy nhân vật",
+    "inbox": "Hộp thư tạm",
+    "inboxEmpty": "Không có gợi ý tạm thời",
+    "merge": "Merge vào nhân vật có sẵn",
+    "promote": "Promote tier",
+    "archive": "Lưu trữ",
+    "addCharacter": "Thêm nhân vật",
+    "displayName": "Tên hiển thị",
+    "role": "Vai trò",
+    "tier": "Hạng",
+    "status": "Trạng thái",
+    "filterTier": "Lọc theo hạng",
+    "filterStatus": "Lọc theo trạng thái",
+    "searchPlaceholder": "Tìm kiếm nhân vật…",
+    "searchLabel": "Tìm kiếm nhân vật",
+    "selectCharacter": "Chọn nhân vật",
+    "toastCreated": "Đã tạo nhân vật",
+    "toastSaved": "Đã lưu nhân vật",
+    "toastPromoted": "Đã promote tier",
+    "toastArchived": "Đã lưu trữ nhân vật",
+    "toastError": "Không thể lưu",
+    "toastCreateError": "Không thể tạo nhân vật",
+    "tabs": {
+      "overview": "Tổng quan",
+      "psyche": "Tâm lý",
+      "relationships": "Quan hệ",
+      "ledger": "Ledger",
+      "appearances": "Xuất hiện"
+    },
+    "relationshipsEmpty": "Chưa có quan hệ được ghi nhận."
+  },
+  "twist": {
+    "title": "Twist Board",
+    "columns": {
+      "secrets": "Bí mật",
+      "plants": "Plants",
+      "payoffs": "Payoffs",
+      "revealed": "Đã lộ"
+    },
+    "empty": "Chưa có twist nào",
+    "emptyCta": "Thêm twist",
+    "fairnessFail": "Thiếu plant cho payoff",
+    "errorLoad": "Không tải được twist board",
+    "outlineStub": "Dàn ý chi tiết — sắp ra mắt (Phase 8+)",
+    "timelineStub": "Timeline — sắp ra mắt (Phase 8+)"
+  },
+  "power": {
+    "title": "Power System",
+    "disabled": "Genre không dùng power system",
+    "disabledLink": "Đổi thể loại",
+    "emptyRanks": "Chưa có cấp bậc",
+    "addRank": "Thêm cấp bậc đầu tiên",
+    "errorLoad": "Không tải được power system",
+    "validationMonotonic": "Thứ tự cấp bậc phải tăng dần",
+    "ranks": "Cấp bậc",
+    "techniques": "Kỹ thuật"
+  },
+  "psych": {
+    "emptyPsyche": "Chưa có psyche card",
+    "seedPsyche": "Tạo psyche card",
+    "timelineEmpty": "Chưa có sự kiện tâm lý",
+    "errorLoad": "Không tải được dữ liệu tâm lý",
+    "toastSaved": "Đã lưu psyche card"
+  },
+  "labels": {
+    "genre": {
+      "xianxia": "Tiên hiệp",
+      "mystery": "Trinh thám",
+      "literary": "Văn học",
+      "romance": "Ngôn tình",
+      "custom": "Tùy chỉnh"
+    },
+    "template": {
+      "blank": "Trống",
+      "xianxia_starter": "Tiên hiệp khởi đầu",
+      "mystery_starter": "Trinh thám khởi đầu"
+    },
+    "characterStatus": {
+      "established": "Chính thức",
+      "provisional": "Tạm thời",
+      "archived": "Đã lưu trữ"
+    },
+    "characterTier": {
+      "0": "T0",
+      "1": "T1",
+      "2": "T2",
+      "3": "T3"
+    }
+  },
+  "errors": {
+    "not_found": "Không tìm thấy",
+    "network": "Lỗi mạng",
+    "boundary": "Đã xảy ra lỗi",
+    "boundaryRetry": "Tải lại trang"
+  }
+}

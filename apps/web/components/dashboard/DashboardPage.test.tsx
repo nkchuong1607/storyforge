@@ -1,13 +1,14 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 import { server } from "@/mocks/server";
+import { renderWithProviders } from "@/lib/test/render-with-providers";
 import { DashboardPage } from "./DashboardPage";
 
 describe("DashboardPage", () => {
   it("renders project grid", async () => {
-    render(<DashboardPage />);
+    renderWithProviders(<DashboardPage />);
     expect(await screen.findByText("Kiếm Lai")).toBeInTheDocument();
     expect(screen.getByText("Dự án của tôi")).toBeInTheDocument();
   });
@@ -21,7 +22,7 @@ describe("DashboardPage", () => {
         }),
       ),
     );
-    render(<DashboardPage />);
+    renderWithProviders(<DashboardPage />);
     expect(await screen.findByText("Chưa có dự án")).toBeInTheDocument();
   });
 
@@ -31,7 +32,7 @@ describe("DashboardPage", () => {
         HttpResponse.json({ error: { code: "error", message: "fail" } }, { status: 500 }),
       ),
     );
-    render(<DashboardPage />);
+    renderWithProviders(<DashboardPage />);
     expect(await screen.findByText("Không tải được dự án")).toBeInTheDocument();
     server.resetHandlers();
     await userEvent.click(screen.getByRole("button", { name: "Thử lại" }));
@@ -40,7 +41,7 @@ describe("DashboardPage", () => {
 
   it("shows filtered empty and clears search", async () => {
     const user = userEvent.setup();
-    render(<DashboardPage />);
+    renderWithProviders(<DashboardPage />);
     await screen.findByText("Kiếm Lai");
     await user.type(screen.getByRole("searchbox"), "xyz-not-found");
     expect(await screen.findByText(/Không có kết quả/)).toBeInTheDocument();
@@ -50,7 +51,7 @@ describe("DashboardPage", () => {
 
   it("filters projects by search", async () => {
     const user = userEvent.setup();
-    render(<DashboardPage />);
+    renderWithProviders(<DashboardPage />);
     await screen.findByText("Kiếm Lai");
     await user.type(screen.getByRole("searchbox"), "Đêm");
     await waitFor(() => {

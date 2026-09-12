@@ -1,27 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { listProjects } from "@/lib/api/projects";
 import type { ProjectSummary } from "@/lib/api/types";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { AppShell } from "@/components/ui/AppShell";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Empty } from "@/components/ui/EmptyState";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { FabButton } from "@/components/ui/FabButton";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
-import Link from "next/link";
 import { ProjectGrid } from "./ProjectGrid";
 import { SearchBar } from "./SearchBar";
 
 type LoadState = "loading" | "success" | "error";
 
 export function DashboardPage() {
+  const t = useTranslations();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebouncedValue(query, 300);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [loadState, setLoadState] = useState<LoadState>("loading");
-  const [errorMessage, setErrorMessage] = useState("Không tải được dự án");
 
   const loadProjects = useCallback(async (searchQuery: string) => {
     setLoadState("loading");
@@ -37,7 +38,6 @@ export function DashboardPage() {
       setLoadState("success");
     } catch {
       setLoadState("error");
-      setErrorMessage("Không tải được dự án");
     }
   }, []);
 
@@ -49,12 +49,16 @@ export function DashboardPage() {
     <>
       <Link
         href="/"
-        className="block rounded-lg bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700"
+        className="block rounded-[var(--sf-radius-md)] bg-sf-accent/10 px-3 py-2 text-sm font-medium text-sf-accent"
       >
-        Dự án
+        {t("nav.projects")}
       </Link>
-      <span className="block rounded-lg px-3 py-2 text-sm text-slate-400">Mẫu (sắp ra mắt)</span>
-      <span className="block rounded-lg px-3 py-2 text-sm text-slate-400">Cài đặt</span>
+      <span className="block rounded-[var(--sf-radius-md)] px-3 py-2 text-sm text-sf-text-secondary">
+        {t("nav.templates")}
+      </span>
+      <span className="block rounded-[var(--sf-radius-md)] px-3 py-2 text-sm text-sf-text-secondary">
+        {t("nav.settings")}
+      </span>
     </>
   );
 
@@ -63,42 +67,56 @@ export function DashboardPage() {
     loadState === "success" && projects.length === 0 && debouncedQuery.length > 0;
 
   return (
-    <AppShell sidebar={sidebar} searchBar={<SearchBar value={query} onChange={setQuery} />}>
+    <AppShell
+      sidebar={sidebar}
+      searchBar={
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder={t("dashboard.searchPlaceholder")}
+          ariaLabel={t("dashboard.searchLabel")}
+        />
+      }
+    >
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Dự án của tôi</h1>
+        <h1 className="text-2xl font-bold text-sf-text-primary">{t("dashboard.title")}</h1>
       </div>
 
       {loadState === "error" ? (
-        <ErrorBanner message={errorMessage} onRetry={() => void loadProjects(debouncedQuery)} />
+        <ErrorBanner
+          message={t("dashboard.errorLoad")}
+          retryLabel={t("common.retry")}
+          onRetry={() => void loadProjects(debouncedQuery)}
+        />
       ) : null}
 
       {loadState === "loading" ? <LoadingSkeleton variant="cards" /> : null}
 
       {showEmpty ? (
-        <EmptyState
-          title="Chưa có dự án"
-          description="Bắt đầu hành trình sáng tác với dự án đầu tiên của bạn."
+        <Empty
+          title={t("dashboard.empty")}
+          description={t("dashboard.emptyDescription")}
           action={
             <Link
               href="/projects/new"
-              className="inline-flex rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              className="inline-flex rounded-[var(--sf-radius-md)] bg-sf-accent px-4 py-2 text-sm font-medium text-white hover:bg-sf-accent-hover"
             >
-              + Tạo dự án mới
+              {t("dashboard.emptyCta")}
             </Link>
           }
         />
       ) : null}
 
       {showFilteredEmpty ? (
-        <EmptyState
-          title={`Không có kết quả cho '${debouncedQuery}'`}
+        <Empty
+          title={t("dashboard.filteredEmpty", { query: debouncedQuery })}
           action={
             <button
               type="button"
               onClick={() => setQuery("")}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+              className="text-sm font-medium text-sf-accent hover:text-sf-accent-hover"
             >
-              Xóa tìm kiếm
+              {t("common.clearSearch")}
             </button>
           }
         />
@@ -108,7 +126,7 @@ export function DashboardPage() {
         <ProjectGrid projects={projects} />
       ) : null}
 
-      <FabButton href="/projects/new" label="Dự án mới" />
+      <FabButton href="/projects/new" label={t("dashboard.newProject")} />
     </AppShell>
   );
 }
