@@ -121,6 +121,21 @@ Always-on and path-scoped rules in `.cursor/rules/*.mdc`. Agents should read `AG
 
 GitHub Actions runs harness checks and skill frontmatter lint on push/PR.
 
+## LLM / Prompt Edit (Phase 6+)
+
+**Default for tests and local dev:** `STORYFORGE_LLM_PROVIDER=fake` (FakeLLM — deterministic, no network, no API cost).  
+`make check` and CI never call paid LLM APIs.
+
+**Opt-in real LiteLLM** (manual dev only):
+
+```bash
+export STORYFORGE_LLM_PROVIDER=litellm
+export LITELLM_MODEL=gpt-4o
+export OPENAI_API_KEY=sk-...   # or provider-specific keys — .env only, never commit
+```
+
+See [docs/specs/phase-6/prompt-edit.md](./specs/phase-6/prompt-edit.md) and [test-strategy.md](./specs/phase-6/test-strategy.md).
+
 ## Environment Variables
 
 Copy `.env.example` to `.env` after `make setup`. Never commit secrets.
