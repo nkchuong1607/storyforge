@@ -15,8 +15,11 @@ make check    # before claiming done
 1. **This file** — workflow and pointers
 2. **[docs/architecture.md](docs/architecture.md)** — layers, agent pipeline, stack
 3. **[docs/domain-model.md](docs/domain-model.md)** — entities, ledgers, settlement
-4. **Task-relevant skill** in `skills/*/SKILL.md` (see table below)
-5. **Path-scoped rules** in `.cursor/rules/` (auto-applied by Cursor)
+4. **Task-relevant first-party skill** in `skills/storyforge-*/SKILL.md` (see table below)
+5. **AAS stack skill** (optional) — `vendor/aas-skills/<id>/SKILL.md` via [`skills/storyforge-aas-stack/SKILL.md`](skills/storyforge-aas-stack/SKILL.md) and [`aas-stack.json`](aas-stack.json) for generic Next/FastAPI/Postgres craft
+6. **Path-scoped rules** in `.cursor/rules/` (auto-applied by Cursor)
+
+**Precedence:** StoryForge domain and stack skills win over vendored AAS skills when they conflict.
 
 ## Skill Index
 
@@ -33,6 +36,11 @@ make check    # before claiming done
 | Next.js frontend | `skills/storyforge-web-next/` |
 | Postgres, migrations | `skills/storyforge-db-design/` |
 | UI visual quality | `skills/storyforge-ui-external/` |
+| AAS stack (Next/FastAPI/DB craft) | `skills/storyforge-aas-stack/` → `vendor/aas-skills/` |
+
+## Vendored AAS Skills
+
+20 curated skills from [agentic-awesome-skills](https://github.com/sickn33/agentic-awesome-skills) v17.1.0 live in `vendor/aas-skills/`. See [docs/aas-selection.md](docs/aas-selection.md) for IDs, rationale, and overlap with first-party skills.
 
 ## External UI Skills (install on dev machine)
 
@@ -48,6 +56,8 @@ apps/web/     Next.js (author UI) — stub
 apps/api/     FastAPI — stub
 docs/         Architecture, domain, roadmap, schema draft
 skills/       Portable first-party skills
+vendor/aas-skills/  Vendored AAS implementation-craft skills
+aas-stack.json    AAS pin manifest (release, IDs)
 .cursor/rules/ Cursor rules
 scripts/harness/ check.sh, agent-preflight.sh
 ```

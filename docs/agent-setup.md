@@ -19,6 +19,33 @@ make db-up      # postgres + redis via docker compose
 make check      # harness must pass
 ```
 
+## Vendored AAS Stack (implementation craft)
+
+StoryForge vendors a **curated subset** (20 skills) of [agentic-awesome-skills](https://github.com/sickn33/agentic-awesome-skills) at **v17.1.0** in `vendor/aas-skills/`. This is not the full catalog.
+
+| Resource | Purpose |
+|----------|---------|
+| [`aas-stack.json`](../aas-stack.json) | Pinned release, skill IDs, rationale |
+| [`docs/aas-selection.md`](./aas-selection.md) | Selection details, overlaps, licenses |
+| `skills/storyforge-aas-stack/SKILL.md` | Agent entrypoint — when to load AAS vs first-party |
+
+### When to load which
+
+1. **StoryForge domain** (`storyforge-domain-canon`, `storyforge-continuity`, …) — product logic, canon, ledgers
+2. **StoryForge stack** (`storyforge-api-python`, `storyforge-web-next`, `storyforge-db-design`) — repo layout and conventions
+3. **AAS vendored** (`vendor/aas-skills/<id>/SKILL.md`) — generic Next.js, FastAPI, Python, Postgres patterns
+
+First-party StoryForge skills **win** when they conflict with AAS (e.g. append-only ledgers vs generic CRUD examples).
+
+### Refresh vendored skills
+
+```bash
+npx agentic-awesome-skills@17.1.0 --path vendor/aas-skills \
+  --skills <ids-from-aas-stack.json> --release 17.1.0 --dry-run
+```
+
+See [aas-selection.md](./aas-selection.md) for the full comma-separated ID list.
+
 ## External Skills (UI quality)
 
 StoryForge first-party skills cover domain and stack. For **frontend visual quality**, install these third-party skills on your machine (not vendored into the repo):
@@ -66,6 +93,7 @@ Portable skills live in `skills/*/SKILL.md`. Cursor and Claude can load them fro
 | `storyforge-web-next` | Next.js App Router patterns |
 | `storyforge-db-design` | Ledger schema, migrations |
 | `storyforge-ui-external` | Before UI: install external skills |
+| `storyforge-aas-stack` | Pointer to vendored AAS skills in `vendor/aas-skills/` |
 
 ## Cursor Rules
 

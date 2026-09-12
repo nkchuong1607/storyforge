@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "upstream": {
+    "repository": "https://github.com/sickn33/agentic-awesome-skills",
+    "release": "17.1.0",
+    "commit": "392a9b0133e4c077db5877ba042347c780db4a35",
+    "installer": "npx agentic-awesome-skills@17.1.0"
+  },
+  "installPath": "vendor/aas-skills",
+  "installedAt": "2026-09-12",
+  "skills": [
+    {
+      "id": "nextjs-app-router-patterns",
+      "category": "nextjs",
+      "rationale": "App Router layouts, loading/error boundaries, and route conventions for apps/web."
+    },
+    {
+      "id": "nextjs-best-practices",
+      "category": "nextjs",
+      "rationale": "General Next.js performance and structure patterns complementing storyforge-web-next."
+    },
+    {
+      "id": "react-nextjs-development",
+      "category": "nextjs",
+      "rationale": "React + Next.js component and data-fetching craft for the author UI."
+    },
+    {
+      "id": "react-best-practices",
+      "category": "nextjs",
+      "rationale": "Shared React patterns (hooks, composition) used across the web app."
+    },
+    {
+      "id": "typescript-pro",
+      "category": "nextjs",
+      "rationale": "Strict TypeScript typing and API-client safety in apps/web."
+    },
+    {
+      "id": "fastapi-pro",
+      "category": "fastapi",
+      "rationale": "Advanced FastAPI patterns for routers, deps, and async endpoints."
+    },
+    {
+      "id": "fastapi-templates",
+      "category": "fastapi",
+      "rationale": "Project scaffolding and router layout reference for apps/api growth."
+    },
+    {
+      "id": "python-fastapi-development",
+      "category": "fastapi",
+      "rationale": "End-to-end FastAPI development workflow (models, routes, testing)."
+    },
+    {
+      "id": "async-python-patterns",
+      "category": "fastapi",
+      "rationale": "Async I/O and concurrency for LLM calls and DB sessions."
+    },
+    {
+      "id": "python-pro",
+      "category": "fastapi",
+      "rationale": "Python idioms, typing, and packaging for the API layer."
+    },
+    {
+      "id": "python-patterns",
+      "category": "fastapi",
+      "rationale": "Reusable Python design patterns for services and domain logic."
+    },
+    {
+      "id": "pydantic-models-py",
+      "category": "fastapi",
+      "rationale": "Pydantic v2 schemas for request/response and canon payloads."
+    },
+    {
+      "id": "backend-dev-guidelines",
+      "category": "fastapi",
+      "rationale": "Backend engineering conventions (errors, logging, API design)."
+    },
+    {
+      "id": "database-design",
+      "category": "database",
+      "rationale": "Relational modeling and normalization for ledger + bible tables."
+    },
+    {
+      "id": "database-architect",
+      "category": "database",
+      "rationale": "Schema evolution and multi-tenant Postgres layout guidance."
+    },
+    {
+      "id": "database-optimizer",
+      "category": "database",
+      "rationale": "Query plans, indexes, and hot-path tuning for ledger reads."
+    },
+    {
+      "id": "postgres-best-practices",
+      "category": "database",
+      "rationale": "Core PostgreSQL conventions aligned with StoryForge's Postgres stack."
+    },
+    {
+      "id": "postgresql-optimization",
+      "category": "database",
+      "rationale": "Deep Postgres performance tuning for append-only ledgers."
+    },
+    {
+      "id": "database-migrations-sql-migrations",
+      "category": "database",
+      "rationale": "Safe, reversible SQL migrations (Alembic/raw SQL) for schema changes."
+    },
+    {
+      "id": "supabase-postgres-best-practices",
+      "category": "database",
+      "rationale": "General Postgres query/index/connection guidance from Supabase; ignore Supabase-specific APIs unless using Supabase.",
+      "note": "Kept for portable Postgres optimization rules; StoryForge uses plain PostgreSQL, not Supabase Auth/RLS."
+    }
+  ],
+  "skipped": [],
+  "refreshCommand": "npx agentic-awesome-skills@17.1.0 --path vendor/aas-skills --skills <comma-list-from-this-file> --release 17.1.0"
+}
