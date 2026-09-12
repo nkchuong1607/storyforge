@@ -17,10 +17,12 @@ from app.models.enums import ChapterStatus, ContinuitySeverity
 from app.models.project import Project
 from app.repositories.beat import BeatRepository
 from app.repositories.bible import BibleRepository
+from app.repositories.chapter import ChapterRepository
 from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
 from app.repositories.ledger import LedgerRepository
 from app.repositories.prose import ProseRepository
+from app.repositories.twist import TwistRepository
 from app.schemas.continuity import (
     ContinuityCheckRequest,
     ContinuityIssue,
@@ -35,6 +37,12 @@ from app.schemas.continuity import (
 )
 from app.services.chapter_status import is_chapter_locked
 from app.services.continuity.engine import RULE_PACK_VERSION, run_continuity_checks
+from app.services.continuity.foreshadow import (
+    ForeshadowPayoffContext,
+    ForeshadowPlantContext,
+    ForeshadowTwistContext,
+    run_foreshadow_checks,
+)
 
 
 class ContinuityService:
@@ -42,10 +50,12 @@ class ContinuityService:
         self.session = session
         self.continuity = ContinuityRepository(session)
         self.prose = ProseRepository(session)
+        self.chapters = ChapterRepository(session)
         self.beats = BeatRepository(session)
         self.bible = BibleRepository(session)
         self.characters = CharacterRepository(session)
         self.ledger = LedgerRepository(session)
+        self.twists = TwistRepository(session)
 
     def _report_schema(self, report: ContinuityReport) -> ContinuityReportSchema:
         return ContinuityReportSchema(
@@ -105,9 +115,73 @@ class ContinuityService:
         beats = [{"summary": b.summary, "beat_key": b.beat_key} for b in beat_rows]
         overrides = await self.continuity.active_override_fingerprints(chapter.id)
 
+        payoff_rows = await self.twists.list_payoffs_with_twists_for_chapter(project.id, chapter.id)
+        all_plants = await self.twists.list_plants_for_project(project.id)
+        all_twists = await self.twists.list_all_plans(project.id, include_abandoned=True)
+
+        chapter_numbers: dict[uuid.UUID, int] = {}
+        for plant in all_plants:
+            if plant.chapter_id not in chapter_numbers:
+                ch = await self.chapters.get(project.id, plant.chapter_id)
+                if ch:
+                    chapter_numbers[plant.chapter_id] = ch.number
+
+        foreshadow_plants = [
+            ForeshadowPlantContext(
+                plant_id=p.id,
+                twist_id=p.twist_id,
+                chapter_id=p.chapter_id,
+                chapter_number=chapter_numbers.get(p.chapter_id, 999),
+            )
+            for p in all_plants
+        ]
+        foreshadow_payoffs: list[ForeshadowPayoffContext] = []
+        for payoff, twist in payoff_rows:
+            target_ch = await self.chapters.get(project.id, payoff.target_chapter_id)
+            if target_ch is None:
+                continue
+            foreshadow_payoffs.append(
+                ForeshadowPayoffContext(
+                    payoff_id=payoff.id,
+                    twist=ForeshadowTwistContext(
+                        twist_id=twist.id,
+                        title=twist.title,
+                        secret_truth=twist.secret_truth,
+                        status=twist.status,
+                        constraints_json=dict(twist.constraints_json or {}),
+                        genre_strictness=twist.genre_strictness,
+                    ),
+                    target_chapter_id=payoff.target_chapter_id,
+                    target_chapter_number=target_ch.number,
+                    min_plants=payoff.min_plants,
+                    required_plant_ids=list(payoff.required_plant_ids or []),
+                )
+            )
+        foreshadow_twists = [
+            ForeshadowTwistContext(
+                twist_id=t.id,
+                title=t.title,
+                secret_truth=t.secret_truth,
+                status=t.status,
+                constraints_json=dict(t.constraints_json or {}),
+                genre_strictness=t.genre_strictness,
+            )
+            for t in all_twists
+        ]
+        foreshadow_raw = run_foreshadow_checks(
+            chapter_id=chapter.id,
+            chapter_number=chapter.number,
+            prose=prose_row.content,
+            genre_profile=project.genre_profile,
+            payoffs=foreshadow_payoffs,
+            plants=foreshadow_plants,
+            all_twists=foreshadow_twists,
+        )
+
         issues, state_diff, stats, result = run_continuity_checks(
             prose=prose_row.content,
             chapter_number=chapter.number,
+            chapter_id=chapter.id,
             characters=characters,
             ledger_tail=await self._ledger_tail(project.id),
             staging_rows=staging,
@@ -115,6 +189,7 @@ class ContinuityService:
             bible_version_current=project.bible_version_current,
             beats=beats,
             active_override_fingerprints=overrides,
+            foreshadow_issues=foreshadow_raw,
         )
 
         report = ContinuityReport(

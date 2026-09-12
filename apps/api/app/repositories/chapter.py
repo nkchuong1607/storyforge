@@ -35,6 +35,9 @@ class ChapterRepository:
             )
         )
 
+    async def get_by_id(self, chapter_id: uuid.UUID) -> Chapter | None:
+        return await self.session.get(Chapter, chapter_id)
+
     async def update(self, chapter: Chapter) -> Chapter:
         await self.session.flush()
         return chapter

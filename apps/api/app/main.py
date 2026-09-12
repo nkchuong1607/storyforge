@@ -13,7 +13,7 @@ from app.exceptions import (
     http_exception_handler,
     validation_exception_handler,
 )
-from app.routers import bible, chapters, characters, context_packs, health, projects
+from app.routers import bible, chapters, characters, context_packs, health, projects, twists
 
 settings = get_settings()
 
@@ -40,3 +40,4 @@ app.include_router(bible.router)
 app.include_router(chapters.router)
 app.include_router(characters.router)
 app.include_router(context_packs.router)
+app.include_router(twists.router)

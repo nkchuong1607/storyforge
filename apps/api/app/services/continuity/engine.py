@@ -12,7 +12,7 @@ from app.models.bible import BibleEntryStaging
 from app.models.character import Character
 from app.models.enums import ContinuityCategory, ContinuityResult, ContinuitySeverity
 
-RULE_PACK_VERSION = "deterministic-v1"
+RULE_PACK_VERSION = "deterministic-v1+foreshadow-v1"
 
 DEATH_KEYWORDS = ("chết", "tử vong", "băng hà", "mất mạng")
 TRANSITION_KEYWORDS = ("đến", "tới", "rời", "đi tới", "quay về")
@@ -348,6 +348,7 @@ def run_continuity_checks(
     *,
     prose: str,
     chapter_number: int,
+    chapter_id: uuid.UUID | None = None,
     characters: list[Character],
     ledger_tail: list[dict],
     staging_rows: list[BibleEntryStaging],
@@ -355,8 +356,9 @@ def run_continuity_checks(
     bible_version_current: int,
     beats: list[dict],
     active_override_fingerprints: set[str],
+    foreshadow_issues: list[ContinuityIssue] | None = None,
 ) -> tuple[list[dict], dict, dict, ContinuityResult]:
-    """Run all Phase 2 rules; return issues, state_diff, stats, aggregate result."""
+    """Run all Phase 2 + Phase 4 rules; return issues, state_diff, stats, aggregate result."""
     raw_issues: list[ContinuityIssue] = []
 
     for character in characters:
@@ -392,6 +394,8 @@ def run_continuity_checks(
             prose=prose, beats=beats, chapter_number=chapter_number
         )
     )
+    if foreshadow_issues:
+        raw_issues.extend(foreshadow_issues)
 
     state_diff = build_state_diff_stub(prose=prose, characters=characters, beats=beats)
     for proposal in state_diff.get("ledger_proposals", []):

@@ -230,6 +230,9 @@ async def test_continuity_service_run_check() -> None:
     service.continuity.active_override_fingerprints = AsyncMock(return_value=set())
     service.ledger.list_settled_for_project = AsyncMock(return_value=[])
     service.continuity.create_report = AsyncMock(return_value=report)
+    service.twists.list_payoffs_with_twists_for_chapter = AsyncMock(return_value=[])
+    service.twists.list_plants_for_project = AsyncMock(return_value=[])
+    service.twists.list_all_plans = AsyncMock(return_value=[])
     session.refresh = AsyncMock()
     session.flush = AsyncMock()
 
@@ -449,6 +452,7 @@ async def test_settle_service_success_path() -> None:
     service.bible.create_version = AsyncMock(return_value=new_bible)
     service.ledger.create = AsyncMock()
     service.continuity.save_idempotency = AsyncMock()
+    service.twists.mark_payoffs_revealed_for_chapter = AsyncMock(return_value=0)
     session.flush = AsyncMock()
 
     from app.services import settle as settle_module
