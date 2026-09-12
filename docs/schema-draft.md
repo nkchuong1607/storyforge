@@ -4,7 +4,8 @@ Entity list and key tables for Postgres. **Not migrated yet** — reference for 
 
 > **Phase 1 canonical schema:** [docs/specs/phase-1/schema.md](specs/phase-1/schema.md)  
 > **Phase 2 canonical schema:** [docs/specs/phase-2/schema.md](specs/phase-2/schema.md) — prose, beats, ledger, continuity, settle  
-> This draft remains for Phase 3+ tables not yet specified in detail.
+> **Phase 3 canonical schema:** [docs/specs/phase-3/schema.md](specs/phase-3/schema.md) — progressive characters, provisional inbox, search v1  
+> This draft remains for Phase 4+ tables not yet specified in detail.
 
 ## Naming Conventions
 
