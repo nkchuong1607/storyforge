@@ -123,11 +123,11 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ### Suggested PR order
 
-1. `api/chapter-prose-beats`
-2. `web/chapter-editor-mvp`
-3. `api/continuity-deterministic`
-4. `web/continuity-gate-mvp`
-5. `api/settle-transaction`
+1. **`specs/phase-2`** — schema, OpenAPI, web screens, continuity rules, test strategy ([docs/specs/phase-2/README.md](../specs/phase-2/README.md))
+2. **`api/phase-2-implementation`** — migrations `004`–`007`, continuity engine, settle TXN, Testcontainers tests, coverage ≥90% local
+3. **`web/phase-2-implementation`** — Chapter Editor + Continuity Gate against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
 
 **Skill focus:** `storyforge-continuity`, `storyforge-domain-canon`
 

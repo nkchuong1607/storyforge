@@ -76,9 +76,9 @@ scripts/harness/ check.sh, agent-preflight.sh
 1. **Specs first** — API/schema/UI contracts in `docs/specs/phase-N/` before feature code
 2. **Implement** — match OpenAPI and schema; domain skills override generic patterns
 3. **Tests** — unit + integration (API: Testcontainers Postgres)
-4. **Coverage** — line ≥ **90%** hard gate for `apps/api` and Phase 1 web modules
+4. **Coverage** — line ≥ **90%** hard gate for `apps/api` and phase-scoped web modules
 
-See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md) and [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md).
+See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md), and [docs/specs/phase-2/README.md](docs/specs/phase-2/README.md).
 
 ## Docs Index
 
@@ -96,7 +96,8 @@ See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md) and [
 
 - [Architecture stub](docs/architecture.md) → product/02
 - [Roadmap stub](docs/roadmap.md) → product/06
-- [Schema draft](docs/schema-draft.md) → Phase 1 canonical in specs
+- [Schema draft](docs/schema-draft.md) → Phase 1–2 canonical in specs
 - [Phase 1 specs (canonical API/schema)](docs/specs/phase-1/README.md)
+- [Phase 2 specs (chapter editor, continuity, settle)](docs/specs/phase-2/README.md)
 - [Quality gates](docs/engineering/quality-gates.md)
 - [Agent setup](docs/agent-setup.md)
