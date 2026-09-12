@@ -1,6 +1,6 @@
 # StoryForge — Wireframe Catalog
 
-> 5 wireframe lo-fi đã vẽ + spec text cho màn hình chưa vẽ. Images: `docs/wireframes/images/`.
+> 10 wireframe lo-fi đã vẽ. Images: `docs/wireframes/images/`.
 
 ---
 
@@ -13,11 +13,11 @@
 | 3 | Chapter Editor + Prompt Edit | [image](../wireframes/images/chapter-editor.png) | US-W01–W03 |
 | 4 | Story Bible / World | [image](../wireframes/images/story-bible.png) | US-B01–B03 |
 | 5 | Continuity Gate + State diff | [image](../wireframes/images/continuity-gate.png) | US-CO01–CO03 |
-| 6 | New Project wizard | text spec | US-P01 |
-| 7 | Characters + Provisional inbox | text spec | US-C01–C03 |
-| 8 | Outline / Timeline / Twist Board | text spec | US-O01–O03, US-T01 |
-| 9 | Power System bible | text spec | US-PW01 |
-| 10 | Psych / Relationship panels | text spec | US-C03 |
+| 6 | New Project wizard | [image](../wireframes/images/new-project-wizard.png) | US-P01 |
+| 7 | Characters + Provisional inbox | [image](../wireframes/images/characters-inbox.png) | US-C01–C03 |
+| 8 | Outline / Timeline / Twist Board | [image](../wireframes/images/outline-twist-board.png) | US-O01–O03, US-T01 |
+| 9 | Power System bible | [image](../wireframes/images/power-system.png) | US-PW01 |
+| 10 | Psych / Relationship panels | [image](../wireframes/images/psych-relationships.png) | US-C03 |
 
 ---
 
@@ -225,32 +225,18 @@ flowchart TD
 
 ---
 
-## 6. New Project wizard (text spec)
+## 6. New Project wizard
 
-Chưa có wireframe image — spec dưới đây cho Phase 1 UI.
+![New Project wizard — Basics step](../wireframes/images/new-project-wizard.png)
 
-### ASCII layout
+### Wizard steps
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  StoryForge          Tạo dự án mới                    [X]   │
-├─────────────────────────────────────────────────────────────┤
-│  ● Basics ─── ○ Genre ─── ○ Template ─── ○ Confirm          │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   Tên dự án *        [________________________]             │
-│   Mô tả ngắn         [________________________]             │
-│   Ngôn ngữ prose     (•) Tiếng Việt  ( ) English            │
-│                                                             │
-│              [ Hủy ]              [ Tiếp theo → ]           │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**Step 2 — Genre:** cards xianxia, mystery, literary, romance, custom → sets `genre_profile` + rule pack.
-
-**Step 3 — Template:** Blank | Kiếm hiệp starter | Trinh thám starter → seeds bible TOC + sample chapters count.
-
-**Step 4 — Confirm:** summary + optional import markdown bible.
+| Step | Nội dung |
+|------|----------|
+| **Basics** (wireframe) | Tên dự án, mô tả ngắn, ngôn ngữ prose |
+| **Genre** | cards xianxia, mystery, literary, romance, custom → sets `genre_profile` + rule pack |
+| **Template** | Blank \| Kiếm hiệp starter \| Trinh thám starter → seeds bible TOC + sample chapters count |
+| **Confirm** | summary + optional import markdown bible |
 
 ### States
 
@@ -264,24 +250,19 @@ Chưa có wireframe image — spec dưới đây cho Phase 1 UI.
 
 ---
 
-## 7. Characters + Provisional inbox (text spec)
+## 7. Characters + Provisional inbox
 
-### ASCII layout — Characters list
+![Characters list + Provisional inbox](../wireframes/images/characters-inbox.png)
 
-```
-┌──────────┬──────────────────────────────────────────────────┐
-│ Sidebar  │  Nhân vật                    [+ Thêm] [Inbox 12]│
-│          ├──────────────────────────────────────────────────┤
-│          │ Filter: [All tiers ▼] [Search...        ]        │
-│          │ ┌────────────────────────────────────────────┐ │
-│          │ │ T3 ★ Lý Thanh Vân    Protagonist    [Edit]│ │
-│          │ │ T1   Mặc Khách A       Guest         [···] │ │
-│          │ │ T0   Đệ tử ngoại môn   Seed          [···] │ │
-│          │ └────────────────────────────────────────────┘ │
-└──────────┴──────────────────────────────────────────────────┘
-```
+### Layout zones
 
-### Provisional inbox (modal or tab)
+| Zone | Thành phần |
+|------|------------|
+| **Main** | Character table — tier, name, role, actions; filters + search |
+| **Inbox panel** | Provisional mentions from outline/draft chapters |
+| **Actions** | Merge (→ official cast), Promote (upgrade tier), Reject |
+
+### Provisional inbox
 
 | Column | Content |
 |--------|---------|
@@ -309,22 +290,15 @@ Chưa có wireframe image — spec dưới đây cho Phase 1 UI.
 
 ---
 
-## 8. Outline / Timeline / Twist Board (text spec)
+## 8. Outline / Timeline / Twist Board
+
+![Twist Board — Kanban view](../wireframes/images/outline-twist-board.png)
+
+Three tabs: **Outline** (tree), **Timeline** (swimlane), **Twist Board** (Kanban — wireframe above).
 
 ### 8a. Outline tree
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Outline                          [+ Act] [+ Chapter]        │
-├─────────────────────────────────────────────────────────────┤
-│ ▼ Act I — Khởi (Ch.1-10)                                    │
-│    ├─ Ch.1  Giới thiệu          planned    [beats]         │
-│    └─ Ch.2  Xung đột đầu        drafting   [beats]         │
-│ ▼ Act II — …                                                │
-└─────────────────────────────────────────────────────────────┘
-```
-
-Drag-drop reorder chapters; link beat plan to Chapter Editor.
+Act → chapter hierarchy; drag-drop reorder; link beat plan to Chapter Editor.
 
 ### 8b. Timeline board
 
@@ -339,6 +313,8 @@ Horizontal swimlane: `World time` vs `Story chapters`. Anchor events draggable; 
 | **Payoffs** | target chapter, required plant IDs |
 | **Revealed** | settled reveals read-only |
 
+Hold **Shift** to link cards across columns. Fairness check panel validates plant/payoff balance.
+
 ### States
 
 | State | UI |
@@ -350,26 +326,19 @@ Horizontal swimlane: `World time` vs `Story chapters`. Anchor events draggable; 
 
 ---
 
-## 9. Power System bible (text spec)
+## 9. Power System bible
+
+![Power System — Cảnh giới tu luyện](../wireframes/images/power-system.png)
 
 Sub-view under Story Bible → World Rules → Power System (xianxia projects).
 
-### ASCII layout
+### Layout zones
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ Power System — Cảnh giới tu luyện              [Edit]       │
-├─────────────────────────────────────────────────────────────┤
-│ Rank ladder (ordered):                                      │
-│  1. Luyện Khí    [constraints...]              [+ Rank]     │
-│  2. Trúc Cơ      ...                                        │
-│ Priority gap: [ 2 ] ranks                                   │
-├─────────────────────────────────────────────────────────────┤
-│ Techniques:                                                 │
-│  ID          Rank req   Sect      Cost                        │
-│  technique.x  Trúc Cơ   Thanh Vân  100 linh thạch           │
-└─────────────────────────────────────────────────────────────┘
-```
+| Zone | Thành phần |
+|------|------------|
+| **Rank ladder** | Ordered ranks with constraints/notes per level |
+| **Priority gap** | Multiplier between ranks (anti-creep) |
+| **Techniques** | ID, rank req, sect, cost, notes |
 
 ### States
 
@@ -382,34 +351,19 @@ Sub-view under Story Bible → World Rules → Power System (xianxia projects).
 
 ---
 
-## 10. Psych / Relationship panels (text spec)
+## 10. Psych / Relationship panels
+
+![Character detail — Psyche + Relationships](../wireframes/images/psych-relationships.png)
 
 Part of Character detail — có thể split panel trong Chapter Editor (POV character quick view).
 
 ### Psyche panel
 
-```
-┌─ Psyche Card ────────────────────────────────────────────────┐
-│ Core traits    [ loyal ] [ stubborn ] [+ ]                  │
-│ Wound          [ betrayal by mentor ]                        │
-│ Desires / Fears                                            │
-│ Moral boundaries  [ never harm children ]                  │
-│ Speech patterns   [ short sentences, northern dialect ]    │
-├─ PsychState timeline ──────────────────────────────────────┤
-│ Ch.10  stress: high | belief: "mentor is dead"              │
-│ Ch.7   stress: medium | ...                                 │
-└─────────────────────────────────────────────────────────────┘
-```
+Core traits, wound, desires/fears, moral boundaries, speech patterns; **PsychState timeline** charting stress/belief per chapter.
 
 ### Relationship panel
 
-```
-┌─ Relationships ──────────────────────────────────────────────┐
-│ Lý Thanh Vân  — trust: ████░ — rival → ally (Ch.8)         │
-│ Bạch Hạo      — trust: ██░░░ — secret debt                  │
-│ [+ Add relationship]                                         │
-└─────────────────────────────────────────────────────────────┘
-```
+Trust bars per character, role labels, sticky notes for arc shifts (e.g. rival → ally after Ch.7).
 
 Graph view (Phase 8+): optional force-directed mini-graph.
 
