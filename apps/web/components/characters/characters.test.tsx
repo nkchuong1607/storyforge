@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mockProjects } from "@/mocks/data";
 import { CHARACTER_1_ID, PROVISIONAL_1_ID } from "@/mocks/phase3-data";
 import { server } from "@/mocks/server";
@@ -11,8 +11,19 @@ import { CharacterFilters } from "./CharacterFilters";
 import { CharacterTable } from "./CharacterTable";
 import { ProvisionalInboxPanel } from "./ProvisionalInboxPanel";
 import { CharactersEmptyState } from "./CharactersEmptyState";
-import { CharacterPsychTabStub } from "./CharacterPsychTabStub";
-import { CharacterRelationshipsTabStub } from "./CharacterRelationshipsTabStub";
+import { CharacterRelationshipsPanel } from "./CharacterRelationshipsPanel";
+
+let activeTabParam = "";
+const replace = vi.fn((url: string) => {
+  const query = url.split("?")[1] ?? "";
+  activeTabParam = new URLSearchParams(query).get("tab") ?? "";
+});
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace, push: vi.fn() }),
+  useSearchParams: () => ({
+    get: (key: string) => (key === "tab" ? activeTabParam || null : null),
+  }),
+}));
 import { CharactersHeader } from "./CharactersHeader";
 import { AddCharacterModal } from "./AddCharacterModal";
 import { MergeCharacterModal } from "./MergeCharacterModal";
@@ -20,6 +31,9 @@ import { MergeCharacterModal } from "./MergeCharacterModal";
 const projectId = mockProjects[0].id;
 
 describe("CharactersPage", () => {
+  beforeEach(() => {
+    activeTabParam = "";
+  });
   it("renders character list and inbox", async () => {
     render(<CharactersPage projectId={projectId} />);
     expect(await screen.findByRole("heading", { name: "Nhân vật" })).toBeInTheDocument();
@@ -125,6 +139,10 @@ describe("CharactersPage", () => {
 });
 
 describe("CharacterDetailPage", () => {
+  beforeEach(() => {
+    activeTabParam = "";
+  });
+
   it("renders overview tab", async () => {
     render(<CharacterDetailPage projectId={projectId} characterId={CHARACTER_1_ID} />);
     expect(await screen.findByRole("heading", { name: "Lý Phong" })).toBeInTheDocument();
@@ -132,13 +150,23 @@ describe("CharacterDetailPage", () => {
     expect(screen.getByDisplayValue("Lý Phong")).toBeInTheDocument();
   });
 
-  it("shows psyche stub tab", async () => {
+  it("shows psyche tab with editor and timeline", async () => {
+    activeTabParam = "psyche";
+    render(<CharacterDetailPage projectId={projectId} characterId={CHARACTER_1_ID} />);
+    await screen.findByRole("heading", { name: "Lý Phong" });
+    const driveField = await screen.findByLabelText("Drive");
+    expect(driveField).toHaveValue("Trở thành kiếm tiên mạnh nhất Thanh Vân Tông");
+    expect(screen.getByText("PsychState timeline")).toBeInTheDocument();
+  });
+
+  it("updates URL when switching tabs", async () => {
     const user = userEvent.setup();
     render(<CharacterDetailPage projectId={projectId} characterId={CHARACTER_1_ID} />);
     await screen.findByRole("heading", { name: "Lý Phong" });
     await user.click(screen.getByRole("button", { name: "Psyche" }));
-    expect(screen.getByText("Chỉnh sửa đầy đủ — Phase 5")).toBeInTheDocument();
-    expect(screen.getByText("Kiên định")).toBeInTheDocument();
+    expect(replace).toHaveBeenCalledWith(
+      `/projects/${projectId}/characters/${CHARACTER_1_ID}?tab=psyche`,
+    );
   });
 
   it("saves overview changes", async () => {
@@ -164,12 +192,12 @@ describe("CharacterDetailPage", () => {
     expect(await screen.findByText("Không tìm thấy nhân vật")).toBeInTheDocument();
   });
 
-  it("shows relationships stub tab", async () => {
-    const user = userEvent.setup();
+  it("shows relationships panel with trust list", async () => {
+    activeTabParam = "relationships";
     render(<CharacterDetailPage projectId={projectId} characterId={CHARACTER_1_ID} />);
     await screen.findByRole("heading", { name: "Lý Phong" });
-    await user.click(screen.getByRole("button", { name: "Relationships" }));
-    expect(screen.getByText("Đồ thị quan hệ đầy đủ — Phase 8+")).toBeInTheDocument();
+    expect(await screen.findByText("Graph view — Phase 8")).toBeInTheDocument();
+    expect(screen.getByText("Đồng môn thân thiết")).toBeInTheDocument();
   });
 
   it("promotes tier from detail page", async () => {
@@ -276,11 +304,12 @@ describe("character components", () => {
     expect(onAdd).toHaveBeenCalled();
   });
 
-  it("CharacterPsychTabStub shows empty state", () => {
+  it("CharacterRelationshipsPanel shows empty trust list", async () => {
     render(
-      <CharacterPsychTabStub
+      <CharacterRelationshipsPanel
+        projectId={projectId}
         character={{
-          id: "c1",
+          id: "990e8400-e29b-41d4-a716-446655440003",
           project_id: projectId,
           display_name: "Empty",
           tier: 0,
@@ -292,27 +321,7 @@ describe("character components", () => {
         }}
       />,
     );
-    expect(screen.getByText("Chưa có psyche card.")).toBeInTheDocument();
-  });
-
-  it("CharacterRelationshipsTabStub shows relations list", () => {
-    render(
-      <CharacterRelationshipsTabStub
-        character={{
-          id: "c1",
-          project_id: projectId,
-          display_name: "Hero",
-          tier: 1,
-          status: "established",
-          aliases: [],
-          appearance_count: 1,
-          metadata: { relations: ["Bạn của Lý Phong"] },
-          created_at: "2026-01-01",
-          updated_at: "2026-01-01",
-        }}
-      />,
-    );
-    expect(screen.getByText("Bạn của Lý Phong")).toBeInTheDocument();
+    expect(await screen.findByText("Chưa có quan hệ được ghi nhận.")).toBeInTheDocument();
   });
 
   it("CharactersHeader toggles inbox", async () => {

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { ContinuityIssue, ContinuityOverride } from "@/lib/api/types";
 import { severityBadgeClass } from "@/lib/continuity-utils";
+import { categoryBadgeClass } from "@/lib/psych-utils";
 import { MarkIntentionalModal } from "./MarkIntentionalModal";
 
 interface ContinuityIssueTableProps {
@@ -82,7 +83,13 @@ export function ContinuityIssueTable({
                       {isOverridden ? " ✓" : ""}
                     </span>
                   </td>
-                  <td className="px-4 py-3">{issue.category}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${categoryBadgeClass(issue.category)}`}
+                    >
+                      {issue.category}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">{issue.message}</td>
                   <td className="px-4 py-3">{issue.chapter_refs.join(", ")}</td>
                   <td className="px-4 py-3">

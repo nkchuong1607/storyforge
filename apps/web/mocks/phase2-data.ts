@@ -69,6 +69,8 @@ export const mockProseVersions: Record<string, ProseVersionDetail[]> = {
 
 const FAIL_FINGERPRINT = "character:770e8400:character_deceased_appears_alive:abc123";
 const WARN_FINGERPRINT = "timeline:880e8400:timeline_order_violation:def456";
+const PSYCH_FAIL_FINGERPRINT =
+  "psychology:990e8400:psych_ooc_moral_boundary_violation:ghi789";
 
 export const mockContinuityReports: Record<string, ContinuityReport[]> = {
   [CHAPTER_3_ID]: [
@@ -77,7 +79,7 @@ export const mockContinuityReports: Record<string, ContinuityReport[]> = {
       chapter_id: CHAPTER_3_ID,
       prose_version: 1,
       result: "fail",
-      stats: { passed: 12, warnings: 1, errors: 1 },
+      stats: { passed: 12, warnings: 1, errors: 2 },
       issues: [
         {
           fingerprint: FAIL_FINGERPRINT,
@@ -85,6 +87,15 @@ export const mockContinuityReports: Record<string, ContinuityReport[]> = {
           category: "character",
           code: "character_deceased_appears_alive",
           message: "Nhân vật 'Lý Phong' đã chết ở ch.3 nhưng xuất hiện sống.",
+          chapter_refs: [3],
+          entity_ids: ["990e8400-e29b-41d4-a716-446655440001"],
+        },
+        {
+          fingerprint: PSYCH_FAIL_FINGERPRINT,
+          severity: "fail",
+          category: "psychology",
+          code: "psych_ooc_moral_boundary_violation",
+          message: "Lý Phong vi phạm moral boundary 'Không giết người vô tội'.",
           chapter_refs: [3],
           entity_ids: ["990e8400-e29b-41d4-a716-446655440001"],
         },
@@ -103,6 +114,24 @@ export const mockContinuityReports: Record<string, ContinuityReport[]> = {
         ],
         bible_patch_candidates: [
           { entry_key: "locations.main_sect", patch: "Thêm mô tả sơn môn" },
+        ],
+        psych_state_proposals: [
+          {
+            character_id: "990e8400-e29b-41d4-a716-446655440001",
+            chapter_id: CHAPTER_3_ID,
+            stress_level: 8,
+            dominant_emotion: "Tuyệt vọng",
+            active_goal: "Trả thù",
+            belief_updates: [{ to_belief: "Công lý không tồn tại", confidence: "extract_stub" }],
+            arc_beat: "Moral break",
+          },
+        ],
+        psyche_card_patches: [
+          {
+            character_id: "990e8400-e29b-41d4-a716-446655440001",
+            patch: { arc_flags: { current_arc_beat: "Moral break" } },
+            confidence: "extract_stub",
+          },
         ],
       },
     },

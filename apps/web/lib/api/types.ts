@@ -84,19 +84,50 @@ export interface ProseVersionCompareResponse {
   created_at_to: string;
 }
 
+export type ContinuityCategory =
+  | "character"
+  | "timeline"
+  | "world"
+  | "foreshadow"
+  | "psychology"
+  | string;
+
 export interface ContinuityIssue {
   fingerprint: string;
   severity: ContinuitySeverity;
-  category: string;
+  category: ContinuityCategory;
   code: string;
   message: string;
   chapter_refs: number[];
   entity_ids?: string[];
+  evidence?: Record<string, unknown>;
+}
+
+export interface PsycheCardPatchProposal {
+  character_id: string;
+  patch: PsycheCard;
+  confidence?: "extract_stub" | "author";
+}
+
+export interface PsychStateProposal {
+  character_id: string;
+  chapter_id: string;
+  stress_level: number;
+  dominant_emotion: string;
+  active_goal: string;
+  belief_updates?: BeliefUpdate[];
+  relationship_stance?: RelationshipStance[];
+  value_pressure?: string | null;
+  arc_beat?: string | null;
+  trigger_event_refs?: string[];
+  confidence?: "extract_stub" | "author";
 }
 
 export interface StateDiff {
   ledger_proposals: Record<string, unknown>[];
   bible_patch_candidates: Record<string, unknown>[];
+  psyche_card_patches?: PsycheCardPatchProposal[];
+  psych_state_proposals?: PsychStateProposal[];
 }
 
 export interface ContinuityStats {
@@ -383,6 +414,103 @@ export interface ExtractCharactersResponse {
   skipped_count: number;
   skipped_reasons?: Record<string, number>;
   provisionals: CharacterProvisional[];
+}
+
+export interface PsycheArcFlags {
+  allow_moral_break?: boolean;
+  expected_arc_beats?: string[];
+  current_arc_beat?: string | null;
+}
+
+export interface RelationshipLensEntry {
+  target_character_id: string;
+  role_label?: string;
+  trust_level?: number;
+  notes?: string;
+}
+
+export interface PsycheCard {
+  drive?: string;
+  need?: string;
+  wound?: string;
+  fear?: string;
+  value_hierarchy?: string[];
+  defense?: string;
+  voice_taboo?: string[];
+  stress_behavior?: string;
+  moral_boundaries?: string[];
+  relationship_lens?: RelationshipLensEntry[];
+  arc_flags?: PsycheArcFlags;
+  [key: string]: unknown;
+}
+
+export interface PsycheCardResponse {
+  character_id: string;
+  project_id: string;
+  tier: CharacterTier;
+  psyche_card: PsycheCard;
+  updated_at: string;
+}
+
+export interface PsycheCardUpdateRequest {
+  psyche_card: PsycheCard;
+}
+
+export interface BeliefUpdate {
+  from_belief?: string;
+  to_belief?: string;
+  confidence?: "extract_stub" | "author" | "llm";
+  trigger_ref?: string;
+}
+
+export interface RelationshipStance {
+  target_character_id?: string;
+  stance?: string;
+  trust_delta?: number;
+  notes?: string;
+}
+
+export interface PsychState {
+  id: string;
+  character_id: string;
+  chapter_id: string;
+  chapter_number?: number;
+  stress_level: number;
+  dominant_emotion: string;
+  active_goal: string;
+  belief_updates: BeliefUpdate[];
+  relationship_stance: RelationshipStance[];
+  value_pressure?: string | null;
+  arc_beat?: string | null;
+  trigger_event_refs: string[];
+  settled_at: string;
+}
+
+export interface PsychStateListResponse {
+  items: PsychState[];
+  pagination: PaginationMeta;
+}
+
+export interface PsychContextPackRequest {
+  chapter_id: string;
+  beat_ids?: string[];
+  character_ids?: string[];
+  include_psyche_card?: boolean;
+  psych_history_limit?: number;
+}
+
+export interface PsychContextPackEntry {
+  character_id: string;
+  display_name: string;
+  tier: CharacterTier;
+  psyche_summary?: PsycheCard;
+  latest_psych_state?: Record<string, unknown>;
+  included_reason: "scene_beat" | "pov" | "t3_principal" | "explicit";
+}
+
+export interface PsychContextPackResponse {
+  entries: PsychContextPackEntry[];
+  truncated: boolean;
 }
 
 export type TwistPlanStatus = "seeded" | "planted" | "armed" | "paid_off" | "abandoned";

@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ContinuityActionsBar } from "./ContinuityActionsBar";
+import { ContinuityIssueTable } from "./ContinuityIssueTable";
 import { ContinuityReportHeader } from "./ContinuityReportHeader";
 import { MarkIntentionalModal } from "./MarkIntentionalModal";
 import { StateDiffPanel } from "./StateDiffPanel";
@@ -29,11 +30,47 @@ describe("continuity-gate components", () => {
         stateDiff={{
           ledger_proposals: [{ entity: "Test" }],
           bible_patch_candidates: [{ key: "rules.test" }],
+          psych_state_proposals: [
+            {
+              character_id: "c1",
+              chapter_id: "ch1",
+              stress_level: 8,
+              dominant_emotion: "Anger",
+              active_goal: "Revenge",
+            },
+          ],
+          psyche_card_patches: [{ character_id: "c1", patch: { drive: "New" } }],
         }}
       />,
     );
     expect(screen.getByText(/Test/)).toBeInTheDocument();
     expect(screen.getByText(/rules.test/)).toBeInTheDocument();
+    expect(screen.getByText(/Stress 8\/10/)).toBeInTheDocument();
+    expect(screen.getByText(/New/)).toBeInTheDocument();
+  });
+
+  it("ContinuityIssueTable shows psychology badge", () => {
+    render(
+      <ContinuityIssueTable
+        projectId="p1"
+        chapterId="c1"
+        issues={[
+          {
+            fingerprint: "psych:1",
+            severity: "fail",
+            category: "psychology",
+            code: "psych_ooc_moral_boundary_violation",
+            message: "OOC violation",
+            chapter_refs: [3],
+          },
+        ]}
+        overrides={[]}
+        readOnly={false}
+        onMarkIntentional={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("psychology")).toBeInTheDocument();
+    expect(screen.getByText("OOC violation")).toBeInTheDocument();
   });
 
   it("ContinuityActionsBar settle disabled with reason", () => {
