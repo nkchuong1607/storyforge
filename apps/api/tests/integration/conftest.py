@@ -10,6 +10,7 @@ from sqlalchemy import text
 async def reset_database(engine) -> AsyncGenerator[None, None]:
     """Truncate tenant tables between integration tests for isolation."""
     tables = (
+        "psych_states",
         "twist_payoffs",
         "twist_plants",
         "twist_plans",

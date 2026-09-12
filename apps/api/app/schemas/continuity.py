@@ -23,6 +23,8 @@ class ContinuityIssue(BaseModel):
 class StateDiff(BaseModel):
     ledger_proposals: list[dict[str, Any]] = Field(default_factory=list)
     bible_patch_candidates: list[dict[str, Any]] = Field(default_factory=list)
+    psyche_card_patches: list[dict[str, Any]] = Field(default_factory=list)
+    psych_state_proposals: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class ContinuityReport(BaseModel):
@@ -66,4 +68,5 @@ class SettleChapterResponse(BaseModel):
     bible_version_before: int
     bible_version_after: int
     ledger_events_appended: int
+    psych_states_appended: int = 0
     settled_at: datetime

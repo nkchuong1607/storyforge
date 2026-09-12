@@ -22,6 +22,7 @@ from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
 from app.repositories.ledger import LedgerRepository
 from app.repositories.prose import ProseRepository
+from app.repositories.psych_state import PsychStateRepository
 from app.repositories.twist import TwistRepository
 from app.schemas.continuity import (
     ContinuityCheckRequest,
@@ -43,6 +44,10 @@ from app.services.continuity.foreshadow import (
     ForeshadowTwistContext,
     run_foreshadow_checks,
 )
+from app.services.continuity.psychology import (
+    build_psych_state_proposals,
+    run_psychology_checks,
+)
 
 
 class ContinuityService:
@@ -56,6 +61,7 @@ class ContinuityService:
         self.characters = CharacterRepository(session)
         self.ledger = LedgerRepository(session)
         self.twists = TwistRepository(session)
+        self.psych_states = PsychStateRepository(session)
 
     def _report_schema(self, report: ContinuityReport) -> ContinuityReportSchema:
         return ContinuityReportSchema(
@@ -112,7 +118,7 @@ class ContinuityService:
         characters = await self.characters.list_all_for_project(project.id)
         staging = await self.bible.list_all_staging(project.id)
         beat_rows = await self.beats.list_for_chapter(chapter.id)
-        beats = [{"summary": b.summary, "beat_key": b.beat_key} for b in beat_rows]
+        beats = [{"id": str(b.id), "summary": b.summary, "beat_key": b.beat_key} for b in beat_rows]
         overrides = await self.continuity.active_override_fingerprints(chapter.id)
 
         payoff_rows = await self.twists.list_payoffs_with_twists_for_chapter(project.id, chapter.id)
@@ -178,6 +184,29 @@ class ContinuityService:
             all_twists=foreshadow_twists,
         )
 
+        scene_character_ids = [
+            c.id for c in characters if c.display_name in prose_row.content and c.tier >= 2
+        ]
+        prior_map = await self.psych_states.list_latest_for_characters_before_chapter(
+            project.id, scene_character_ids, chapter.number
+        )
+        prior_states = {cid: row[0] for cid, row in prior_map.items()}
+        psych_proposals, psyche_patches = build_psych_state_proposals(
+            prose=prose_row.content,
+            characters=characters,
+            beats=beats,
+            chapter_id=chapter.id,
+            prior_states=prior_states,
+        )
+        psychology_raw = run_psychology_checks(
+            prose=prose_row.content,
+            chapter_number=chapter.number,
+            chapter_id=chapter.id,
+            characters=characters,
+            prior_states=prior_states,
+            psych_state_proposals=psych_proposals,
+        )
+
         issues, state_diff, stats, result = run_continuity_checks(
             prose=prose_row.content,
             chapter_number=chapter.number,
@@ -190,6 +219,9 @@ class ContinuityService:
             beats=beats,
             active_override_fingerprints=overrides,
             foreshadow_issues=foreshadow_raw,
+            psychology_issues=psychology_raw,
+            psych_state_proposals=psych_proposals,
+            psyche_card_patches=psyche_patches,
         )
 
         report = ContinuityReport(
@@ -267,9 +299,29 @@ class ContinuityService:
         from app.services.continuity.engine import build_state_diff_stub
 
         characters = await self.characters.list_all_for_project(chapter.project_id)
+        beat_payload = [
+            {"id": str(b.id), "summary": b.summary, "beat_key": b.beat_key} for b in beats
+        ]
+        scene_character_ids = [
+            c.id for c in characters if c.display_name in prose_row.content and c.tier >= 2
+        ]
+        prior_map = await self.psych_states.list_latest_for_characters_before_chapter(
+            chapter.project_id, scene_character_ids, chapter.number
+        )
+        prior_states = {cid: row[0] for cid, row in prior_map.items()}
+        psych_proposals, psyche_patches = build_psych_state_proposals(
+            prose=prose_row.content,
+            characters=characters,
+            beats=beat_payload,
+            chapter_id=chapter.id,
+            prior_states=prior_states,
+        )
         diff = build_state_diff_stub(
             prose=prose_row.content,
             characters=characters,
-            beats=[{"summary": b.summary} for b in beats],
+            beats=beat_payload,
+            chapter_id=chapter.id,
+            psych_state_proposals=psych_proposals,
+            psyche_card_patches=psyche_patches,
         )
         return StateDiff.model_validate(diff)
