@@ -47,6 +47,46 @@ class BibleSection(StrEnum):
 class ChapterStatus(StrEnum):
     planned = "planned"
     drafting = "drafting"
-    continuity_pending = "continuity_pending"
+    reviewing = "reviewing"
     settled = "settled"
     locked = "locked"
+
+
+class ProseSource(StrEnum):
+    human = "human"
+    ai_writer = "ai_writer"
+    ai_editor = "ai_editor"
+
+
+class ContinuityResult(StrEnum):
+    PASS = "pass"
+    WARN = "warn"
+    FAIL = "fail"
+
+
+class ContinuitySeverity(StrEnum):
+    PASS = "pass"
+    WARN = "warn"
+    FAIL = "fail"
+
+
+class ContinuityCategory(StrEnum):
+    character = "character"
+    timeline = "timeline"
+    location = "location"
+    world_rule = "world_rule"
+    bible_staging = "bible_staging"
+
+
+class LedgerEntityType(StrEnum):
+    character = "character"
+    object = "object"
+    knowledge = "knowledge"
+    promise = "promise"
+
+
+class LedgerEventType(StrEnum):
+    status_change = "status_change"
+    location_change = "location_change"
+    timeline_anchor = "timeline_anchor"
+    bible_promote = "bible_promote"

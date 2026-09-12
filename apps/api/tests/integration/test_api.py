@@ -158,7 +158,7 @@ async def test_cross_tenant_project_access_denied(
 
 
 @pytest.mark.integration
-async def test_bible_settle_returns_501(
+async def test_bible_settle_endpoint_removed(
     client: AsyncClient,
     user_a_headers: dict[str, str],
 ) -> None:
@@ -171,8 +171,7 @@ async def test_bible_settle_returns_501(
         f"/projects/{project_id}/bible/settle",
         headers=user_a_headers,
     )
-    assert response.status_code == 501
-    assert response.json()["error"]["code"] == "not_implemented"
+    assert response.status_code == 404
 
 
 @pytest.mark.integration

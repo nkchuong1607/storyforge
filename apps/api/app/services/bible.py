@@ -4,7 +4,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions import AppError, EntryKeyConflictError, NotFoundError
+from app.exceptions import EntryKeyConflictError, NotFoundError
 from app.models.bible import BibleEntryStaging
 from app.models.enums import BibleSection
 from app.models.project import Project
@@ -116,11 +116,4 @@ class BibleService:
             entry_count=entry_count,
             project_id=row.project_id,
             snapshot_json=row.snapshot_json,
-        )
-
-    async def settle_stub(self) -> None:
-        raise AppError(
-            status_code=501,
-            code="not_implemented",
-            message="Bible settle is scheduled for Phase 2",
         )

@@ -1,8 +1,9 @@
 """Chapter metadata model."""
 
 import uuid
+from datetime import datetime
 
-from sqlalchemy import Enum, ForeignKey, Index, Integer, Text, UniqueConstraint
+from sqlalchemy import DateTime, Enum, ForeignKey, Index, Integer, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -15,6 +16,7 @@ class Chapter(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     __table_args__ = (
         UniqueConstraint("project_id", "number", name="uq_chapters_project_number"),
         Index("chapters_project_id_number_idx", "project_id", "number"),
+        Index("chapters_project_status_idx", "project_id", "status", "number"),
     )
 
     project_id: Mapped[uuid.UUID] = mapped_column(
@@ -29,3 +31,6 @@ class Chapter(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     word_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     bible_version_at_draft: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    current_prose_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    settled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    locked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

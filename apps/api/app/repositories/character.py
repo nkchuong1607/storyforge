@@ -18,6 +18,14 @@ class CharacterRepository:
         await self.session.flush()
         return character
 
+    async def list_all_for_project(self, project_id: uuid.UUID) -> list[Character]:
+        rows = await self.session.scalars(
+            select(Character)
+            .where(Character.project_id == project_id)
+            .order_by(Character.display_name.asc())
+        )
+        return list(rows.all())
+
     async def list_for_project(
         self, project_id: uuid.UUID, page: PageParams
     ) -> tuple[list[Character], int]:
