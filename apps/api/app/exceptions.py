@@ -166,6 +166,30 @@ class NotImplementedFeatureError(AppError):
         super().__init__(status_code=501, code="not_implemented", message=message)
 
 
+class TwistPaidOffImmutableError(AppError):
+    def __init__(self, message: str = "Paid-off twist is immutable") -> None:
+        super().__init__(status_code=409, code="twist_paid_off_immutable", message=message)
+
+
+class InvalidTwistStatusTransitionError(AppError):
+    def __init__(self, message: str = "Invalid twist status transition") -> None:
+        super().__init__(
+            status_code=409,
+            code="invalid_twist_status_transition",
+            message=message,
+        )
+
+
+class PayoffAlreadyExistsError(AppError):
+    def __init__(self, message: str = "Payoff already exists for this twist") -> None:
+        super().__init__(status_code=422, code="payoff_already_exists", message=message)
+
+
+class InvalidPlantReferenceError(AppError):
+    def __init__(self, message: str = "Invalid plant reference for payoff") -> None:
+        super().__init__(status_code=422, code="invalid_plant_reference", message=message)
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

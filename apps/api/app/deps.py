@@ -11,6 +11,7 @@ from app.database import get_db_session
 from app.exceptions import NotFoundError, UnauthorizedError
 from app.models.chapter import Chapter
 from app.models.project import Project, ProjectMember
+from app.models.twist import TwistPlan
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
 
@@ -68,3 +69,22 @@ async def require_chapter_access(
 
 
 ChapterAccess = Annotated[Chapter, Depends(require_chapter_access)]
+
+
+async def require_twist_access(
+    project: ProjectAccess,
+    twist_id: Annotated[uuid.UUID, Path(alias="twist_id")],
+    session: DbSession,
+) -> TwistPlan:
+    twist = await session.scalar(
+        select(TwistPlan).where(
+            TwistPlan.id == twist_id,
+            TwistPlan.project_id == project.id,
+        )
+    )
+    if twist is None:
+        raise NotFoundError()
+    return twist
+
+
+TwistAccess = Annotated[TwistPlan, Depends(require_twist_access)]

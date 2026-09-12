@@ -76,6 +76,35 @@ class ContinuityCategory(StrEnum):
     location = "location"
     world_rule = "world_rule"
     bible_staging = "bible_staging"
+    foreshadow = "foreshadow"
+
+
+class TwistPlanStatus(StrEnum):
+    seeded = "seeded"
+    planted = "planted"
+    armed = "armed"
+    paid_off = "paid_off"
+    abandoned = "abandoned"
+
+
+class TwistPlanKind(StrEnum):
+    twist = "twist"
+    promise = "promise"
+
+
+class PlantSalience(StrEnum):
+    soft = "soft"
+    hard = "hard"
+
+
+class GenreStrictness(StrEnum):
+    strict = "strict"
+    relaxed = "relaxed"
+
+
+class ContextAudience(StrEnum):
+    author = "author"
+    writer = "writer"
 
 
 class LedgerEntityType(StrEnum):

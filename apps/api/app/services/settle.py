@@ -25,6 +25,7 @@ from app.models.ledger_event import LedgerEvent
 from app.repositories.bible import BibleRepository
 from app.repositories.continuity import ContinuityRepository
 from app.repositories.ledger import LedgerRepository
+from app.repositories.twist import TwistRepository
 from app.schemas.continuity import SettleChapterRequest, SettleChapterResponse
 from app.services.continuity.engine import _normalize_content, _snapshot_entries_map
 
@@ -35,6 +36,7 @@ class SettleService:
         self.bible = BibleRepository(session)
         self.continuity = ContinuityRepository(session)
         self.ledger = LedgerRepository(session)
+        self.twists = TwistRepository(session)
 
     async def _get_cached_response(
         self, chapter_id: uuid.UUID, idempotency_key: uuid.UUID | None
@@ -198,6 +200,7 @@ class SettleService:
         chapter.status = ChapterStatus.locked
         chapter.settled_at = now
         chapter.locked_at = now
+        await self.twists.mark_payoffs_revealed_for_chapter(project.id, chapter.id, now)
         await self.session.flush()
 
         response = SettleChapterResponse(
