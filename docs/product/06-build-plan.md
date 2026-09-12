@@ -276,17 +276,19 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ## Phase 7 — UI Polish
 
-**Goal:** Production-grade UX; accessibility; taste-skill alignment.
+**Goal:** Production-grade UX; accessibility; design system; wireframe parity; i18n (VI primary, EN secondary for chrome).
 
 ### Deliverables
 
 | Item | Output |
 |------|--------|
-| Design system | tokens, typography, dark mode |
-| Wireframe parity | all 5 screens + wizard/inbox |
+| Design system | tokens, typography, light/dark, shared components |
+| Wireframe parity | all 10 wireframe screens + wizard/inbox states |
 | External skills | taste-skill, ui-ux-pro-max on dev machines |
-| Performance | optimistic UI, skeleton states |
-| i18n | VI primary, EN secondary for chrome |
+| Performance | skeletons, safe optimistic UI, route loading |
+| i18n | `messages/vi.json`, `messages/en.json`; no hard-coded chrome |
+| Accessibility | WCAG AA; jest-axe smoke on primary routes |
+| Client prefs | theme + locale in `localStorage` (no Phase 7 API) |
 
 ### Dependencies
 
@@ -294,10 +296,18 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ### Definition of done
 
-- Empty/loading/error states on all primary screens
+- Empty/loading/error/success states on all primary screens ([screen-parity](../specs/phase-7/screen-parity.md))
 - `docs/product/05-wireframes.md` acceptance checklist passed
+- `make test-web-cov` ≥90% on Phase 7 polish modules locally
 
-**Skill focus:** `storyforge-ui-external`
+### Suggested PR order
+
+1. **`specs/phase-7`** — design system, screen parity, a11y, i18n, performance, web screens, test strategy ([docs/specs/phase-7/README.md](../specs/phase-7/README.md))
+2. **`web/phase-7-implementation`** — design tokens, components, i18n, a11y, wireframe parity across routes
+
+**No default API PR** — theme/locale are client-only unless server prefs explicitly scoped later.
+
+**Skill focus:** `storyforge-web-next`, `storyforge-ui-external`
 
 ---
 
