@@ -30,7 +30,7 @@ test-api-cov:
 
 # Web coverage gate (implementation PR — requires vitest coverage script)
 test-web-cov:
-	@if [[ -f apps/web/package.json ]] && grep -q '"test:coverage"' apps/web/package.json; then \
+	@if [ -f apps/web/package.json ] && grep -q '"test:coverage"' apps/web/package.json; then \
 	  cd apps/web && npm run test:coverage; \
 	else \
 	  echo "SKIP: apps/web test:coverage script not configured yet"; \
