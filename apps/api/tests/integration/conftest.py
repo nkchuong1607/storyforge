@@ -17,6 +17,7 @@ async def reset_database(engine) -> AsyncGenerator[None, None]:
         "prose_versions",
         "scene_beats",
         "characters",
+        "character_provisional",
         "chapters",
         "bible_entry_staging",
         "bible_versions",

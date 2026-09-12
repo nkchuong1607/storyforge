@@ -39,13 +39,15 @@ class LedgerRepository:
         )
         return list(rows.all())
 
-    async def latest_settled_for_entity(
+    async def list_tail_for_entity(
         self,
         project_id: uuid.UUID,
         entity_type: LedgerEntityType,
         entity_id: uuid.UUID,
-    ) -> LedgerEvent | None:
-        return await self.session.scalar(
+        *,
+        limit: int = 5,
+    ) -> list[LedgerEvent]:
+        rows = await self.session.scalars(
             select(LedgerEvent)
             .where(
                 LedgerEvent.project_id == project_id,
@@ -54,5 +56,6 @@ class LedgerRepository:
                 LedgerEvent.settled_at.is_not(None),
             )
             .order_by(LedgerEvent.settled_at.desc())
-            .limit(1)
+            .limit(limit)
         )
+        return list(rows.all())
