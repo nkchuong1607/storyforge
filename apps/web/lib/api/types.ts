@@ -13,9 +13,138 @@ export type BibleSection =
 export type ChapterStatus =
   | "planned"
   | "drafting"
-  | "continuity_pending"
+  | "reviewing"
   | "settled"
   | "locked";
+
+export type ContinuitySeverity = "pass" | "warn" | "fail";
+export type ProseSource = "human" | "ai";
+
+export interface ChapterUpdateRequest {
+  title?: string;
+  status?: ChapterStatus;
+}
+
+export interface SceneBeat {
+  id: string;
+  chapter_id: string;
+  beat_key: string;
+  summary: string;
+  sort_order: number;
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SceneBeatCreateRequest {
+  beat_key: string;
+  summary: string;
+  sort_order: number;
+  completed?: boolean;
+}
+
+export interface SceneBeatUpdateRequest {
+  beat_key?: string;
+  summary?: string;
+  sort_order?: number;
+  completed?: boolean;
+}
+
+export interface SceneBeatListResponse {
+  items: SceneBeat[];
+  pagination: PaginationMeta;
+}
+
+export interface ProseVersionSummary {
+  version: number;
+  word_count: number;
+  source: ProseSource;
+  created_by: string;
+  created_at: string;
+}
+
+export interface ProseVersionDetail extends ProseVersionSummary {
+  content: string;
+}
+
+export interface ProseVersionListResponse {
+  items: ProseVersionSummary[];
+  pagination: PaginationMeta;
+}
+
+export interface ProseVersionCreateRequest {
+  content: string;
+}
+
+export interface ProseVersionCompareResponse {
+  from_version: number;
+  to_version: number;
+  word_count_delta: number;
+  created_at_from: string;
+  created_at_to: string;
+}
+
+export interface ContinuityIssue {
+  fingerprint: string;
+  severity: ContinuitySeverity;
+  category: string;
+  code: string;
+  message: string;
+  chapter_refs: number[];
+  entity_ids?: string[];
+}
+
+export interface StateDiff {
+  ledger_proposals: Record<string, unknown>[];
+  bible_patch_candidates: Record<string, unknown>[];
+}
+
+export interface ContinuityStats {
+  passed: number;
+  warnings: number;
+  errors: number;
+}
+
+export interface ContinuityReport {
+  report_id: string;
+  chapter_id: string;
+  prose_version: number;
+  result: ContinuitySeverity;
+  stats: ContinuityStats;
+  issues: ContinuityIssue[];
+  state_diff: StateDiff;
+}
+
+export interface ContinuityCheckRequest {
+  prose_version?: number;
+}
+
+export interface ContinuityOverride {
+  id: string;
+  issue_fingerprint: string;
+  severity_at_override: ContinuitySeverity;
+  reason: string;
+  created_at: string;
+}
+
+export interface ContinuityOverrideCreateRequest {
+  issue_fingerprint: string;
+  reason: string;
+}
+
+export interface SettleRequest {
+  report_id?: string;
+  approve_state_diff?: boolean;
+}
+
+export interface SettleResponse {
+  chapter_id: string;
+  status: ChapterStatus;
+  bible_version_before: number;
+  bible_version_after: number;
+  ledger_events_appended: number;
+  settled_at: string;
+}
 
 export interface PaginationMeta {
   page: number;
@@ -127,6 +256,9 @@ export interface Chapter {
   status: ChapterStatus;
   word_count: number;
   bible_version_at_draft?: number | null;
+  current_prose_version?: number | null;
+  settled_at?: string | null;
+  locked_at?: string | null;
   created_at: string;
   updated_at: string;
 }

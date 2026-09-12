@@ -92,7 +92,7 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
           <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
             <div>
               <h2 className="mb-3 text-lg font-semibold text-slate-900">Danh sách chương</h2>
-              <ChapterTable chapters={chapters} />
+              <ChapterTable projectId={projectId} chapters={chapters} />
             </div>
             <RecentActivity />
           </div>
