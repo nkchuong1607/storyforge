@@ -1,0 +1,42 @@
+openapi: 3.1.0
+info:
+  title: StoryForge API
+  version: 0.2.0-phase7
+  description: |
+    Phase 7 contract — **no new API endpoints**.
+
+    UI polish (theme, locale, design system) uses **client-only preferences**:
+    - `localStorage` keys `storyforge.theme` and `storyforge.locale`
+    - Optional cookies `sf_theme` / `sf_locale` for SSR flash prevention
+
+    Phase 1–6 routes remain authoritative in their phase OpenAPI files.
+    Server-persisted user preferences deferred to Phase 8+ (when real auth ships).
+
+    See [api-contracts.md](./api-contracts.md) and [i18n.md](./i18n.md).
+
+servers:
+  - url: http://localhost:8000
+    description: Local API dev
+
+tags:
+  - name: Health
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: API reachable
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    example: ok

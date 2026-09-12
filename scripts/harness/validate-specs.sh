@@ -44,5 +44,6 @@ validate_openapi "Phase 3" "docs/specs/phase-3/openapi.yaml"
 validate_openapi "Phase 4" "docs/specs/phase-4/openapi.yaml"
 validate_openapi "Phase 5" "docs/specs/phase-5/openapi.yaml"
 validate_openapi "Phase 6" "docs/specs/phase-6/openapi.yaml"
+validate_openapi "Phase 7" "docs/specs/phase-7/openapi.yaml"
 
 echo "Spec validation passed"
