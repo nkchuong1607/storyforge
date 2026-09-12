@@ -71,10 +71,11 @@ describe("shared UI", () => {
   });
 
   it("ChapterTable empty and populated", () => {
-    const { rerender } = render(<ChapterTable chapters={[]} />);
+    const { rerender } = render(<ChapterTable projectId="p" chapters={[]} />);
     expect(screen.getByText("Chưa có chương")).toBeInTheDocument();
     rerender(
       <ChapterTable
+        projectId="p"
         chapters={[
           {
             id: "1",

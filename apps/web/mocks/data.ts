@@ -7,8 +7,16 @@ import type {
   ProjectSummary,
 } from "@/lib/api/types";
 import { DEFAULT_USER_ID } from "@/lib/session";
+import {
+  CHAPTER_1_ID,
+  CHAPTER_2_ID,
+  CHAPTER_3_ID,
+  PROJECT_1_ID,
+  resetPhase2MockData,
+} from "./phase2-data";
 
 export const MOCK_USER_ID = DEFAULT_USER_ID;
+export { CHAPTER_1_ID, CHAPTER_2_ID, CHAPTER_3_ID, PROJECT_1_ID };
 
 export const mockProjects: ProjectDetail[] = [
   {
@@ -25,7 +33,7 @@ export const mockProjects: ProjectDetail[] = [
     updated_at: "2026-09-12T10:00:00Z",
     created_by: MOCK_USER_ID,
     created_at: "2026-09-01T10:00:00Z",
-    chapter_count: 2,
+    chapter_count: 3,
     bible_entry_count: 2,
   },
   {
@@ -48,26 +56,41 @@ export const mockProjects: ProjectDetail[] = [
 ];
 
 export const mockChapters: Record<string, Chapter[]> = {
-  "660e8400-e29b-41d4-a716-446655440001": [
+  [PROJECT_1_ID]: [
     {
-      id: "770e8400-e29b-41d4-a716-446655440001",
-      project_id: "660e8400-e29b-41d4-a716-446655440001",
+      id: CHAPTER_1_ID,
+      project_id: PROJECT_1_ID,
       number: 1,
       title: "Chương 1 — Khởi đầu",
       status: "planned",
       word_count: 0,
+      current_prose_version: null,
       created_at: "2026-09-12T10:00:00Z",
       updated_at: "2026-09-12T10:00:00Z",
     },
     {
-      id: "770e8400-e29b-41d4-a716-446655440002",
-      project_id: "660e8400-e29b-41d4-a716-446655440001",
+      id: CHAPTER_2_ID,
+      project_id: PROJECT_1_ID,
       number: 2,
       title: "Chương 2 — Tu luyện",
       status: "drafting",
-      word_count: 1200,
+      word_count: 18,
+      bible_version_at_draft: 0,
+      current_prose_version: 2,
       created_at: "2026-09-12T11:00:00Z",
       updated_at: "2026-09-12T12:00:00Z",
+    },
+    {
+      id: CHAPTER_3_ID,
+      project_id: PROJECT_1_ID,
+      number: 3,
+      title: "Chương 3 — Thử thách",
+      status: "reviewing",
+      word_count: 850,
+      bible_version_at_draft: 0,
+      current_prose_version: 1,
+      created_at: "2026-09-12T13:00:00Z",
+      updated_at: "2026-09-12T14:00:00Z",
     },
   ],
 };
@@ -169,6 +192,7 @@ export function resetMockData(): void {
     delete mockCharacters[key];
   }
   Object.assign(mockCharacters, structuredClone(initialCharacters));
+  resetPhase2MockData();
 }
 
 export function toSummary(project: ProjectDetail): ProjectSummary {

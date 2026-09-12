@@ -11,6 +11,14 @@ describe("ProjectHubPage", () => {
     expect(await screen.findByRole("heading", { name: "Kiếm Lai" })).toBeInTheDocument();
     expect(screen.getByText("Chương 1 — Khởi đầu")).toBeInTheDocument();
     expect(screen.getByText("Danh sách chương")).toBeInTheDocument();
+    expect(screen.getByText("Chương đang xem xét")).toBeInTheDocument();
+  });
+
+  it("chapter links route reviewing to continuity gate", async () => {
+    render(<ProjectHubPage projectId={mockProjects[0].id} />);
+    await screen.findByText("Chương 3 — Thử thách");
+    const link = screen.getByRole("link", { name: "Chương 3 — Thử thách" });
+    expect(link.getAttribute("href")).toContain("/continuity");
   });
 
   it("shows not found for unknown project", async () => {

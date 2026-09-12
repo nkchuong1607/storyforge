@@ -10,6 +10,7 @@ import {
   paginate,
   toSummary,
 } from "./data";
+import { phase2Handlers } from "./phase2-handlers";
 
 const BASE = "http://localhost:8000";
 
@@ -231,4 +232,6 @@ export const handlers = [
       snapshot_json: { version, entries: [] },
     });
   }),
+
+  ...phase2Handlers,
 ];

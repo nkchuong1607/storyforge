@@ -17,9 +17,15 @@ export const TEMPLATE_LABELS: Record<ProjectTemplate, string> = {
 export const CHAPTER_STATUS_LABELS: Record<ChapterStatus, string> = {
   planned: "Đã lập kế hoạch",
   drafting: "Đang viết",
-  continuity_pending: "Đang xem xét",
+  reviewing: "Đang xem xét",
   settled: "Đã viết",
   locked: "Bị khóa",
+};
+
+export const CONTINUITY_RESULT_LABELS: Record<string, string> = {
+  pass: "PASS",
+  warn: "WARN",
+  fail: "FAIL",
 };
 
 export const BIBLE_SECTION_LABELS: Record<string, string> = {
