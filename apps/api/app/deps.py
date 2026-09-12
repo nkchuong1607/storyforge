@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db_session
 from app.exceptions import NotFoundError, UnauthorizedError
+from app.models.chapter import Chapter
 from app.models.project import Project, ProjectMember
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
@@ -48,3 +49,22 @@ async def require_project_access(
 
 
 ProjectAccess = Annotated[Project, Depends(require_project_access)]
+
+
+async def require_chapter_access(
+    project: ProjectAccess,
+    chapter_id: Annotated[uuid.UUID, Path(alias="chapter_id")],
+    session: DbSession,
+) -> Chapter:
+    chapter = await session.scalar(
+        select(Chapter).where(
+            Chapter.id == chapter_id,
+            Chapter.project_id == project.id,
+        )
+    )
+    if chapter is None:
+        raise NotFoundError()
+    return chapter
+
+
+ChapterAccess = Annotated[Chapter, Depends(require_chapter_access)]

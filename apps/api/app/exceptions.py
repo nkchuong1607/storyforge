@@ -74,6 +74,48 @@ class ChapterNumberConflictError(AppError):
         )
 
 
+class ChapterLockedError(AppError):
+    def __init__(self, message: str = "Chapter is locked after settle") -> None:
+        super().__init__(status_code=409, code="chapter_locked", message=message)
+
+
+class InvalidChapterStatusTransitionError(AppError):
+    def __init__(self, message: str = "Invalid chapter status transition") -> None:
+        super().__init__(
+            status_code=409,
+            code="invalid_chapter_status_transition",
+            message=message,
+        )
+
+
+class ContinuityFailBlocksSettleError(AppError):
+    def __init__(self, details: list[dict[str, Any]] | None = None) -> None:
+        super().__init__(
+            status_code=409,
+            code="continuity_fail_blocks_settle",
+            message="Unresolved continuity FAIL blocks settle",
+            details=details,
+        )
+
+
+class ContinuityCheckRequiredError(AppError):
+    def __init__(self, message: str = "Continuity check required before settle") -> None:
+        super().__init__(
+            status_code=422,
+            code="continuity_check_required",
+            message=message,
+        )
+
+
+class BeatKeyConflictError(AppError):
+    def __init__(self, beat_key: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="beat_key_conflict",
+            message=f"Beat key '{beat_key}' already exists",
+        )
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

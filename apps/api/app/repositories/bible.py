@@ -106,3 +106,9 @@ class BibleRepository:
     async def get_version_snapshot_entry_count(self, snapshot_json: dict) -> int:
         entries = snapshot_json.get("entries", [])
         return len(entries) if isinstance(entries, list) else 0
+
+    async def list_all_staging(self, project_id: uuid.UUID) -> list[BibleEntryStaging]:
+        rows = await self.session.scalars(
+            select(BibleEntryStaging).where(BibleEntryStaging.project_id == project_id)
+        )
+        return list(rows.all())

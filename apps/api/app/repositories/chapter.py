@@ -27,6 +27,18 @@ class ChapterRepository:
         )
         return result is not None
 
+    async def get(self, project_id: uuid.UUID, chapter_id: uuid.UUID) -> Chapter | None:
+        return await self.session.scalar(
+            select(Chapter).where(
+                Chapter.id == chapter_id,
+                Chapter.project_id == project_id,
+            )
+        )
+
+    async def update(self, chapter: Chapter) -> Chapter:
+        await self.session.flush()
+        return chapter
+
     async def list_for_project(
         self, project_id: uuid.UUID, page: PageParams
     ) -> tuple[list[Chapter], int]:

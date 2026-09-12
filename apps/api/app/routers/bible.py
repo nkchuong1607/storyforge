@@ -96,9 +96,3 @@ async def get_bible_version(
 ) -> BibleVersionDetail:
     service = BibleService(session)
     return await service.get_version(project, version)
-
-
-@router.post("/settle", status_code=status.HTTP_501_NOT_IMPLEMENTED)
-async def settle_bible(project: ProjectAccess, session: DbSession) -> None:
-    service = BibleService(session)
-    await service.settle_stub()
