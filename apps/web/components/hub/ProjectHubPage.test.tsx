@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 import { mockProjects } from "@/mocks/data";
@@ -24,6 +24,13 @@ describe("ProjectHubPage", () => {
   it("shows not found for unknown project", async () => {
     render(<ProjectHubPage projectId="00000000-0000-0000-0000-000000000000" />);
     expect(await screen.findByText("Không tìm thấy dự án")).toBeInTheDocument();
+  });
+
+  it("shows fairness fail badge in sidebar", async () => {
+    render(<ProjectHubPage projectId={mockProjects[0].id} />);
+    expect(await screen.findByRole("heading", { name: "Kiếm Lai" })).toBeInTheDocument();
+    const outlineLink = screen.getByRole("link", { name: /Outline \/ Twist/i });
+    expect(within(outlineLink).getByText("1")).toBeInTheDocument();
   });
 
   it("shows error state", async () => {

@@ -25,6 +25,8 @@ export default defineConfig({
         "components/chapter-editor/**/*.tsx",
         "components/characters/**/*.tsx",
         "components/continuity-gate/**/*.tsx",
+        "components/twist-board/**/*.tsx",
+        "lib/twist-utils.ts",
         "components/ui/**/*.tsx",
       ],
       exclude: ["**/*.test.{ts,tsx}", "**/mocks/**"],

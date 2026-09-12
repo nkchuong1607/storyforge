@@ -3,8 +3,9 @@ import Link from "next/link";
 interface ProjectSidebarProps {
   projectId: string;
   projectTitle: string;
-  active: "hub" | "bible" | "characters";
+  active: "hub" | "bible" | "characters" | "outline";
   pendingCount?: number;
+  fairnessFailCount?: number;
 }
 
 export function ProjectSidebar({
@@ -12,6 +13,7 @@ export function ProjectSidebar({
   projectTitle,
   active,
   pendingCount = 0,
+  fairnessFailCount = 0,
 }: ProjectSidebarProps) {
   const linkClass = (isActive: boolean) =>
     `flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
@@ -42,7 +44,17 @@ export function ProjectSidebar({
           </span>
         ) : null}
       </Link>
-      <span className="block rounded-lg px-3 py-2 text-sm text-slate-400">Outline (sắp ra mắt)</span>
+      <Link
+        href={`/projects/${projectId}/outline?tab=twist-board`}
+        className={linkClass(active === "outline")}
+      >
+        <span>Outline / Twist</span>
+        {fairnessFailCount > 0 ? (
+          <span className="rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">
+            {fairnessFailCount}
+          </span>
+        ) : null}
+      </Link>
       <span className="block rounded-lg px-3 py-2 text-sm text-slate-400">
         Continuity (sắp ra mắt)
       </span>
