@@ -12,6 +12,7 @@ import {
 } from "./data";
 import { phase2Handlers } from "./phase2-handlers";
 import { phase3Handlers } from "./phase3-handlers";
+import { phase4Handlers } from "./phase4-handlers";
 
 const BASE = "http://localhost:8000";
 
@@ -226,4 +227,5 @@ export const handlers = [
 
   ...phase2Handlers,
   ...phase3Handlers,
+  ...phase4Handlers,
 ];

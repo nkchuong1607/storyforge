@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { getProject } from "@/lib/api/projects";
 import { listChapters } from "@/lib/api/chapters";
+import { getTwistBoard } from "@/lib/api/twists";
+import { countFairnessFails } from "@/lib/twist-utils";
 import type { Chapter, ProjectDetail } from "@/lib/api/types";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
@@ -23,17 +25,20 @@ interface ProjectHubPageProps {
 export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [fairnessFailCount, setFairnessFailCount] = useState(0);
   const [loadState, setLoadState] = useState<LoadState>("loading");
 
   const loadHub = useCallback(async () => {
     setLoadState("loading");
     try {
-      const [projectData, chaptersData] = await Promise.all([
+      const [projectData, chaptersData, boardData] = await Promise.all([
         getProject(projectId),
         listChapters(projectId),
+        getTwistBoard(projectId).catch(() => null),
       ]);
       setProject(projectData);
       setChapters(chaptersData.items);
+      setFairnessFailCount(boardData ? countFairnessFails(boardData) : 0);
       setLoadState("success");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "status" in err && err.status === 404) {
@@ -63,7 +68,12 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
 
   const sidebar =
     project ? (
-      <ProjectSidebar projectId={projectId} projectTitle={project.title} active="hub" />
+      <ProjectSidebar
+        projectId={projectId}
+        projectTitle={project.title}
+        active="hub"
+        fairnessFailCount={fairnessFailCount}
+      />
     ) : null;
 
   return (

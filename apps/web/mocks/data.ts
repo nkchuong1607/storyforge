@@ -14,6 +14,7 @@ import {
   resetPhase2MockData,
 } from "./phase2-data";
 import { mockPhase3Characters, resetPhase3MockData } from "./phase3-data";
+import { resetPhase4MockData } from "./phase4-data";
 
 export const MOCK_USER_ID = DEFAULT_USER_ID;
 export { CHAPTER_1_ID, CHAPTER_2_ID, CHAPTER_3_ID, PROJECT_1_ID };
@@ -176,6 +177,7 @@ export function resetMockData(): void {
   Object.assign(mockVersions, structuredClone(initialVersions));
   resetPhase2MockData();
   resetPhase3MockData();
+  resetPhase4MockData();
 }
 
 export function toSummary(project: ProjectDetail): ProjectSummary {

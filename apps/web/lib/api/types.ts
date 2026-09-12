@@ -384,3 +384,163 @@ export interface ExtractCharactersResponse {
   skipped_reasons?: Record<string, number>;
   provisionals: CharacterProvisional[];
 }
+
+export type TwistPlanStatus = "seeded" | "planted" | "armed" | "paid_off" | "abandoned";
+export type TwistPlanKind = "twist" | "promise";
+export type PlantSalience = "soft" | "hard";
+export type TwistFairnessSeverity = "ok" | "warn" | "fail";
+
+export interface TwistFairnessState {
+  state: TwistFairnessSeverity;
+  issue_codes: string[];
+}
+
+export interface TwistPayoffSummary {
+  id: string;
+  target_chapter_id: string;
+  target_chapter_number: number;
+  min_plants: number;
+  required_plant_ids: string[];
+}
+
+export interface TwistPlan {
+  id: string;
+  project_id: string;
+  title: string;
+  secret_truth?: string;
+  status: TwistPlanStatus;
+  kind: TwistPlanKind;
+  misdirection?: string | null;
+  constraints_json: Record<string, unknown>;
+  genre_strictness?: "strict" | "relaxed" | null;
+  plant_count: number;
+  payoff?: TwistPayoffSummary | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TwistPlanCreateRequest {
+  title: string;
+  secret_truth: string;
+  kind?: TwistPlanKind;
+  misdirection?: string | null;
+  constraints_json?: Record<string, unknown>;
+  genre_strictness?: "strict" | "relaxed" | null;
+}
+
+export interface TwistPlanUpdateRequest {
+  title?: string;
+  secret_truth?: string;
+  misdirection?: string | null;
+  constraints_json?: Record<string, unknown>;
+  genre_strictness?: "strict" | "relaxed" | null;
+  status?: TwistPlanStatus;
+}
+
+export interface TwistPlanListResponse {
+  items: TwistPlan[];
+  pagination: PaginationMeta;
+}
+
+export interface TwistTransitionRequest {
+  status: TwistPlanStatus;
+}
+
+export interface TwistPlant {
+  id: string;
+  project_id: string;
+  twist_id: string;
+  chapter_id: string;
+  chapter_number?: number;
+  beat_id?: string | null;
+  salience: PlantSalience;
+  snippet: string;
+  prose_span_start?: number | null;
+  prose_span_end?: number | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TwistPlantCreateRequest {
+  chapter_id: string;
+  beat_id?: string | null;
+  salience?: PlantSalience;
+  snippet: string;
+  prose_span_start?: number | null;
+  prose_span_end?: number | null;
+  sort_order?: number;
+}
+
+export interface TwistPlantUpdateRequest {
+  chapter_id?: string;
+  beat_id?: string | null;
+  salience?: PlantSalience;
+  snippet?: string;
+  prose_span_start?: number | null;
+  prose_span_end?: number | null;
+  sort_order?: number;
+  twist_id?: string;
+}
+
+export interface TwistPlantListResponse {
+  items: TwistPlant[];
+}
+
+export interface TwistPayoff {
+  id: string;
+  project_id: string;
+  twist_id: string;
+  target_chapter_id: string;
+  target_chapter_number: number;
+  required_plant_ids: string[];
+  min_plants: number;
+  revealed_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TwistPayoffCreateRequest {
+  target_chapter_id: string;
+  required_plant_ids?: string[];
+  min_plants?: number;
+}
+
+export interface TwistPayoffUpdateRequest {
+  target_chapter_id?: string;
+  required_plant_ids?: string[];
+  min_plants?: number;
+}
+
+export type TwistBoardColumnId = "secrets" | "plants" | "payoffs" | "revealed";
+export type TwistBoardCardType = "twist" | "plant" | "payoff";
+
+export interface TwistBoardCard {
+  card_type: TwistBoardCardType;
+  twist_id?: string;
+  plant_id?: string;
+  payoff_id?: string;
+  title?: string;
+  twist_title?: string;
+  status?: TwistPlanStatus;
+  kind?: TwistPlanKind;
+  secret_truth_preview?: string;
+  chapter_number?: number;
+  target_chapter_number?: number;
+  salience?: PlantSalience;
+  snippet?: string;
+  min_plants?: number;
+  plant_count?: number;
+  required_plant_ids?: string[];
+  fairness?: TwistFairnessState;
+}
+
+export interface TwistBoardColumn {
+  id: TwistBoardColumnId;
+  label: string;
+  cards: TwistBoardCard[];
+}
+
+export interface TwistBoardResponse {
+  columns: TwistBoardColumn[];
+}
