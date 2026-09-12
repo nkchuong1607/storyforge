@@ -1,0 +1,15 @@
+---
+description: Database and ledger design invariants
+globs: apps/api/**,docs/schema-draft.md
+alwaysApply: false
+---
+
+# Database Design Rules
+
+- Ledger events are append-only after settle; no silent UPDATE/DELETE of settled rows.
+- Bible versions are immutable INSERT-only rows.
+- Every tenant table includes `project_id` with an index.
+- Foreign keys and composite UNIQUE constraints as in `docs/schema-draft.md`.
+- Never overwrite settled character state — append compensating events.
+- Migrations via Alembic (Phase 1+); one logical change per revision.
+- Context queries must be bounded (LIMIT); no full novel loads.

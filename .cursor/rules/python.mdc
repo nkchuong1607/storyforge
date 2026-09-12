@@ -1,0 +1,15 @@
+---
+description: Python and FastAPI conventions for apps/api
+globs: apps/api/**
+alwaysApply: false
+---
+
+# Python / FastAPI Rules
+
+- Python 3.11+ with full type hints on public functions.
+- Use Ruff for lint and format; configuration in `apps/api/pyproject.toml`.
+- Tests with pytest; files under `apps/api/tests/`.
+- No bare `except:` — catch specific exceptions and log or re-raise appropriately.
+- FastAPI: Pydantic v2 schemas, `Depends()` for DB session and project ACL.
+- Business logic in `services/`, thin routers.
+- Ledger and bible writes follow `storyforge-domain-canon` — transactional settle only.

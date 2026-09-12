@@ -1,0 +1,15 @@
+---
+description: Core StoryForge conventions for all agents
+alwaysApply: true
+---
+
+# StoryForge Core Rules
+
+- Read `AGENTS.md` before non-trivial work.
+- Product docs may use Vietnamese; **code, identifiers, commits, and API fields use English**.
+- Multi-project isolation: never leak data across `project_id` boundaries.
+- Prefer small, focused PRs with conventional commit messages.
+- Do not commit secrets, API keys, or `.env` files.
+- Run `make check` (or `bash scripts/harness/check.sh`) before claiming work is done.
+- This bootstrap is harness + docs + stubs — do not implement full product UI or Writer agents unless explicitly requested.
+- Canon invariants: bible versions immutable; ledgers append-only; human approve before settle.

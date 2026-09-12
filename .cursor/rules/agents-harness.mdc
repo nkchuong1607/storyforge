@@ -1,0 +1,25 @@
+---
+description: Agent harness — preflight and check scripts before done
+alwaysApply: true
+---
+
+# Agents Harness
+
+Before starting implementation:
+
+```bash
+bash scripts/harness/agent-preflight.sh
+```
+
+Before marking work complete:
+
+```bash
+make check
+# or: bash scripts/harness/check.sh
+```
+
+Both must exit 0. If a new check is added (lint, test, skill lint), wire it into `scripts/harness/check.sh`.
+
+Reading order: `AGENTS.md` → relevant `docs/` → matching `skills/*/SKILL.md` → path-scoped rules.
+
+Do not skip harness because the change "is docs only" — skill frontmatter lint still applies.

@@ -1,0 +1,14 @@
+---
+description: TypeScript and Next.js conventions for apps/web
+globs: apps/web/**
+alwaysApply: false
+---
+
+# TypeScript / Next.js Rules
+
+- `strict: true` in tsconfig; avoid `any` unless justified with a comment.
+- App Router: Server Components default; `"use client"` only when needed.
+- No direct database or LLM calls from web — use API client in `lib/`.
+- Environment: public vars only via `NEXT_PUBLIC_*`.
+- UI polish: follow taste-skill and ui-ux-pro-max when installed (see `docs/agent-setup.md`).
+- Vietnamese UI copy is OK; component and function names in English.

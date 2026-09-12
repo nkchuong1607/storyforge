@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+apps/api/.venv/
+__pycache__/
+*.py[cod]
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Next.js
+apps/web/.next/
+apps/web/tsconfig.tsbuildinfo
+out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Test / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+
+# Logs
+*.log

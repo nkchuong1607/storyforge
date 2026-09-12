@@ -1,0 +1,12 @@
+---
+description: DRY with judgment — avoid premature abstraction
+alwaysApply: true
+---
+
+# DRY With Judgment
+
+- Do not duplicate business rules (continuity, settlement, tier logic) — centralize in API services.
+- Do not extract one-off helpers or premature abstractions "for future use."
+- Three similar lines beat a wrong generic framework.
+- Shared types belong in `packages/shared/` only when used by both web and api.
+- Domain truth lives in `docs/` and skills — link, don't copy long passages into code comments.

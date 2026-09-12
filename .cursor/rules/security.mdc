@@ -1,0 +1,13 @@
+---
+description: Security — secrets, ACL, and safe defaults
+alwaysApply: true
+---
+
+# Security Rules
+
+- Never commit API keys, tokens, or `.env` — use `.env.example` for templates.
+- All project-scoped API routes must enforce ACL via dependency injection.
+- LLM calls only from API/workers, never from browser client code.
+- Validate and sanitize user prose storage; treat prompts as untrusted input for injection into agent templates with escaping.
+- Rate-limit agent endpoints (Redis, Phase 2).
+- Dependabot and secret scanning enabled via GitHub (repo settings).
