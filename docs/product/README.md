@@ -24,7 +24,7 @@ StoryForge là hệ thống viết tiểu thuyết dài có AI: bible/canon có 
 | 02 | [Architecture](./02-architecture.md) | **Canonical** stack, agents, ledgers, data flow, security |
 | 03 | [Domain & Subsystems](./03-domain-and-subsystems.md) | Deep dive: characters, twists, psych, power, genre, scene engine, … |
 | 04 | [User Stories](./04-user-stories.md) | Epics + acceptance criteria |
-| 05 | [Wireframes](./05-wireframes.md) | 5 images + text specs màn hình còn lại |
+| 05 | [Wireframes](./05-wireframes.md) | 10 wireframe images (bộ đủ 10/10) |
 | 06 | [Build Plan](./06-build-plan.md) | Phase 0–8+, MVP scope, PR order |
 
 ---
@@ -40,6 +40,11 @@ Images: [`docs/wireframes/images/`](../wireframes/images/)
 | `chapter-editor.png` | Chapter editor + Prompt Edit |
 | `story-bible.png` | Story Bible / World |
 | `continuity-gate.png` | Continuity Gate + state diff |
+| `new-project-wizard.png` | New Project wizard (Basics) |
+| `characters-inbox.png` | Characters + Provisional inbox |
+| `outline-twist-board.png` | Outline / Timeline / Twist Board |
+| `power-system.png` | Power System bible |
+| `psych-relationships.png` | Psych + Relationships character detail |
 
 ---
 
