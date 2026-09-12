@@ -72,8 +72,10 @@ See [test-strategy.md](../specs/phase-1/test-strategy.md).
 |-----|----------|-------------------|
 | `make check` | ✅ required | ✅ required |
 | `make validate-specs` | ✅ required | ✅ if specs touched |
-| `make test-api-cov` | skip | ✅ required |
+| `make test-api-cov` | **local only** | **local only** (Docker + Testcontainers) |
 | `make test-web-cov` | skip | ✅ when web tests exist |
+
+**Cost policy:** Do not run Testcontainers or full `pytest-cov` on GitHub Actions. Agents and developers run `make test-api-cov` locally before opening API PRs.
 
 ---
 

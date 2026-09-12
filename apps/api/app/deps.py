@@ -1,0 +1,50 @@
+"""FastAPI dependencies for auth and project ACL."""
+
+import uuid
+from typing import Annotated
+
+from fastapi import Depends, Header, Path
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database import get_db_session
+from app.exceptions import NotFoundError, UnauthorizedError
+from app.models.project import Project, ProjectMember
+
+DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+async def get_current_user_id(
+    x_user_id: Annotated[str | None, Header(alias="X-User-Id")] = None,
+) -> uuid.UUID:
+    if not x_user_id:
+        raise UnauthorizedError()
+    try:
+        return uuid.UUID(x_user_id)
+    except ValueError as exc:
+        raise UnauthorizedError(message="X-User-Id must be a valid UUID") from exc
+
+
+CurrentUserId = Annotated[uuid.UUID, Depends(get_current_user_id)]
+
+
+async def require_project_access(
+    project_id: Annotated[uuid.UUID, Path(alias="project_id")],
+    user_id: CurrentUserId,
+    session: DbSession,
+) -> Project:
+    membership = await session.scalar(
+        select(ProjectMember).where(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == user_id,
+        )
+    )
+    if membership is None:
+        raise NotFoundError()
+    project = await session.get(Project, project_id)
+    if project is None:
+        raise NotFoundError()
+    return project
+
+
+ProjectAccess = Annotated[Project, Depends(require_project_access)]

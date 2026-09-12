@@ -1,15 +1,41 @@
 """StoryForge FastAPI application entrypoint."""
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from app.config import get_settings
+from app.exceptions import (
+    AppError,
+    app_error_handler,
+    http_exception_handler,
+    validation_exception_handler,
+)
+from app.routers import bible, chapters, characters, health, projects
+
+settings = get_settings()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    yield
+
 
 app = FastAPI(
-    title="StoryForge API",
+    title=settings.app_title,
     description="AI long-form fiction — canon, continuity, ledgers",
-    version="0.1.0",
+    version=settings.app_version,
+    lifespan=lifespan,
 )
 
+app.add_exception_handler(AppError, app_error_handler)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    """Health check for harness and orchestration."""
-    return {"status": "ok"}
+app.include_router(health.router)
+app.include_router(projects.router)
+app.include_router(bible.router)
+app.include_router(chapters.router)
+app.include_router(characters.router)

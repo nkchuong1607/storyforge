@@ -26,9 +26,10 @@ cd storyforge
 make setup
 make db-up      # optional: Postgres + Redis
 make check
+make test-api-cov   # API only — local Docker + Testcontainers, >= 90% line coverage
 ```
 
-- API stub: http://localhost:8000/health (`make api-dev`)
+- API: http://localhost:8000/health (`make api-dev`)
 - Web stub: http://localhost:3000 (`make web-dev`)
 
 ## Documentation
