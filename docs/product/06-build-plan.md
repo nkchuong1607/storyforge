@@ -192,9 +192,11 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ### Suggested PR order
 
-1. `db/twist_plans`
-2. `api/twist-crud-continuity`
-3. `web/twist-board`
+1. **`specs/phase-4`** — schema, OpenAPI, web screens, fairness rules, test strategy ([docs/specs/phase-4/README.md](../specs/phase-4/README.md))
+2. **`api/phase-4-implementation`** — migrations `011`–`013`, twist CRUD, foreshadow continuity, context-pack strip, Testcontainers tests, coverage ≥90%
+3. **`web/phase-4-implementation`** — Twist Board Kanban against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
 
 **Skill focus:** `storyforge-twists`
 

@@ -5,7 +5,8 @@ Entity list and key tables for Postgres. **Not migrated yet** — reference for 
 > **Phase 1 canonical schema:** [docs/specs/phase-1/schema.md](specs/phase-1/schema.md)  
 > **Phase 2 canonical schema:** [docs/specs/phase-2/schema.md](specs/phase-2/schema.md) — prose, beats, ledger, continuity, settle  
 > **Phase 3 canonical schema:** [docs/specs/phase-3/schema.md](specs/phase-3/schema.md) — progressive characters, provisional inbox, search v1  
-> This draft remains for Phase 4+ tables not yet specified in detail.
+> **Phase 4 canonical schema:** [docs/specs/phase-4/schema.md](specs/phase-4/schema.md) — twist plans, plants, payoffs  
+> This draft remains for Phase 5+ tables not yet specified in detail.
 
 ## Naming Conventions
 
@@ -111,18 +112,9 @@ Inbox for extracted mentions before merge.
 
 ## Twist & Psychology
 
-### `twist_plans`
+### `twist_plans`, `twist_plants`, `twist_payoffs`
 
-| Column | Type | Notes |
-|--------|------|-------|
-| id | uuid PK | |
-| project_id | uuid FK | |
-| secret_truth | text | author-only |
-| status | text | active, revealed |
-
-### `twist_plants`, `twist_payoffs`
-
-Link plants to chapters and payoff targets.
+**Canonical:** [docs/specs/phase-4/schema.md](specs/phase-4/schema.md) — status lifecycle `seeded|planted|armed|paid_off|abandoned`; promise reuse via `kind`; author-only `secret_truth`.
 
 ### `psych_states`
 

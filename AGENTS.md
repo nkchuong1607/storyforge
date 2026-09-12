@@ -78,7 +78,7 @@ scripts/harness/ check.sh, agent-preflight.sh
 3. **Tests** — unit + integration (API: Testcontainers Postgres)
 4. **Coverage** — line ≥ **90%** hard gate for `apps/api` and phase-scoped web modules
 
-See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md), [docs/specs/phase-2/README.md](docs/specs/phase-2/README.md), and [docs/specs/phase-3/README.md](docs/specs/phase-3/README.md).
+See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md), [docs/specs/phase-2/README.md](docs/specs/phase-2/README.md), [docs/specs/phase-3/README.md](docs/specs/phase-3/README.md), and [docs/specs/phase-4/README.md](docs/specs/phase-4/README.md).
 
 ## Docs Index
 
@@ -100,5 +100,6 @@ See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [doc
 - [Phase 1 specs (canonical API/schema)](docs/specs/phase-1/README.md)
 - [Phase 2 specs (chapter editor, continuity, settle)](docs/specs/phase-2/README.md)
 - [Phase 3 specs (progressive characters, provisional inbox)](docs/specs/phase-3/README.md)
+- [Phase 4 specs (twist / promise ledger, twist board)](docs/specs/phase-4/README.md)
 - [Quality gates](docs/engineering/quality-gates.md)
 - [Agent setup](docs/agent-setup.md)
