@@ -118,7 +118,22 @@ Inbox for extracted mentions before merge.
 
 ### `psych_states`
 
-Append-only per character per chapter snapshot.
+**Canonical:** [docs/specs/phase-5/schema.md](specs/phase-5/schema.md) — append-only per `(character_id, chapter_id)`; formal `psyche_card` jsonb on `characters`.
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid PK | |
+| project_id | uuid FK | |
+| character_id | uuid FK | |
+| chapter_id | uuid FK | settle chapter |
+| stress_level | smallint | 0–10 |
+| dominant_emotion | text | |
+| active_goal | text | |
+| belief_updates | jsonb | earned shifts |
+| relationship_stance | jsonb | per-target deltas |
+| value_pressure | text | nullable |
+| arc_beat | text | nullable |
+| settled_at | timestamptz | immutable after write |
 
 ## Continuity
 
