@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-09-12T10:33:07.239Z",
+  "entries": [
+    "async-python-patterns",
+    "backend-dev-guidelines",
+    "database-architect",
+    "database-design",
+    "database-migrations-sql-migrations",
+    "database-optimizer",
+    "fastapi-pro",
+    "fastapi-templates",
+    "nextjs-app-router-patterns",
+    "nextjs-best-practices",
+    "postgres-best-practices",
+    "postgresql-optimization",
+    "pydantic-models-py",
+    "python-fastapi-development",
+    "python-patterns",
+    "python-pro",
+    "react-best-practices",
+    "react-nextjs-development",
+    "supabase-postgres-best-practices",
+    "typescript-pro"
+  ]
+}

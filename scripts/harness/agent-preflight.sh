@@ -26,6 +26,21 @@ require_path "docs/domain-model.md"
 require_path "skills"
 require_path ".cursor/rules"
 
+# Vendored AAS stack (curated implementation-craft skills)
+require_path "aas-stack.json"
+require_path "skills/storyforge-aas-stack/SKILL.md"
+require_path "vendor/aas-skills"
+
+if [[ -f "aas-stack.json" ]]; then
+  aas_count=$(python3 -c "import json; d=json.load(open('aas-stack.json')); print(len(d.get('skills', [])))" 2>/dev/null || echo "0")
+  echo "OK: aas-stack.json lists $aas_count skill(s)"
+fi
+
+if [[ -d "vendor/aas-skills" ]]; then
+  vendored_count=$(find vendor/aas-skills -mindepth 1 -maxdepth 1 -type d ! -name '.*' | wc -l)
+  echo "OK: $vendored_count skill directories under vendor/aas-skills/"
+fi
+
 skill_count=$(find skills -mindepth 1 -maxdepth 1 -type d | wc -l)
 echo "OK: $skill_count skill directories under skills/"
 
