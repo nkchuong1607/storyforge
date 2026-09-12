@@ -1,0 +1,112 @@
+"""Application exceptions and error response helpers."""
+
+from typing import Any
+
+from fastapi import Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+
+class AppError(Exception):
+    """Base application error with HTTP mapping."""
+
+    def __init__(
+        self,
+        *,
+        status_code: int,
+        code: str,
+        message: str,
+        details: list[dict[str, Any]] | None = None,
+    ) -> None:
+        self.status_code = status_code
+        self.code = code
+        self.message = message
+        self.details = details or []
+        super().__init__(message)
+
+
+class NotFoundError(AppError):
+    def __init__(self, message: str = "Resource not found") -> None:
+        super().__init__(status_code=404, code="not_found", message=message)
+
+
+class UnauthorizedError(AppError):
+    def __init__(self, message: str = "X-User-Id header is required") -> None:
+        super().__init__(status_code=401, code="unauthorized", message=message)
+
+
+class ValidationAppError(AppError):
+    def __init__(self, message: str, details: list[dict[str, Any]] | None = None) -> None:
+        super().__init__(
+            status_code=400,
+            code="validation_error",
+            message=message,
+            details=details,
+        )
+
+
+class SlugConflictError(AppError):
+    def __init__(self, slug: str, suggested_slug: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="slug_conflict",
+            message=f"Slug '{slug}' already exists",
+            details=[{"suggested_slug": suggested_slug}],
+        )
+
+
+class EntryKeyConflictError(AppError):
+    def __init__(self, entry_key: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="entry_key_conflict",
+            message=f"Entry key '{entry_key}' already exists",
+        )
+
+
+class ChapterNumberConflictError(AppError):
+    def __init__(self, number: int) -> None:
+        super().__init__(
+            status_code=409,
+            code="chapter_number_conflict",
+            message=f"Chapter number {number} already exists",
+        )
+
+
+def error_body(
+    code: str, message: str, details: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {"error": {"code": code, "message": message}}
+    if details:
+        payload["error"]["details"] = details
+    return payload
+
+
+async def app_error_handler(_request: Request, exc: AppError) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=error_body(exc.code, exc.message, exc.details or None),
+    )
+
+
+async def http_exception_handler(_request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    if isinstance(exc.detail, dict) and "error" in exc.detail:
+        return JSONResponse(status_code=exc.status_code, content=exc.detail)
+    code = "not_found" if exc.status_code == 404 else "validation_error"
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=error_body(code, str(exc.detail)),
+    )
+
+
+async def validation_exception_handler(
+    _request: Request, exc: RequestValidationError
+) -> JSONResponse:
+    details = [
+        {"loc": list(err["loc"]), "msg": err["msg"], "type": err["type"]} for err in exc.errors()
+    ]
+    return JSONResponse(
+        status_code=400,
+        content=error_body("validation_error", "Request validation failed", details),
+    )
