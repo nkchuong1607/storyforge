@@ -13,11 +13,12 @@ make check    # before claiming done
 ## Reading Order
 
 1. **This file** — workflow and pointers
-2. **[docs/architecture.md](docs/architecture.md)** — layers, agent pipeline, stack
+2. **[docs/product/02-architecture.md](docs/product/02-architecture.md)** — canonical architecture (layers, agent pipeline, stack)
 3. **[docs/domain-model.md](docs/domain-model.md)** — entities, ledgers, settlement
 4. **Task-relevant first-party skill** in `skills/storyforge-*/SKILL.md` (see table below)
-5. **AAS stack skill** (optional) — `vendor/aas-skills/<id>/SKILL.md` via [`skills/storyforge-aas-stack/SKILL.md`](skills/storyforge-aas-stack/SKILL.md) and [`aas-stack.json`](aas-stack.json) for generic Next/FastAPI/Postgres craft
-6. **Path-scoped rules** in `.cursor/rules/` (auto-applied by Cursor)
+5. **Product context** (when building UI or author flows) — [docs/product/README.md](docs/product/README.md), [wireframes](docs/product/05-wireframes.md), [user stories](docs/product/04-user-stories.md), [build plan](docs/product/06-build-plan.md)
+6. **AAS stack skill** (optional) — `vendor/aas-skills/<id>/SKILL.md` via [`skills/storyforge-aas-stack/SKILL.md`](skills/storyforge-aas-stack/SKILL.md) and [`aas-stack.json`](aas-stack.json) for generic Next/FastAPI/Postgres craft
+7. **Path-scoped rules** in `.cursor/rules/` (auto-applied by Cursor)
 
 **Precedence:** StoryForge domain and stack skills win over vendored AAS skills when they conflict.
 
@@ -72,6 +73,19 @@ scripts/harness/ check.sh, agent-preflight.sh
 
 ## Docs Index
 
-- [Roadmap](docs/roadmap.md)
+### Product
+
+- [Product docs index](docs/product/README.md)
+- [Vision & outcomes](docs/product/01-vision-and-outcomes.md)
+- [Architecture (canonical)](docs/product/02-architecture.md)
+- [Domain & subsystems](docs/product/03-domain-and-subsystems.md)
+- [User stories](docs/product/04-user-stories.md)
+- [Wireframes](docs/product/05-wireframes.md)
+- [Build plan](docs/product/06-build-plan.md)
+
+### Engineering
+
+- [Architecture stub](docs/architecture.md) → product/02
+- [Roadmap stub](docs/roadmap.md) → product/06
 - [Schema draft](docs/schema-draft.md)
 - [Agent setup](docs/agent-setup.md)
