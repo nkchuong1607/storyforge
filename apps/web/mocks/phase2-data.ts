@@ -71,6 +71,8 @@ const FAIL_FINGERPRINT = "character:770e8400:character_deceased_appears_alive:ab
 const WARN_FINGERPRINT = "timeline:880e8400:timeline_order_violation:def456";
 const PSYCH_FAIL_FINGERPRINT =
   "psychology:990e8400:psych_ooc_moral_boundary_violation:ghi789";
+const POWER_FAIL_FINGERPRINT =
+  "power_system:880e8400:power_rank_jump_exceeded:jkl012";
 
 export const mockContinuityReports: Record<string, ContinuityReport[]> = {
   [CHAPTER_3_ID]: [
@@ -96,6 +98,15 @@ export const mockContinuityReports: Record<string, ContinuityReport[]> = {
           category: "psychology",
           code: "psych_ooc_moral_boundary_violation",
           message: "Lý Phong vi phạm moral boundary 'Không giết người vô tội'.",
+          chapter_refs: [3],
+          entity_ids: ["990e8400-e29b-41d4-a716-446655440001"],
+        },
+        {
+          fingerprint: POWER_FAIL_FINGERPRINT,
+          severity: "fail",
+          category: "power_system",
+          code: "power_rank_jump_exceeded",
+          message: "Lý Phong nhảy từ Luyện Khí lên Kim Đan trong một chương.",
           chapter_refs: [3],
           entity_ids: ["990e8400-e29b-41d4-a716-446655440001"],
         },

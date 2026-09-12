@@ -35,8 +35,9 @@ describe("psych-utils", () => {
     expect(validatePsycheCard(1, emptyPsycheCard())).toEqual({});
   });
 
-  it("categoryBadgeClass maps psychology", () => {
-    expect(categoryBadgeClass("psychology")).toContain("violet");
+  it("categoryBadgeClass maps continuity categories", () => {
+    expect(categoryBadgeClass("power_system")).toContain("violet");
+    expect(categoryBadgeClass("psychology")).toContain("purple");
   });
 
   it("parseApiFieldErrors maps details", () => {

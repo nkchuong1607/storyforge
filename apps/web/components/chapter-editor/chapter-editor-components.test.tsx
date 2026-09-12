@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { ChapterEditorHeader } from "./ChapterEditorHeader";
 import { EditorFooter } from "./EditorFooter";
 import { ProseEditor } from "./ProseEditor";
-import { PromptEditPanelStub } from "./PromptEditPanelStub";
+import { PromptEditPanelHeader } from "./PromptEditPanelHeader";
+import { PromptEditInstructionInput } from "./PromptEditInstructionInput";
 import { SceneBeatsPanel } from "./SceneBeatsPanel";
 import { VersionDropdown } from "./VersionDropdown";
 
@@ -143,9 +144,14 @@ describe("chapter-editor components", () => {
     expect(screen.getByText(/42 từ/)).toBeInTheDocument();
   });
 
-  it("PromptEditPanelStub is disabled", () => {
-    render(<PromptEditPanelStub />);
-    expect(screen.getByText("Sắp ra mắt Phase 6")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Mô tả chỉnh sửa cho AI…")).toBeDisabled();
+  it("PromptEditPanelHeader shows provider badge", () => {
+    render(<PromptEditPanelHeader provider="fake" />);
+    expect(screen.getByText("Prompt Edit")).toBeInTheDocument();
+    expect(screen.getByText("fake")).toBeInTheDocument();
+  });
+
+  it("PromptEditInstructionInput respects disabled", () => {
+    render(<PromptEditInstructionInput value="" onChange={vi.fn()} disabled />);
+    expect(screen.getByLabelText("Prompt Edit instruction")).toBeDisabled();
   });
 });

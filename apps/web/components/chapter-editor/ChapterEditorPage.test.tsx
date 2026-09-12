@@ -16,7 +16,7 @@ describe("ChapterEditorPage", () => {
     expect(screen.getByText("Scene beats")).toBeInTheDocument();
     expect(screen.getByText("2.1")).toBeInTheDocument();
     expect(screen.getByLabelText("Nội dung chương")).toBeInTheDocument();
-    expect(screen.getByText("Sắp ra mắt Phase 6")).toBeInTheDocument();
+    expect(screen.getByText("Prompt Edit")).toBeInTheDocument();
   });
 
   it("shows empty prose placeholder for planned chapter", async () => {

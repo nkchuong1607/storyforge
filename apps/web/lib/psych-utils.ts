@@ -58,14 +58,16 @@ export function validatePsycheCard(tier: CharacterTier, card: PsycheCard): Psych
 
 export function categoryBadgeClass(category: string): string {
   switch (category) {
-    case "psychology":
+    case "power_system":
       return "bg-violet-100 text-violet-800";
+    case "psychology":
+      return "bg-purple-100 text-purple-800";
     case "character":
-      return "bg-blue-100 text-blue-800";
+      return "bg-orange-100 text-orange-800";
     case "timeline":
-      return "bg-amber-100 text-amber-800";
+      return "bg-cyan-100 text-cyan-800";
     case "foreshadow":
-      return "bg-indigo-100 text-indigo-800";
+      return "bg-blue-100 text-blue-800";
     default:
       return "bg-slate-100 text-slate-700";
   }

@@ -9,7 +9,9 @@ import {
   listBibleVersions,
   updateBibleEntry,
 } from "@/lib/api/bible";
+import { getGenreRulePack } from "@/lib/api/genre-rule-pack";
 import { getProject } from "@/lib/api/projects";
+import { isPowerSystemEnabled } from "@/lib/genre-utils";
 import type { BibleEntry, BibleVersionSummary, ProjectDetail } from "@/lib/api/types";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
@@ -37,18 +39,21 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
   const [pageState, setPageState] = useState<PageState>("loading");
   const [entryLoading, setEntryLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [powerSystemEnabled, setPowerSystemEnabled] = useState(false);
 
   const loadPage = useCallback(async () => {
     setPageState("loading");
     try {
-      const [projectData, entriesData, versionsData] = await Promise.all([
+      const [projectData, entriesData, versionsData, packData] = await Promise.all([
         getProject(projectId),
         listBibleEntries(projectId, { page_size: 100 }),
         listBibleVersions(projectId),
+        getGenreRulePack(projectId),
       ]);
       setProject(projectData);
       setEntries(entriesData.items);
       setVersions(versionsData.items);
+      setPowerSystemEnabled(isPowerSystemEnabled(packData.pack));
       setPageState("success");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "status" in err && err.status === 404) {
@@ -122,10 +127,24 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
     <AppShell sidebar={sidebar}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-slate-900">Story Bible</h1>
-        <div className="flex gap-2 text-sm">
+        <div className="flex flex-wrap gap-2 text-sm">
           <span className="rounded-lg bg-indigo-50 px-3 py-1.5 font-medium text-indigo-700">
             Bible
           </span>
+          {powerSystemEnabled ? (
+            <Link
+              href={`/projects/${projectId}/bible/power-system`}
+              className="rounded-lg bg-violet-50 px-3 py-1.5 font-medium text-violet-700 hover:bg-violet-100"
+            >
+              Power System
+            </Link>
+          ) : null}
+          <Link
+            href={`/projects/${projectId}/settings/genre`}
+            className="rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-50"
+          >
+            Genre
+          </Link>
           <span className="rounded-lg px-3 py-1.5 text-slate-400" title="Phase 2">
             Graph (sắp ra mắt)
           </span>

@@ -3,9 +3,10 @@ import Link from "next/link";
 interface ProjectSidebarProps {
   projectId: string;
   projectTitle: string;
-  active: "hub" | "bible" | "characters" | "outline";
+  active: "hub" | "bible" | "characters" | "outline" | "settings";
   pendingCount?: number;
   fairnessFailCount?: number;
+  powerSystemEnabled?: boolean;
 }
 
 export function ProjectSidebar({
@@ -14,6 +15,7 @@ export function ProjectSidebar({
   active,
   pendingCount = 0,
   fairnessFailCount = 0,
+  powerSystemEnabled = false,
 }: ProjectSidebarProps) {
   const linkClass = (isActive: boolean) =>
     `flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
@@ -33,6 +35,14 @@ export function ProjectSidebar({
       <Link href={`/projects/${projectId}/bible`} className={linkClass(active === "bible")}>
         Story Bible
       </Link>
+      {powerSystemEnabled ? (
+        <Link
+          href={`/projects/${projectId}/bible/power-system`}
+          className={linkClass(active === "bible")}
+        >
+          Power System
+        </Link>
+      ) : null}
       <Link
         href={`/projects/${projectId}/characters`}
         className={linkClass(active === "characters")}
@@ -55,9 +65,12 @@ export function ProjectSidebar({
           </span>
         ) : null}
       </Link>
-      <span className="block rounded-lg px-3 py-2 text-sm text-slate-400">
-        Continuity (sắp ra mắt)
-      </span>
+      <Link
+        href={`/projects/${projectId}/settings/genre`}
+        className={linkClass(active === "settings")}
+      >
+        Genre Settings
+      </Link>
     </>
   );
 }

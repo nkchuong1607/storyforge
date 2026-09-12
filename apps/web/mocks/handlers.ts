@@ -14,6 +14,8 @@ import { phase2Handlers } from "./phase2-handlers";
 import { phase3Handlers } from "./phase3-handlers";
 import { phase5Handlers } from "./phase5-handlers";
 import { phase4Handlers } from "./phase4-handlers";
+import { ensurePhase6MockData } from "./phase6-data";
+import { phase6Handlers } from "./phase6-handlers";
 
 const BASE = "http://localhost:8000";
 
@@ -99,6 +101,7 @@ export const handlers = [
       { version: 0, settled_from_chapter_id: null, created_at: now, entry_count: 0 },
     ];
     mockCharacters[project.id] = [];
+    ensurePhase6MockData(project.id, body.genre_profile);
     return HttpResponse.json(project, { status: 201 });
   }),
 
@@ -106,6 +109,24 @@ export const handlers = [
     if (!requireUserId(request)) return unauthorized();
     const project = mockProjects.find((p) => p.id === params.projectId);
     if (!project) return notFound();
+    return HttpResponse.json(project);
+  }),
+
+  http.patch(`${BASE}/projects/:projectId`, async ({ request, params }) => {
+    if (!requireUserId(request)) return unauthorized();
+    const project = mockProjects.find((p) => p.id === params.projectId);
+    if (!project) return notFound();
+    const body = (await request.json()) as {
+      title?: string;
+      description?: string;
+      genre_profile?: string;
+    };
+    if (body.title) project.title = body.title;
+    if (body.description !== undefined) project.description = body.description;
+    if (body.genre_profile) {
+      project.genre_profile = body.genre_profile as typeof project.genre_profile;
+    }
+    project.updated_at = new Date().toISOString();
     return HttpResponse.json(project);
   }),
 
@@ -230,4 +251,5 @@ export const handlers = [
   ...phase3Handlers,
   ...phase4Handlers,
   ...phase5Handlers,
+  ...phase6Handlers,
 ];
