@@ -6,7 +6,9 @@ Entity list and key tables for Postgres. **Not migrated yet** — reference for 
 > **Phase 2 canonical schema:** [docs/specs/phase-2/schema.md](specs/phase-2/schema.md) — prose, beats, ledger, continuity, settle  
 > **Phase 3 canonical schema:** [docs/specs/phase-3/schema.md](specs/phase-3/schema.md) — progressive characters, provisional inbox, search v1  
 > **Phase 4 canonical schema:** [docs/specs/phase-4/schema.md](specs/phase-4/schema.md) — twist plans, plants, payoffs  
-> This draft remains for Phase 5+ tables not yet specified in detail.
+> **Phase 5 canonical schema:** [docs/specs/phase-5/schema.md](specs/phase-5/schema.md) — psyche card, psych_states  
+> **Phase 6 canonical schema:** [docs/specs/phase-6/schema.md](specs/phase-6/schema.md) — power system, genre rule pack, prompt edit  
+> This draft remains for Phase 7+ tables not yet specified in detail.
 
 ## Naming Conventions
 
@@ -120,20 +122,19 @@ Inbox for extracted mentions before merge.
 
 **Canonical:** [docs/specs/phase-5/schema.md](specs/phase-5/schema.md) — append-only per `(character_id, chapter_id)`; formal `psyche_card` jsonb on `characters`.
 
-| Column | Type | Notes |
-|--------|------|-------|
-| id | uuid PK | |
-| project_id | uuid FK | |
-| character_id | uuid FK | |
-| chapter_id | uuid FK | settle chapter |
-| stress_level | smallint | 0–10 |
-| dominant_emotion | text | |
-| active_goal | text | |
-| belief_updates | jsonb | earned shifts |
-| relationship_stance | jsonb | per-target deltas |
-| value_pressure | text | nullable |
-| arc_beat | text | nullable |
-| settled_at | timestamptz | immutable after write |
+## Power System (Phase 6)
+
+### `power_system_settings`, `power_ranks`, `power_techniques`
+
+**Canonical:** [docs/specs/phase-6/schema.md](specs/phase-6/schema.md) — staging tables + bible snapshot `world.power_system`; cultivation ledger events on settle.
+
+### `projects.genre_rule_pack_json`
+
+**Canonical:** [docs/specs/phase-6/schema.md](specs/phase-6/schema.md) — genre contract JSON; tunes continuity severity.
+
+### `prompt_edit_sessions`, `prompt_edit_turns`
+
+**Canonical:** [docs/specs/phase-6/schema.md](specs/phase-6/schema.md) — instruction log; applied prose in `prose_versions` (`source=ai_editor`).
 
 ## Continuity
 

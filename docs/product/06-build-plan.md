@@ -264,11 +264,11 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ### Suggested PR order
 
-1. `api/litellm-editor-agent`
-2. `web/prompt-edit-panel`
-3. `api/power-system-rules`
-4. `web/power-system-bible`
-5. `api/genre-rule-packs`
+1. **`specs/phase-6`** — schema, OpenAPI, web screens, power rules, genre contracts, prompt-edit contract, test strategy ([docs/specs/phase-6/README.md](../specs/phase-6/README.md))
+2. **`api/phase-6-implementation`** — migrations `016`–`019`, power routes, genre pack, prompt-edit + FakeLLM, power continuity, settle extract, Testcontainers tests, coverage ≥90%
+3. **`web/phase-6-implementation`** — Power System bible, Prompt Edit panel, genre settings against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
 
 **Skill focus:** `storyforge-power-system`, `storyforge-continuity`
 
