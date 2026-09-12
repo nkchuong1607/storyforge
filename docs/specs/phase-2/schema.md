@@ -396,7 +396,7 @@ Nested resources (`beats`, `prose_versions`) validate `chapter.project_id = {pro
 
 ## Deferred tables (do not create in Phase 2)
 
-From [schema-draft.md](../../schema-draft.md): `character_provisional`, `twist_plans`, `twist_plants`, `twist_payoffs`, `psych_states`, `canon_embeddings`.
+From [schema-draft.md](../../schema-draft.md): `character_provisional`, `canon_embeddings` — see [Phase 3 schema](../phase-3/schema.md). Also deferred: `twist_plans`, `twist_plants`, `twist_payoffs`, `psych_states`.
 
 ---
 

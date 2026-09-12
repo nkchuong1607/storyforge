@@ -158,10 +158,11 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ### Suggested PR order
 
-1. `db/characters_provisional`
-2. `api/character-tier-promote`
-3. `api/fact-extractor-v1`
-4. `web/characters-inbox`
+1. **`specs/phase-3`** — schema, OpenAPI, web screens, character lifecycle, test strategy ([docs/specs/phase-3/README.md](../specs/phase-3/README.md))
+2. **`api/phase-3-implementation`** — migrations `008`–`010`, character CRUD, provisional inbox, extractor v1, search, Testcontainers tests, coverage ≥90%
+3. **`web/phase-3-implementation`** — Characters list, detail, Provisional inbox against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
 
 **Skill focus:** `storyforge-characters`
 
