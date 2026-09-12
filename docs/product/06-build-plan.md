@@ -223,6 +223,16 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 - Moral boundary violation → WARN/FAIL
 - State diff shows psych snapshot proposals
+- PsychState timeline visible per character
+- Deterministic psychology continuity category active
+
+### Suggested PR order
+
+1. **`specs/phase-5`** — schema, OpenAPI, web screens, OOC rules, test strategy ([docs/specs/phase-5/README.md](../specs/phase-5/README.md))
+2. **`api/phase-5-implementation`** — migrations `014`–`015`, psyche/psych routes, psychology continuity, settle extract, Testcontainers tests, coverage ≥90%
+3. **`web/phase-5-implementation`** — Character Psyche tab + PsychState timeline against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
 
 **Skill focus:** `storyforge-psychology`
 
