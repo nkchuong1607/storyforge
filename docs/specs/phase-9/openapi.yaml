@@ -1,0 +1,1240 @@
+openapi: 3.1.0
+info:
+  title: StoryForge API
+  version: 0.9.0-phase9-slice1
+  description: |
+    Phase 9 Slice 1 contract — extends Phase 8 with research notes (promote → bible staging),
+    series projects (parent bible slice + child overrides), and async export jobs (EPUB/DOCX/git-md mirror).
+
+    Phase 1–8 routes remain authoritative in prior phase OpenAPI files.
+
+    **Auth (MVP stub):** Send `X-User-Id: <uuid>` on every request except `/health`.
+
+    **Canon rule:** Research promote writes `bible_entry_staging` only — never auto-settle.
+    Series inherited slice is read-only in child; overrides are explicit staging rows.
+    Export is derived output — never mutates canon.
+
+    **Jobs:** Export enqueue returns `202`; poll job status until `done` or `failed`.
+    Artifacts served from local path via download endpoint (no S3 Phase 9).
+servers:
+  - url: http://localhost:8000
+    description: Local API dev
+tags:
+  - name: Health
+  - name: Research
+  - name: Series
+  - name: Export
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /series:
+    get:
+      tags: [Series]
+      operationId: listSeries
+      summary: List series owned by current user
+      parameters:
+        - $ref: "#/components/parameters/UserIdHeader"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Paginated series list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Series]
+      operationId: createSeries
+      summary: Create series with optional hub project
+      parameters:
+        - $ref: "#/components/parameters/UserIdHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeriesCreateRequest"
+      responses:
+        "201":
+          description: Series created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /series/{series_id}:
+    parameters:
+      - $ref: "#/components/parameters/SeriesId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Series]
+      operationId: getSeries
+      summary: Get series detail with child projects
+      responses:
+        "200":
+          description: Series detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Series]
+      operationId: updateSeries
+      summary: Update series title or slug
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeriesUpdateRequest"
+      responses:
+        "200":
+          description: Updated series
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /series/{series_id}/bible-slice:
+    parameters:
+      - $ref: "#/components/parameters/SeriesId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Series]
+      operationId: getSeriesBibleSlice
+      summary: Get current settled series bible slice
+      responses:
+        "200":
+          description: Latest slice version
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesBibleSlice"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /series/{series_id}/projects:
+    parameters:
+      - $ref: "#/components/parameters/SeriesId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [Series]
+      operationId: attachSeriesProject
+      summary: Attach child project to series
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeriesAttachProjectRequest"
+      responses:
+        "201":
+          description: Project attached
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesProjectLink"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /series/{series_id}/projects/{project_id}:
+    parameters:
+      - $ref: "#/components/parameters/SeriesId"
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    delete:
+      tags: [Series]
+      operationId: detachSeriesProject
+      summary: Detach child project from series
+      responses:
+        "204":
+          description: Detached
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/research/notes:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Research]
+      operationId: listResearchNotes
+      summary: List research notes
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ResearchNoteStatus"
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Paginated notes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchNoteListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Research]
+      operationId: createResearchNote
+      summary: Create research note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResearchNoteCreateRequest"
+      responses:
+        "201":
+          description: Note created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchNote"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/research/notes/search:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Research]
+      operationId: searchResearchNotes
+      summary: Full-text search research notes
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/ResearchNoteStatus"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Search results ranked by relevance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchNoteSearchResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/research/notes/{note_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/NoteId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Research]
+      operationId: getResearchNote
+      summary: Get research note with links
+      responses:
+        "200":
+          description: Note detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchNoteDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Research]
+      operationId: updateResearchNote
+      summary: Update active research note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResearchNoteUpdateRequest"
+      responses:
+        "200":
+          description: Updated note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchNote"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+    delete:
+      tags: [Research]
+      operationId: archiveResearchNote
+      summary: Archive research note (soft delete)
+      responses:
+        "204":
+          description: Archived
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /projects/{project_id}/research/notes/{note_id}/links:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/NoteId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [Research]
+      operationId: addResearchNoteLink
+      summary: Add entity link to research note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResearchNoteLinkCreateRequest"
+      responses:
+        "201":
+          description: Link created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchNoteLink"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/research/notes/{note_id}/links/{link_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/NoteId"
+      - $ref: "#/components/parameters/LinkId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    delete:
+      tags: [Research]
+      operationId: removeResearchNoteLink
+      summary: Remove entity link from research note
+      responses:
+        "204":
+          description: Link removed
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/research/notes/{note_id}/promote:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/NoteId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [Research]
+      operationId: promoteResearchNote
+      summary: Promote note content to bible staging (not settle)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResearchPromoteRequest"
+      responses:
+        "200":
+          description: Staging entry created or updated; note marked promoted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResearchPromoteResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/series/inherited-slice:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Series]
+      operationId: getProjectInheritedSlice
+      summary: Merged inherited series slice for child project (read-only)
+      responses:
+        "200":
+          description: Inherited slice + metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectInheritedSliceResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/series/overrides:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [Series]
+      operationId: createSeriesOverrideStaging
+      summary: Create explicit series override in bible staging
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SeriesOverrideCreateRequest"
+      responses:
+        "201":
+          description: Staging entry with series_override flag
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeriesOverrideStagingEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/export/jobs:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Export]
+      operationId: listExportJobs
+      summary: List recent export jobs for project
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Job list newest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportJobListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Export]
+      operationId: enqueueExportJob
+      summary: Enqueue async export job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExportJobCreateRequest"
+      responses:
+        "202":
+          description: Job accepted and queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportJob"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/export/jobs/{job_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/JobId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Export]
+      operationId: getExportJob
+      summary: Poll export job status
+      responses:
+        "200":
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportJob"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Export]
+      operationId: cancelExportJob
+      summary: Cancel pending job or delete artifact
+      responses:
+        "204":
+          description: Cancelled or deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /projects/{project_id}/export/jobs/{job_id}/download:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/JobId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Export]
+      operationId: downloadExportJobArtifact
+      summary: Download completed export artifact
+      responses:
+        "200":
+          description: Binary artifact stream
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/epub+zip:
+              schema:
+                type: string
+                format: binary
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema:
+                type: string
+                format: binary
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+components:
+  parameters:
+    UserIdHeader:
+      name: X-User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SeriesId:
+      name: series_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    NoteId:
+      name: note_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    LinkId:
+      name: link_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    JobId:
+      name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid X-User-Id
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found or cross-tenant
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict with current state
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: ok
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    ResearchNoteStatus:
+      type: string
+      enum: [active, archived, promoted]
+
+    ResearchNoteLinkType:
+      type: string
+      enum: [character, place, fact, chapter]
+
+    BibleSection:
+      type: string
+      enum: [world, characters, timeline, glossary, objects, style, power_system]
+
+    ResearchNote:
+      type: object
+      required:
+        - id
+        - project_id
+        - title
+        - body_md
+        - tags
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        body_md:
+          type: string
+        source_url:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        status:
+          $ref: "#/components/schemas/ResearchNoteStatus"
+        promoted_to_staging_id:
+          type: string
+          format: uuid
+          nullable: true
+        promoted_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ResearchNoteLink:
+      type: object
+      required: [id, note_id, link_type, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        note_id:
+          type: string
+          format: uuid
+        link_type:
+          $ref: "#/components/schemas/ResearchNoteLinkType"
+        character_id:
+          type: string
+          format: uuid
+          nullable: true
+        bible_key:
+          type: string
+          nullable: true
+        chapter_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    ResearchNoteDetail:
+      allOf:
+        - $ref: "#/components/schemas/ResearchNote"
+        - type: object
+          required: [links]
+          properties:
+            links:
+              type: array
+              items:
+                $ref: "#/components/schemas/ResearchNoteLink"
+
+    ResearchNoteCreateRequest:
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body_md:
+          type: string
+        source_url:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    ResearchNoteUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        body_md:
+          type: string
+        source_url:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+
+    ResearchNoteLinkCreateRequest:
+      type: object
+      required: [link_type]
+      properties:
+        link_type:
+          $ref: "#/components/schemas/ResearchNoteLinkType"
+        character_id:
+          type: string
+          format: uuid
+        bible_key:
+          type: string
+        chapter_id:
+          type: string
+          format: uuid
+
+    ResearchPromoteRequest:
+      type: object
+      required: [section, title]
+      properties:
+        section:
+          $ref: "#/components/schemas/BibleSection"
+        title:
+          type: string
+        content_md:
+          type: string
+          description: Override note body; default = note.body_md
+        staging_entry_id:
+          type: string
+          format: uuid
+          description: Update existing staging row instead of create
+
+    ResearchPromoteResponse:
+      type: object
+      required: [note_id, staging_entry_id, status]
+      properties:
+        note_id:
+          type: string
+          format: uuid
+        staging_entry_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [promoted]
+        message:
+          type: string
+          example: Staging entry created — settle separately to commit canon
+
+    ResearchNoteListResponse:
+      type: object
+      required: [items, page, page_size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResearchNote"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+
+    ResearchNoteSearchHit:
+      type: object
+      required: [note, rank]
+      properties:
+        note:
+          $ref: "#/components/schemas/ResearchNote"
+        rank:
+          type: number
+        snippet:
+          type: string
+
+    ResearchNoteSearchResponse:
+      type: object
+      required: [items, page, page_size, total, query]
+      properties:
+        query:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResearchNoteSearchHit"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+
+    SeriesSummary:
+      type: object
+      required: [id, title, slug, book_count, created_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        book_count:
+          type: integer
+        hub_project_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    SeriesProjectLink:
+      type: object
+      required: [series_id, project_id, book_order, attached_at]
+      properties:
+        series_id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        book_order:
+          type: integer
+        project_title:
+          type: string
+        attached_at:
+          type: string
+          format: date-time
+
+    SeriesDetail:
+      type: object
+      required: [id, title, slug, projects, slice_version_current, created_at, updated_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        hub_project_id:
+          type: string
+          format: uuid
+          nullable: true
+        slice_version_current:
+          type: integer
+        projects:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeriesProjectLink"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SeriesListResponse:
+      type: object
+      required: [items, page, page_size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeriesSummary"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+
+    SeriesCreateRequest:
+      type: object
+      required: [title, slug]
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+        create_hub_project:
+          type: boolean
+          default: true
+        hub_project_title:
+          type: string
+
+    SeriesUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        slug:
+          type: string
+
+    SeriesAttachProjectRequest:
+      type: object
+      required: [project_id]
+      properties:
+        project_id:
+          type: string
+          format: uuid
+        book_order:
+          type: integer
+          minimum: 1
+          default: 1
+
+    SeriesBibleSlice:
+      type: object
+      required: [series_id, version, slice_json, inherited_sections, settled_at]
+      properties:
+        series_id:
+          type: string
+          format: uuid
+        version:
+          type: integer
+        slice_json:
+          type: object
+          additionalProperties: true
+        inherited_sections:
+          type: array
+          items:
+            type: string
+        settled_at:
+          type: string
+          format: date-time
+
+    ProjectInheritedSliceResponse:
+      type: object
+      required: [project_id, series_id, slice_version, inherited_sections, slice_json, read_only]
+      properties:
+        project_id:
+          type: string
+          format: uuid
+        series_id:
+          type: string
+          format: uuid
+        series_title:
+          type: string
+        slice_version:
+          type: integer
+        last_seen_slice_version:
+          type: integer
+          nullable: true
+        inherited_sections:
+          type: array
+          items:
+            type: string
+        slice_json:
+          type: object
+          additionalProperties: true
+        read_only:
+          type: boolean
+          default: true
+        drift_warning:
+          type: boolean
+          description: true when parent slice version > last_seen
+
+    SeriesOverrideCreateRequest:
+      type: object
+      required: [overrides_series_key, section, title, content_md]
+      properties:
+        overrides_series_key:
+          type: string
+        section:
+          $ref: "#/components/schemas/BibleSection"
+        title:
+          type: string
+        content_md:
+          type: string
+        override_reason:
+          type: string
+
+    SeriesOverrideStagingEntry:
+      type: object
+      required: [id, project_id, section, title, metadata]
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        section:
+          $ref: "#/components/schemas/BibleSection"
+        title:
+          type: string
+        content_md:
+          type: string
+        metadata:
+          type: object
+          properties:
+            series_override:
+              type: boolean
+            overrides_series_key:
+              type: string
+            override_reason:
+              type: string
+
+    ExportJobType:
+      type: string
+      enum: [epub, docx, git_md_mirror]
+
+    ExportJobStatus:
+      type: string
+      enum: [pending, running, done, failed]
+
+    ExportChapterScope:
+      type: string
+      enum: [settled_only, include_drafts, selected]
+
+    ExportJobOptions:
+      type: object
+      properties:
+        chapter_scope:
+          $ref: "#/components/schemas/ExportChapterScope"
+        chapter_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        include_author_notes:
+          type: boolean
+          default: false
+        include_bible:
+          type: boolean
+          default: true
+        bible_version:
+          type: integer
+          nullable: true
+        strip_secrets:
+          type: boolean
+          default: true
+        git_md_push_stub:
+          type: boolean
+          default: false
+
+    ExportJob:
+      type: object
+      required:
+        - id
+        - project_id
+        - job_type
+        - status
+        - options
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        job_type:
+          $ref: "#/components/schemas/ExportJobType"
+        status:
+          $ref: "#/components/schemas/ExportJobStatus"
+        options:
+          $ref: "#/components/schemas/ExportJobOptions"
+        artifact_filename:
+          type: string
+          nullable: true
+        artifact_size_bytes:
+          type: integer
+          format: int64
+          nullable: true
+        download_url:
+          type: string
+          nullable: true
+          description: Relative API path when done
+        error_message:
+          type: string
+          nullable: true
+        result_json:
+          type: object
+          additionalProperties: true
+          nullable: true
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        finished_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    ExportJobCreateRequest:
+      type: object
+      required: [job_type]
+      properties:
+        job_type:
+          $ref: "#/components/schemas/ExportJobType"
+        options:
+          $ref: "#/components/schemas/ExportJobOptions"
+
+    ExportJobListResponse:
+      type: object
+      required: [items, page, page_size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExportJob"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+
+    ContinuityCategoryPhase9:
+      type: string
+      description: WARN-only additions — research, series
+      enum: [research, series]

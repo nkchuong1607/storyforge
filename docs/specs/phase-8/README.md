@@ -9,7 +9,7 @@ Phase 8 Slice 1 delivers **story-quality modules** that extend existing chapter 
 2. **Relationship arcs** — relationship ledger events + Postgres-backed graph read model (no Neo4j)
 3. **Stakes ledger** — act-level escalation tracking; plants into continuity / settle
 
-**Deferred to Phase 9+:** Research module, Series projects, Git mirror, Neo4j, EPUB/DOCX export, realtime collaboration.
+**Deferred to Phase 9:** Research module, Series projects, Git mirror, EPUB/DOCX export. **Phase 10+:** Neo4j, realtime collaboration.
 
 ---
 
@@ -152,7 +152,7 @@ From `storyforge-domain-canon` + `storyforge-continuity` + `storyforge-architect
 ## Validation
 
 ```bash
-make validate-specs   # Phase 1–8 OpenAPI YAML
+make validate-specs   # Phase 1–9 OpenAPI YAML
 make check            # full harness
 ```
 
