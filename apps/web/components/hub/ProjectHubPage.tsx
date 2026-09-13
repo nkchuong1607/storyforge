@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { getProject } from "@/lib/api/projects";
 import { listChapters } from "@/lib/api/chapters";
+import { getLatestContinuityReport } from "@/lib/api/continuity";
 import { getTwistBoard } from "@/lib/api/twists";
 import { countFairnessFails } from "@/lib/twist-utils";
-import type { Chapter, ProjectDetail } from "@/lib/api/types";
+import type { Chapter, ContinuityIssue, ProjectDetail } from "@/lib/api/types";
 import { useTranslations } from "@/lib/i18n/use-translations";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
@@ -16,6 +17,7 @@ import { ProjectHeader } from "./ProjectHeader";
 import { ProjectSidebar } from "./ProjectSidebar";
 import { RecentActivity } from "./RecentActivity";
 import { SummaryCards } from "./SummaryCards";
+import { StakesHubBadge } from "@/components/stakes/StakesHubBadge";
 
 type LoadState = "loading" | "success" | "error" | "not_found";
 
@@ -28,6 +30,7 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [fairnessFailCount, setFairnessFailCount] = useState(0);
+  const [stakesIssues, setStakesIssues] = useState<ContinuityIssue[]>([]);
   const [loadState, setLoadState] = useState<LoadState>("loading");
 
   const loadHub = useCallback(async () => {
@@ -41,6 +44,20 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
       setProject(projectData);
       setChapters(chaptersData.items);
       setFairnessFailCount(boardData ? countFairnessFails(boardData) : 0);
+
+      const reviewing = chaptersData.items.find((c) => c.status === "reviewing");
+      const continuityChapter = reviewing ?? chaptersData.items[chaptersData.items.length - 1];
+      if (continuityChapter) {
+        try {
+          const report = await getLatestContinuityReport(projectId, continuityChapter.id);
+          setStakesIssues(report.issues);
+        } catch {
+          setStakesIssues([]);
+        }
+      } else {
+        setStakesIssues([]);
+      }
+
       setLoadState("success");
     } catch (err: unknown) {
       if (err && typeof err === "object" && "status" in err && err.status === 404) {
@@ -100,6 +117,7 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
       {loadState === "success" && project ? (
         <>
           <ProjectHeader project={project} />
+          <StakesHubBadge projectId={projectId} issues={stakesIssues} />
           <SummaryCards
             chapterCount={project.chapter_count}
             bibleEntryCount={project.bible_entry_count}

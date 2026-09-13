@@ -1,0 +1,55 @@
+{
+  "nodes": [
+    {
+      "id": "990e8400-e29b-41d4-a716-446655440001",
+      "display_name": "Lý Phong",
+      "tier": 3,
+      "degree": 2
+    },
+    {
+      "id": "990e8400-e29b-41d4-a716-446655440002",
+      "display_name": "Tiểu Nguyệt",
+      "tier": 1,
+      "degree": 1
+    },
+    {
+      "id": "990e8400-e29b-41d4-a716-446655440003",
+      "display_name": "Ma Vương Hắc Ảnh",
+      "tier": 0,
+      "degree": 1
+    }
+  ],
+  "edges": [
+    {
+      "id": "bb0e8400-e29b-41d4-a716-446655440001",
+      "source_id": "990e8400-e29b-41d4-a716-446655440001",
+      "target_id": "990e8400-e29b-41d4-a716-446655440002",
+      "relation_type": "ally",
+      "intensity": 3,
+      "last_event": {
+        "chapter_number": 2,
+        "event_type": "trust_shift",
+        "intensity_delta": 1
+      },
+      "event_count": 2
+    },
+    {
+      "id": "bb0e8400-e29b-41d4-a716-446655440002",
+      "source_id": "990e8400-e29b-41d4-a716-446655440001",
+      "target_id": "990e8400-e29b-41d4-a716-446655440003",
+      "relation_type": "rival",
+      "intensity": -2,
+      "last_event": {
+        "chapter_number": 3,
+        "event_type": "trust_shift",
+        "intensity_delta": -1
+      },
+      "event_count": 1
+    }
+  ],
+  "meta": {
+    "filtered_character_ids": [],
+    "act_number": null,
+    "generated_at": "2026-09-13T00:00:00Z"
+  }
+}

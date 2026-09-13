@@ -34,6 +34,11 @@ describe("ProjectHubPage", () => {
     expect(within(outlineLink).getByText("1")).toBeInTheDocument();
   });
 
+  it("shows stakes hub badge when continuity has stakes warnings", async () => {
+    renderWithProviders(<ProjectHubPage projectId={mockProjects[0].id} />);
+    expect(await screen.findByText(/Stakes — cần leo thang/)).toBeInTheDocument();
+  });
+
   it("shows error state", async () => {
     server.use(
       http.get("http://localhost:8000/projects/:id", () =>

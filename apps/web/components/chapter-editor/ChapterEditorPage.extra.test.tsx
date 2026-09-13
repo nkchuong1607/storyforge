@@ -36,12 +36,11 @@ describe("ChapterEditorPage extra coverage", () => {
   it("toggles beat completion", async () => {
     const user = userEvent.setup();
     render(<ChapterEditorPage projectId={PROJECT_1_ID} chapterId={CHAPTER_2_ID} />);
-    await screen.findByText("2.2");
-    const checkbox = screen.getByRole("checkbox", { name: /Hoàn thành beat 2.2/ });
-    expect(checkbox).not.toBeChecked();
+    const checkbox = await screen.findByRole("checkbox", { name: /Hoàn thành beat 2.1/ });
+    expect(checkbox).toBeChecked();
     await user.click(checkbox);
     await waitFor(() => {
-      expect(checkbox).toBeChecked();
+      expect(checkbox).not.toBeChecked();
     });
   });
 

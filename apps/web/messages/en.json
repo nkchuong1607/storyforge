@@ -178,7 +178,14 @@
       "colChapter": "Chapter",
       "colActions": "Actions",
       "linkPowerBible": "Power bible",
-      "linkFixInEditor": "Fix in editor"
+      "linkFixInEditor": "Fix in editor",
+      "linkFixBeat": "Fix beat",
+      "linkRelationships": "View relationships",
+      "linkStakes": "Open stakes board"
+    },
+    "filter": {
+      "label": "Filter by category",
+      "all": "All categories"
     },
     "stateDiffSections": {
       "ledgerProposals": "Ledger proposals",
@@ -580,5 +587,133 @@
         "compareLoadFailed": "Could not load compare content"
       }
     }
+  },
+  "scene": {
+    "panel": {
+      "title": "Scene structure"
+    },
+    "fields": {
+      "goal": "Goal",
+      "conflict": "Conflict",
+      "outcome": "Outcome",
+      "stakes_level": "Stakes level",
+      "scene_type": "Scene type",
+      "pov_none": "No POV"
+    },
+    "types": {
+      "scene": "Scene",
+      "sequel": "Sequel",
+      "transition": "Transition",
+      "exposition": "Exposition"
+    },
+    "lint": {
+      "missing_outcome": "Missing outcome",
+      "missing_conflict": "Missing conflict",
+      "missing_goal": "Missing goal",
+      "loading": "Checking…",
+      "error": "Could not run scene lint"
+    },
+    "gate": {
+      "category": "Scene structure"
+    },
+    "expandStructure": "Structure fields",
+    "collapseStructure": "Hide structure",
+    "stakesHint": {
+      "peak": "Act peak target {level}/5 · {count} checkpoint(s)",
+      "openBoard": "Open stakes board"
+    }
+  },
+  "relationships": {
+    "graph": {
+      "title": "Relationship graph",
+      "subtitle": "Canonical pairs and trust history from settled events",
+      "canvasHint": "Click an edge in list view for details",
+      "denseHint": "Dense graph — use filters to narrow",
+      "showCanvas": "Graph view",
+      "openFull": "Open full graph",
+      "subgraphTitle": "Character subgraph"
+    },
+    "list": {
+      "title": "Relationship list",
+      "colA": "Character A",
+      "colB": "Character B",
+      "colType": "Type"
+    },
+    "types": {
+      "ally": "Ally",
+      "rival": "Rival",
+      "mentor": "Mentor",
+      "family": "Family",
+      "romantic": "Romantic",
+      "enemy": "Enemy",
+      "custom": "Custom"
+    },
+    "intensity": {
+      "label": "Trust intensity"
+    },
+    "events": {
+      "timeline": "Event history",
+      "empty": "No settled events yet",
+      "chapter": "Ch. {n}"
+    },
+    "empty": "No relationships yet",
+    "gate": {
+      "category": "Relationship arc"
+    },
+    "filters": {
+      "act": "Act",
+      "allActs": "All acts",
+      "apply": "Apply filters"
+    },
+    "detail": {
+      "selectEdge": "Select a relationship to view timeline"
+    },
+    "register": {
+      "button": "Register pair",
+      "first": "Register first relationship",
+      "title": "Register relationship",
+      "characterA": "Character A",
+      "characterB": "Character B",
+      "select": "Select…",
+      "submit": "Register",
+      "error": "Could not register relationship"
+    },
+    "errorLoad": "Failed to load relationship graph"
+  },
+  "stakes": {
+    "board": {
+      "title": "Stakes board",
+      "subtitle": "Act-level escalation checkpoints",
+      "settingsLink": "Act structure settings"
+    },
+    "act": {
+      "label": "Act {n}",
+      "chapters": "Ch. {start}–{end}"
+    },
+    "status": {
+      "planned": "Planned",
+      "planted": "Planted",
+      "resolved": "Resolved",
+      "abandoned": "Abandoned"
+    },
+    "target_level": "Target level",
+    "flat_middle": {
+      "warn": "Flat middle"
+    },
+    "gate": {
+      "category": "Stakes"
+    },
+    "emptyAct": "No checkpoints in this act",
+    "addCheckpoint": "Add checkpoint",
+    "create": {
+      "title": "New checkpoint",
+      "name": "Title"
+    },
+    "linkedTwist": "Linked twist",
+    "markPlanted": "Mark planted",
+    "hub": {
+      "badge": "Stakes — escalation needed ({count})"
+    },
+    "errorLoad": "Failed to load stakes board"
   }
 }

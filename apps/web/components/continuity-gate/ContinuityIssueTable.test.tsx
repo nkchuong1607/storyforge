@@ -41,7 +41,7 @@ describe("ContinuityIssueTable", () => {
       />,
     );
     expect(screen.getByText("Warning message")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Fix in editor" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Sửa trong editor" })).toHaveAttribute(
       "href",
       "/projects/p/chapters/c?highlight=fp1",
     );
