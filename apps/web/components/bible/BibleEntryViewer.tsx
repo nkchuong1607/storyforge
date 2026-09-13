@@ -1,6 +1,7 @@
 "use client";
 
 import type { BibleEntry } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { MetadataBlock } from "./MetadataBlock";
 
 interface BibleEntryViewerProps {
@@ -36,6 +37,8 @@ function renderMarkdown(content: string): React.ReactNode {
 }
 
 export function BibleEntryViewer({ entry, onEdit }: BibleEntryViewerProps) {
+  const t = useTranslations();
+
   return (
     <div>
       <div className="mb-4 flex items-start justify-between gap-4">
@@ -45,7 +48,7 @@ export function BibleEntryViewer({ entry, onEdit }: BibleEntryViewerProps) {
           onClick={onEdit}
           className="shrink-0 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
-          Chỉnh sửa
+          {t("common.edit")}
         </button>
       </div>
       <MetadataBlock entry={entry} />

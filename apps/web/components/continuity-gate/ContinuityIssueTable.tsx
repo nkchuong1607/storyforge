@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { ContinuityIssue, ContinuityOverride } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { severityBadgeClass } from "@/lib/continuity-utils";
 import { categoryBadgeClass } from "@/lib/psych-utils";
 import { MarkIntentionalModal } from "./MarkIntentionalModal";
@@ -24,6 +25,7 @@ export function ContinuityIssueTable({
   readOnly,
   onMarkIntentional,
 }: ContinuityIssueTableProps) {
+  const t = useTranslations();
   const [modalIssue, setModalIssue] = useState<ContinuityIssue | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const overridden = new Set(overrides.map((o) => o.issue_fingerprint));
@@ -42,7 +44,7 @@ export function ContinuityIssueTable({
   if (issues.length === 0) {
     return (
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center text-sm text-emerald-800">
-        Không có vấn đề continuity nào.
+        {t("continuity.issues.empty")}
       </div>
     );
   }
@@ -54,19 +56,19 @@ export function ContinuityIssueTable({
           <thead className="bg-slate-50">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-                Mức
+                {t("continuity.issues.colSeverity")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-                Danh mục
+                {t("continuity.issues.colCategory")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-                Mô tả
+                {t("continuity.issues.colDescription")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-                Chương
+                {t("continuity.issues.colChapter")}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium uppercase text-slate-500">
-                Hành động
+                {t("continuity.issues.colActions")}
               </th>
             </tr>
           </thead>
@@ -99,14 +101,14 @@ export function ContinuityIssueTable({
                           href={`/projects/${projectId}/bible/power-system`}
                           className="text-xs font-medium text-violet-700 hover:text-violet-900"
                         >
-                          Power bible
+                          {t("continuity.issues.linkPowerBible")}
                         </Link>
                       ) : (
                         <Link
                           href={`/projects/${projectId}/chapters/${chapterId}?highlight=${issue.fingerprint}`}
                           className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
                         >
-                          Fix in editor
+                          {t("continuity.issues.linkFixInEditor")}
                         </Link>
                       )}
                       {!readOnly && (issue.severity === "fail" || issue.severity === "warn") ? (
@@ -116,7 +118,7 @@ export function ContinuityIssueTable({
                           onClick={() => setModalIssue(issue)}
                           className="text-xs font-medium text-amber-700 hover:text-amber-900 disabled:opacity-40"
                         >
-                          Mark intentional
+                          {t("continuity.markIntentional")}
                         </button>
                       ) : null}
                     </div>

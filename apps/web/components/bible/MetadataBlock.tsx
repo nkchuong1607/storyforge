@@ -1,11 +1,17 @@
+"use client";
+
 import type { BibleEntry } from "@/lib/api/types";
 import { formatDate } from "@/lib/labels";
+import { useLocale } from "@/lib/i18n/use-translations";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface MetadataBlockProps {
   entry: BibleEntry;
 }
 
 export function MetadataBlock({ entry }: MetadataBlockProps) {
+  const t = useTranslations();
+  const { locale } = useLocale();
   const entryType = (entry.metadata.type as string | undefined) ?? "canon";
   const status = (entry.metadata.status as string | undefined) ?? "active";
 
@@ -30,11 +36,11 @@ export function MetadataBlock({ entry }: MetadataBlockProps) {
         </div>
         <div className="sm:col-span-2">
           <dt className="inline font-medium">last_updated: </dt>
-          <dd className="inline">{formatDate(entry.updated_at)}</dd>
+          <dd className="inline">{formatDate(entry.updated_at, locale)}</dd>
         </div>
       </dl>
       <span className="mt-2 inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-        Staging
+        {t("bible.stagingBadge")}
       </span>
     </div>
   );

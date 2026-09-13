@@ -22,7 +22,7 @@ describe("ContinuityGatePage", () => {
   it("disables settle when FAIL unresolved", async () => {
     render(<ContinuityGatePage projectId={PROJECT_1_ID} chapterId={CHAPTER_3_ID} />);
     await screen.findByText(/Continuity Report/);
-    const settleBtn = screen.getByRole("button", { name: "Approve & Settle" });
+    const settleBtn = screen.getByRole("button", { name: "Phê duyệt & Settle" });
     expect(settleBtn).toBeDisabled();
     expect(screen.getByText(/Còn FAIL chưa giải quyết/)).toBeInTheDocument();
   });
@@ -31,14 +31,14 @@ describe("ContinuityGatePage", () => {
     const user = userEvent.setup();
     render(<ContinuityGatePage projectId={PROJECT_1_ID} chapterId={CHAPTER_3_ID} />);
     await screen.findByText(/Continuity Report/);
-    const markButtons = screen.getAllByRole("button", { name: "Mark intentional" });
+    const markButtons = screen.getAllByRole("button", { name: "Đánh dấu có chủ ý" });
     for (const button of markButtons) {
       await user.click(button);
       await user.type(screen.getByPlaceholderText("Lý do override…"), "Hồi tưởng cố ý");
       await user.click(screen.getByRole("button", { name: "Xác nhận" }));
     }
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Approve & Settle" })).not.toBeDisabled();
+      expect(screen.getByRole("button", { name: "Phê duyệt & Settle" })).not.toBeDisabled();
     });
   });
 
@@ -53,8 +53,8 @@ describe("ContinuityGatePage", () => {
   it("reject navigates to editor", async () => {
     const user = userEvent.setup();
     render(<ContinuityGatePage projectId={PROJECT_1_ID} chapterId={CHAPTER_3_ID} />);
-    await screen.findByText("Reject draft");
-    await user.click(screen.getByRole("button", { name: "Reject draft" }));
+    await screen.findByText("Từ chối");
+    await user.click(screen.getByRole("button", { name: "Từ chối" }));
     await waitFor(() => {
       expect(push).toHaveBeenCalledWith(
         `/projects/${PROJECT_1_ID}/chapters/${CHAPTER_3_ID}`,

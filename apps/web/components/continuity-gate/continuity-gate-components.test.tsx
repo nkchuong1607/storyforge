@@ -112,7 +112,7 @@ describe("continuity-gate components", () => {
         onApproveSettle={vi.fn()}
       />,
     );
-    expect(screen.getByRole("button", { name: "Approve & Settle" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Phê duyệt & Settle" })).toBeDisabled();
     expect(screen.getByText("FAIL unresolved")).toBeInTheDocument();
   });
 
@@ -130,9 +130,9 @@ describe("continuity-gate components", () => {
         onApproveSettle={onSettle}
       />,
     );
-    await user.click(screen.getByRole("button", { name: "Reject draft" }));
+    await user.click(screen.getByRole("button", { name: "Từ chối" }));
     expect(onReject).toHaveBeenCalled();
-    await user.click(screen.getByRole("button", { name: "Approve & Settle" }));
+    await user.click(screen.getByRole("button", { name: "Phê duyệt & Settle" }));
     expect(onSettle).toHaveBeenCalled();
   });
 

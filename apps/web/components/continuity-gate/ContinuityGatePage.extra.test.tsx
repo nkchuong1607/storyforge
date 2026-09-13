@@ -37,18 +37,18 @@ describe("ContinuityGatePage extra coverage", () => {
     const user = userEvent.setup();
     render(<ContinuityGatePage projectId={PROJECT_1_ID} chapterId={CHAPTER_3_ID} />);
     await screen.findByText(/Continuity Report/);
-    const markButtons = screen.getAllByRole("button", { name: "Mark intentional" });
+    const markButtons = screen.getAllByRole("button", { name: "Đánh dấu có chủ ý" });
     for (const button of markButtons) {
       await user.click(button);
       await user.type(screen.getByPlaceholderText("Lý do override…"), "Hồi tưởng");
       await user.click(screen.getByRole("button", { name: "Xác nhận" }));
     }
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Approve & Settle" })).not.toBeDisabled();
+      expect(screen.getByRole("button", { name: "Phê duyệt & Settle" })).not.toBeDisabled();
     });
-    await user.click(screen.getByRole("button", { name: "Approve & Settle" }));
+    await user.click(screen.getByRole("button", { name: "Phê duyệt & Settle" }));
     await waitFor(() => {
-      expect(screen.getByText(/Settle thành công/)).toBeInTheDocument();
+      expect(screen.getByText(/Đã settle chương thành công/)).toBeInTheDocument();
     });
   });
 
@@ -63,8 +63,8 @@ describe("ContinuityGatePage extra coverage", () => {
   it("request revise navigates to editor", async () => {
     const user = userEvent.setup();
     render(<ContinuityGatePage projectId={PROJECT_1_ID} chapterId={CHAPTER_3_ID} />);
-    await screen.findByText("Request revise");
-    await user.click(screen.getByRole("button", { name: "Request revise" }));
+    await screen.findByText("Yêu cầu sửa");
+    await user.click(screen.getByRole("button", { name: "Yêu cầu sửa" }));
     await waitFor(() => {
       expect(push).toHaveBeenCalledWith(
         `/projects/${PROJECT_1_ID}/chapters/${CHAPTER_3_ID}`,
