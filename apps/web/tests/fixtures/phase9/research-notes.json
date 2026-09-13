@@ -1,0 +1,33 @@
+{
+  "items": [
+    {
+      "id": "aa0e8400-e29b-41d4-a716-446655440001",
+      "project_id": "660e8400-e29b-41d4-a716-446655440001",
+      "title": "Lịch sử kiếm phái Thanh Vân",
+      "body_md": "Thanh Vân tông thành lập năm 800, do **Linh Kiếm Tôn** sáng lập.\n\n- Quy tắc tu luyện nghiêm ngặt\n- Cấm dùng ma công",
+      "source_url": "https://example.com/thanh-van",
+      "tags": ["lịch-sử", "phái"],
+      "status": "active",
+      "promoted_to_staging_id": null,
+      "promoted_at": null,
+      "created_at": "2026-09-10T08:00:00Z",
+      "updated_at": "2026-09-12T10:00:00Z"
+    },
+    {
+      "id": "aa0e8400-e29b-41d4-a716-446655440002",
+      "project_id": "660e8400-e29b-41d4-a716-446655440001",
+      "title": "Địa danh — Hẻm núi U Minh",
+      "body_md": "Hẻm núi U Minh nằm phía bắc, thường có sương mù quanh năm.",
+      "source_url": null,
+      "tags": ["địa-danh"],
+      "status": "promoted",
+      "promoted_to_staging_id": "bb0e8400-e29b-41d4-a716-446655440001",
+      "promoted_at": "2026-09-11T12:00:00Z",
+      "created_at": "2026-09-09T08:00:00Z",
+      "updated_at": "2026-09-11T12:00:00Z"
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "total": 2
+}

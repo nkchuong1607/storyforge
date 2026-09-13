@@ -1,0 +1,18 @@
+{
+  "id": "dd0e8400-e29b-41d4-a716-446655440001",
+  "project_id": "660e8400-e29b-41d4-a716-446655440001",
+  "job_type": "epub",
+  "status": "done",
+  "options": {
+    "chapter_scope": "settled_only",
+    "include_bible": true,
+    "strip_secrets": true
+  },
+  "artifact_filename": "kiem-lai.epub",
+  "artifact_size_bytes": 245760,
+  "download_url": "/projects/660e8400-e29b-41d4-a716-446655440001/export/jobs/dd0e8400-e29b-41d4-a716-446655440001/download",
+  "error_message": null,
+  "started_at": "2026-09-12T10:01:00Z",
+  "finished_at": "2026-09-12T10:02:00Z",
+  "created_at": "2026-09-12T10:00:00Z"
+}

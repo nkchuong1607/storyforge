@@ -1,0 +1,18 @@
+{
+  "id": "cc0e8400-e29b-41d4-a716-446655440001",
+  "title": "Tam Giới Kiếm Đạo",
+  "slug": "tam-gioi-kiem-dao",
+  "hub_project_id": "660e8400-e29b-41d4-a716-446655440003",
+  "slice_version_current": 2,
+  "projects": [
+    {
+      "series_id": "cc0e8400-e29b-41d4-a716-446655440001",
+      "project_id": "660e8400-e29b-41d4-a716-446655440001",
+      "book_order": 1,
+      "project_title": "Kiếm Lai",
+      "attached_at": "2026-09-01T10:00:00Z"
+    }
+  ],
+  "created_at": "2026-09-01T08:00:00Z",
+  "updated_at": "2026-09-12T10:00:00Z"
+}

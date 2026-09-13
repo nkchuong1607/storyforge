@@ -39,6 +39,14 @@ describe("ProjectHubPage", () => {
     expect(await screen.findByText(/Stakes — cần leo thang/)).toBeInTheDocument();
   });
 
+  it("shows phase9 research card, series badge, and export section", async () => {
+    renderWithProviders(<ProjectHubPage projectId={mockProjects[0].id} />);
+    expect(await screen.findByRole("heading", { name: "Kiếm Lai" })).toBeInTheDocument();
+    expect(await screen.findByText(/ghi chú đang dùng/)).toBeInTheDocument();
+    expect(screen.getByText(/Thuộc series/)).toBeInTheDocument();
+    expect(screen.getByText("Xuất gần đây")).toBeInTheDocument();
+  });
+
   it("shows error state", async () => {
     server.use(
       http.get("http://localhost:8000/projects/:id", () =>

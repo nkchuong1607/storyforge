@@ -245,6 +245,8 @@ export interface ProjectDetail extends ProjectSummary {
   settings?: Record<string, unknown>;
   chapter_count: number;
   bible_entry_count: number;
+  series_id?: string | null;
+  series_title?: string | null;
 }
 
 export interface ProjectCreateRequest {
@@ -1102,4 +1104,236 @@ export interface StakesBoardResponse {
   };
   acts: StakesActColumn[];
   warnings?: StakesBoardWarnings;
+}
+
+// Phase 9 — Research, Series, Export
+
+export type ResearchNoteStatus = "active" | "archived" | "promoted";
+export type ResearchNoteLinkType = "character" | "place" | "fact" | "chapter";
+export type Phase9BibleSection =
+  | "world"
+  | "characters"
+  | "timeline"
+  | "glossary"
+  | "objects"
+  | "style"
+  | "power_system";
+
+export interface ResearchNote {
+  id: string;
+  project_id: string;
+  title: string;
+  body_md: string;
+  source_url?: string | null;
+  tags: string[];
+  status: ResearchNoteStatus;
+  promoted_to_staging_id?: string | null;
+  promoted_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ResearchNoteLink {
+  id: string;
+  note_id: string;
+  link_type: ResearchNoteLinkType;
+  character_id?: string | null;
+  bible_key?: string | null;
+  chapter_id?: string | null;
+  created_at: string;
+}
+
+export interface ResearchNoteDetail extends ResearchNote {
+  links: ResearchNoteLink[];
+}
+
+export interface ResearchNoteCreateRequest {
+  title: string;
+  body_md?: string;
+  source_url?: string;
+  tags?: string[];
+}
+
+export interface ResearchNoteUpdateRequest {
+  title?: string;
+  body_md?: string;
+  source_url?: string | null;
+  tags?: string[];
+}
+
+export interface ResearchNoteLinkCreateRequest {
+  link_type: ResearchNoteLinkType;
+  character_id?: string;
+  bible_key?: string;
+  chapter_id?: string;
+}
+
+export interface ResearchPromoteRequest {
+  section: Phase9BibleSection;
+  title: string;
+  content_md?: string;
+  staging_entry_id?: string;
+}
+
+export interface ResearchPromoteResponse {
+  note_id: string;
+  staging_entry_id: string;
+  status: "promoted";
+  message?: string;
+}
+
+export interface ResearchNoteListResponse {
+  items: ResearchNote[];
+  page: number;
+  page_size: number;
+  total: number;
+}
+
+export interface ResearchNoteSearchHit {
+  note: ResearchNote;
+  rank: number;
+  snippet?: string;
+}
+
+export interface ResearchNoteSearchResponse {
+  query: string;
+  items: ResearchNoteSearchHit[];
+  page: number;
+  page_size: number;
+  total: number;
+}
+
+export interface SeriesSummary {
+  id: string;
+  title: string;
+  slug: string;
+  book_count: number;
+  hub_project_id?: string | null;
+  created_at: string;
+}
+
+export interface SeriesProjectLink {
+  series_id: string;
+  project_id: string;
+  book_order: number;
+  project_title?: string;
+  attached_at: string;
+}
+
+export interface SeriesDetail {
+  id: string;
+  title: string;
+  slug: string;
+  hub_project_id?: string | null;
+  slice_version_current: number;
+  projects: SeriesProjectLink[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SeriesListResponse {
+  items: SeriesSummary[];
+  page: number;
+  page_size: number;
+  total: number;
+}
+
+export interface SeriesCreateRequest {
+  title: string;
+  slug: string;
+  create_hub_project?: boolean;
+  hub_project_title?: string;
+}
+
+export interface SeriesUpdateRequest {
+  title?: string;
+  slug?: string;
+}
+
+export interface SeriesAttachProjectRequest {
+  project_id: string;
+  book_order?: number;
+}
+
+export interface SeriesBibleSlice {
+  series_id: string;
+  version: number;
+  slice_json: Record<string, unknown>;
+  inherited_sections: string[];
+  settled_at: string;
+}
+
+export interface ProjectInheritedSliceResponse {
+  project_id: string;
+  series_id: string;
+  series_title?: string;
+  slice_version: number;
+  last_seen_slice_version?: number | null;
+  inherited_sections: string[];
+  slice_json: Record<string, unknown>;
+  read_only: boolean;
+  drift_warning?: boolean;
+}
+
+export interface SeriesOverrideCreateRequest {
+  overrides_series_key: string;
+  section: Phase9BibleSection;
+  title: string;
+  content_md: string;
+  override_reason?: string;
+}
+
+export interface SeriesOverrideStagingEntry {
+  id: string;
+  project_id: string;
+  section: Phase9BibleSection;
+  title: string;
+  content_md?: string;
+  metadata: {
+    series_override?: boolean;
+    overrides_series_key?: string;
+    override_reason?: string;
+  };
+}
+
+export type ExportJobType = "epub" | "docx" | "git_md_mirror";
+export type ExportJobStatus = "pending" | "running" | "done" | "failed";
+export type ExportChapterScope = "settled_only" | "include_drafts" | "selected";
+
+export interface ExportJobOptions {
+  chapter_scope?: ExportChapterScope;
+  chapter_ids?: string[];
+  include_author_notes?: boolean;
+  include_bible?: boolean;
+  bible_version?: number | null;
+  strip_secrets?: boolean;
+  git_md_push_stub?: boolean;
+}
+
+export interface ExportJob {
+  id: string;
+  project_id: string;
+  job_type: ExportJobType;
+  status: ExportJobStatus;
+  options: ExportJobOptions;
+  artifact_filename?: string | null;
+  artifact_size_bytes?: number | null;
+  download_url?: string | null;
+  error_message?: string | null;
+  result_json?: Record<string, unknown> | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  created_at: string;
+}
+
+export interface ExportJobCreateRequest {
+  job_type: ExportJobType;
+  options?: ExportJobOptions;
+}
+
+export interface ExportJobListResponse {
+  items: ExportJob[];
+  page: number;
+  page_size: number;
+  total: number;
 }

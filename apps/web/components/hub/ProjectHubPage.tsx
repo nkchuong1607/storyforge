@@ -18,6 +18,9 @@ import { ProjectSidebar } from "./ProjectSidebar";
 import { RecentActivity } from "./RecentActivity";
 import { SummaryCards } from "./SummaryCards";
 import { StakesHubBadge } from "@/components/stakes/StakesHubBadge";
+import { SeriesHubBadge } from "@/components/series/SeriesHubBadge";
+import { ResearchHubCard } from "@/components/research/ResearchHubCard";
+import { ExportHubSection } from "@/components/export/ExportHubSection";
 
 type LoadState = "loading" | "success" | "error" | "not_found";
 
@@ -117,7 +120,26 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
       {loadState === "success" && project ? (
         <>
           <ProjectHeader project={project} />
-          <StakesHubBadge projectId={projectId} issues={stakesIssues} />
+          <div className="flex flex-wrap gap-2">
+            <StakesHubBadge projectId={projectId} issues={stakesIssues} />
+            {project.series_id ? (
+              <SeriesHubBadge seriesId={project.series_id} seriesTitle={project.series_title} />
+            ) : null}
+          </div>
+          <div className="mb-6 mt-4 grid gap-4 sm:grid-cols-2">
+            <ResearchHubCard projectId={projectId} />
+            <Link
+              href={`/projects/${projectId}/settings/export`}
+              className="block rounded-[var(--sf-radius-lg)] border border-sf-border bg-sf-bg-surface p-4 transition-shadow hover:shadow-md"
+            >
+              <p className="text-xs font-medium uppercase tracking-wide text-sf-text-secondary">
+                {t("hub.exportCard")}
+              </p>
+              <p className="mt-1 text-lg font-semibold text-sf-text-primary">
+                {t("export.panel.title")}
+              </p>
+            </Link>
+          </div>
           <SummaryCards
             chapterCount={project.chapter_count}
             bibleEntryCount={project.bible_entry_count}
@@ -132,6 +154,7 @@ export function ProjectHubPage({ projectId }: ProjectHubPageProps) {
             </div>
             <RecentActivity />
           </div>
+          <ExportHubSection projectId={projectId} />
         </>
       ) : null}
     </AppShell>
