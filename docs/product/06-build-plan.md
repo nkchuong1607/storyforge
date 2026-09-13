@@ -23,7 +23,8 @@ gantt
     section Polish Scale
     Phase 7 UI Polish         :p7, 2025-05, 2025-07
     Phase 8 Story Quality     :p8, 2025-07, 2025-10
-    Phase 9 Plus              :p9, 2025-10, 2026-01
+    Phase 9 Research Export   :p9, 2025-10, 2026-01
+    Phase 10 Plus             :p10, 2026-01, 2026-04
 ```
 
 *(Timeline illustrative — không cam kết calendar; thứ tự phase và deps mới là binding.)*
@@ -359,22 +360,73 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ---
 
-## Phase 9+ — Research, Series, Export, Scale
+## Phase 9 — Research, Series, Export (Slice 1)
 
-**Goal:** Research workflow, multi-book series, export pipelines, optional graph DB — deferred until Phase 8 Slice 1 ships.
+**Goal:** Research workflow, multi-book series inheritance, and async export pipelines — deferred modules from Phase 8.
+
+### Deliverables (Slice 1 — in scope)
 
 | Module | Notes |
 |--------|-------|
-| Research module | notes → promote to bible |
-| Series projects | parent bible slice |
-| Git mirror | markdown export jobs |
+| Research module | Notes attached to project; link characters/places/facts; search; promote → bible **staging** (human approve before settle) |
+| Series projects | Parent `Series` entity; child projects share read-only parent bible slice; explicit override staging |
+| Export | EPUB + DOCX chapter jobs; Git markdown mirror zip; Redis job queue; local artifact download |
+
+### Out of scope (Phase 10+)
+
+| Module | Notes |
+|--------|-------|
 | Neo4j | optional if Postgres graph queries painful |
-| Export | EPUB/DOCX |
-| Collaboration | realtime optional |
+| Realtime collaboration | presence / multi-user editing |
+| Multi-user ACL beyond Phase 1 stub | invite flows, team roles |
+| LLM research autofill | deterministic/manual promote first in Phase 9 |
+| S3 / cloud artifact storage | local/tmp + Testcontainers-friendly in Phase 9 |
+| Real git push | stub only in Phase 9 |
+| Outline tree + Timeline swimlane | advanced planning UI |
+| Motif + ending promises UI | cross-book tracking |
 
 ### Dependencies
 
-- Phase 8 Slice 1
+- Phases 1–8 complete (Story Quality Slice 1 merged)
+
+### Definition of done
+
+- Research promote creates staging row; note marked promoted; settle unchanged
+- Series child shows inherited slice; override creates flagged staging entry
+- Export jobs: pending → running → done/failed; download artifact; settled vs draft scope documented
+- Continuity: research/series WARN-only — export does not affect Gate
+- `make test-api-cov` / `make test-web-cov` ≥ 90% on Phase 9 modules locally
+
+### Suggested PR order
+
+1. **`specs/phase-9`** — schema, OpenAPI, web screens, research/series/export rules, test strategy ([docs/specs/phase-9/README.md](../specs/phase-9/README.md))
+2. **`api/phase-9-implementation`** — migrations `024`–`027`, research/series/export routes, Redis worker, Testcontainers tests, coverage ≥90%
+3. **`web/phase-9-implementation`** — Research inbox, Series hub, Export panel against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
+
+**Skill focus:** `storyforge-architecture`, `storyforge-domain-canon`, `storyforge-continuity`, `storyforge-db-design`, `storyforge-api-python`, `storyforge-web-next`
+
+---
+
+## Phase 10+ — Scale & Collaboration
+
+**Goal:** Graph DB option, collaboration, advanced planning UI, cloud export — deferred until Phase 9 Slice 1 ships.
+
+| Module | Notes |
+|--------|-------|
+| Neo4j | optional relationship / knowledge graph |
+| Realtime collaboration | optional |
+| Full multi-user ACL | beyond stub |
+| LLM research autofill | citation extraction |
+| S3 presigned artifacts | production export storage |
+| Real git push mirror | deploy keys |
+| Outline / Timeline advanced | planning UI |
+| Motif + ending promises | series arc tracking |
+
+### Dependencies
+
+- Phase 9 Slice 1
 
 ---
 
@@ -408,7 +460,8 @@ PRs **2** and **3** run **in parallel** after specs merge.
 | 6 | Prompt Edit, Power bible | US-W03, PW01 |
 | 7 | Polish all | all UX AC |
 | 8 | Scene lint, Relationship graph, Stakes board | US-C03, US-O01 (partial) |
-| 9+ | Outline/Timeline advanced, export | US-O02, E01 |
+| 9 | Research inbox, Series hub, Export panel | US-E01, US-E02 |
+| 10+ | Outline/Timeline advanced, collaboration | US-O02, E03 |
 
 ---
 
