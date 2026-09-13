@@ -36,6 +36,12 @@ describe("StoryBiblePage", () => {
     });
   });
 
+  it("shows inherited series slice panel for child project", async () => {
+    renderWithProviders(<StoryBiblePage projectId={projectId} />);
+    expect(await screen.findByText("Nội dung kế thừa")).toBeInTheDocument();
+    expect(screen.getByText(/Series bible đã cập nhật/)).toBeInTheDocument();
+  });
+
   it("shows not found for unknown project", async () => {
     renderWithProviders(<StoryBiblePage projectId="00000000-0000-0000-0000-000000000000" />);
     expect(await screen.findByText("Không tìm thấy dự án")).toBeInTheDocument();

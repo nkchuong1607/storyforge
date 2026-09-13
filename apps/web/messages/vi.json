@@ -78,7 +78,9 @@
     "summaryBible": "Mục Bible",
     "summaryProgress": "Tiến độ viết",
     "recentActivity": "Hoạt động gần đây",
-    "noActivity": "Chưa có hoạt động"
+    "noActivity": "Chưa có hoạt động",
+    "researchCard": "Nghiên cứu",
+    "exportCard": "Xuất bản"
   },
   "chapter": {
     "status": {
@@ -181,7 +183,9 @@
       "linkFixInEditor": "Sửa trong editor",
       "linkFixBeat": "Sửa beat",
       "linkRelationships": "Xem quan hệ",
-      "linkStakes": "Mở bảng stakes"
+      "linkStakes": "Mở bảng stakes",
+      "linkResearch": "Mở nghiên cứu",
+      "linkSeries": "Xem slice kế thừa"
     },
     "filter": {
       "label": "Lọc theo danh mục",
@@ -715,5 +719,151 @@
       "badge": "Stakes — cần leo thang ({count})"
     },
     "errorLoad": "Không thể tải bảng stakes"
+  },
+  "research": {
+    "inbox": {
+      "title": "Nghiên cứu",
+      "search_placeholder": "Tìm ghi chú...",
+      "empty": "Chưa có ghi chú nghiên cứu",
+      "emptySearch": "Không tìm thấy ghi chú phù hợp",
+      "errorLoad": "Không thể tải ghi chú nghiên cứu"
+    },
+    "note": {
+      "new": "Ghi chú mới",
+      "title": "Tiêu đề",
+      "body": "Nội dung",
+      "source_url": "Nguồn tham khảo",
+      "tags": "Thẻ",
+      "status": {
+        "active": "Đang dùng",
+        "promoted": "Đã đưa vào staging",
+        "archived": "Đã lưu trữ"
+      },
+      "save": "Lưu ghi chú",
+      "saved": "Đã lưu ghi chú",
+      "promotedReadOnly": "Ghi chú đã promote — chỉ đọc"
+    },
+    "links": {
+      "title": "Liên kết",
+      "character": "Nhân vật",
+      "place": "Địa điểm",
+      "fact": "Sự kiện / fact",
+      "chapter": "Chương",
+      "empty": "Chưa có liên kết"
+    },
+    "promote": {
+      "title": "Đưa vào Story Bible (staging)",
+      "section": "Mục bible",
+      "confirm": "Tạo staging",
+      "hint": "Cần settle riêng để ghi canon",
+      "success": "Đã promote — mở Bible để xem staging"
+    },
+    "gate": {
+      "category": "Nghiên cứu",
+      "warnOnly": "Không chặn settle"
+    },
+    "hub": {
+      "card": "Nghiên cứu",
+      "activeCount": "{count} ghi chú đang dùng"
+    },
+    "table": {
+      "title": "Tiêu đề",
+      "tags": "Thẻ",
+      "status": "Trạng thái",
+      "updated": "Cập nhật"
+    }
+  },
+  "series": {
+    "hub": {
+      "title": "Series",
+      "books": "Các cuốn",
+      "shared_bible": "Bible dùng chung",
+      "empty": "Chưa có series",
+      "emptyDescription": "Tạo series để chia sẻ bible slice giữa các cuốn.",
+      "create": "Tạo series",
+      "errorLoad": "Không thể tải danh sách series"
+    },
+    "detail": {
+      "attach": "Gắn dự án",
+      "emptyBooks": "Chưa gắn cuốn nào",
+      "errorLoad": "Không thể tải chi tiết series"
+    },
+    "badge": "Thuộc series",
+    "inherited": {
+      "title": "Nội dung kế thừa",
+      "read_only": "Chỉ đọc — từ series",
+      "drift_warn": "Series bible đã cập nhật",
+      "viewChanges": "Xem thay đổi",
+      "empty": "Dự án không kế thừa slice series"
+    },
+    "override": {
+      "title": "Ghi đè cho cuốn này",
+      "reason": "Lý do ghi đè",
+      "confirm": "Tạo staging ghi đè",
+      "key": "Khóa series cần ghi đè",
+      "content": "Nội dung ghi đè",
+      "success": "Đã tạo staging ghi đè"
+    },
+    "attach": {
+      "title": "Gắn dự án vào series",
+      "project": "Dự án",
+      "select": "Chọn dự án…",
+      "confirm": "Gắn"
+    },
+    "book_order": "Thứ tự cuốn",
+    "gate": {
+      "category": "Series",
+      "warnOnly": "Không chặn settle"
+    },
+    "book": {
+      "order": "Cuốn {n}"
+    }
+  },
+  "export": {
+    "panel": {
+      "title": "Xuất bản",
+      "subtitle": "Xuất chương và bible sang định dạng portable"
+    },
+    "format": {
+      "epub": "EPUB",
+      "docx": "DOCX",
+      "git_md": "Git Markdown (zip)"
+    },
+    "scope": {
+      "settled_only": "Chỉ chương đã settle",
+      "settled_only_hint": "Bản nháp sẽ bị loại",
+      "include_drafts": "Bao gồm bản nháp",
+      "selected": "Chọn chương",
+      "draftCount": "{count} bản nháp"
+    },
+    "options": {
+      "include_bible": "Kèm Story Bible",
+      "strip_secrets": "Ẩn twist chưa lộ",
+      "author_notes": "Ghi chú tác giả"
+    },
+    "jobs": {
+      "title": "Lịch sử xuất",
+      "status": {
+        "pending": "Đang chờ",
+        "running": "Đang xử lý",
+        "done": "Hoàn tất",
+        "failed": "Lỗi"
+      },
+      "download": "Tải xuống",
+      "error": "{message}",
+      "empty": "Chưa có job xuất",
+      "type": "Định dạng",
+      "statusCol": "Trạng thái",
+      "created": "Tạo lúc",
+      "size": "Kích thước"
+    },
+    "enqueue": "Bắt đầu xuất",
+    "polling": "Đang tạo file...",
+    "noSettled": "Chưa có chương settled — file xuất có thể trống",
+    "errorLoad": "Không thể tải lịch sử xuất",
+    "hub": {
+      "quickAction": "Xuất bản",
+      "recent": "Xuất gần đây"
+    }
   }
 }

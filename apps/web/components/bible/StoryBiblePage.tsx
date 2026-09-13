@@ -24,6 +24,7 @@ import { BibleLayout } from "./BibleLayout";
 import { BibleTOC } from "./BibleTOC";
 import { EntityLinksPanel } from "./EntityLinksPanel";
 import { VersionHistoryPanel } from "./VersionHistoryPanel";
+import { SeriesInheritedSlicePanel } from "@/components/series/SeriesInheritedSlicePanel";
 
 type PageState = "loading" | "success" | "error" | "not_found";
 
@@ -163,7 +164,9 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
       {pageState === "loading" ? <LoadingSkeleton variant="content" /> : null}
 
       {pageState === "success" ? (
-        <BibleLayout
+        <>
+          <SeriesInheritedSlicePanel projectId={projectId} />
+          <BibleLayout
           toc={
             <BibleTOC
               entries={entries}
@@ -196,6 +199,7 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
             </>
           }
         />
+        </>
       ) : null}
     </AppShell>
   );

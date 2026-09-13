@@ -78,7 +78,9 @@
     "summaryBible": "Bible entries",
     "summaryProgress": "Writing progress",
     "recentActivity": "Recent activity",
-    "noActivity": "No recent activity"
+    "noActivity": "No recent activity",
+    "researchCard": "Research inbox",
+    "exportCard": "Export"
   },
   "chapter": {
     "status": {
@@ -181,7 +183,9 @@
       "linkFixInEditor": "Fix in editor",
       "linkFixBeat": "Fix beat",
       "linkRelationships": "View relationships",
-      "linkStakes": "Open stakes board"
+      "linkStakes": "Open stakes board",
+      "linkResearch": "Open research inbox",
+      "linkSeries": "View inherited slice"
     },
     "filter": {
       "label": "Filter by category",
@@ -715,5 +719,151 @@
       "badge": "Stakes — escalation needed ({count})"
     },
     "errorLoad": "Failed to load stakes board"
+  },
+  "research": {
+    "inbox": {
+      "title": "Research",
+      "search_placeholder": "Search notes…",
+      "empty": "No research notes yet",
+      "emptySearch": "No notes match your search",
+      "errorLoad": "Failed to load research notes"
+    },
+    "note": {
+      "new": "New note",
+      "title": "Title",
+      "body": "Content",
+      "source_url": "Source URL",
+      "tags": "Tags",
+      "status": {
+        "active": "Active",
+        "promoted": "Promoted to staging",
+        "archived": "Archived"
+      },
+      "save": "Save note",
+      "saved": "Note saved",
+      "promotedReadOnly": "This note was promoted — read only"
+    },
+    "links": {
+      "title": "Links",
+      "character": "Character",
+      "place": "Place",
+      "fact": "Fact",
+      "chapter": "Chapter",
+      "empty": "No links yet"
+    },
+    "promote": {
+      "title": "Promote to Story Bible (staging)",
+      "section": "Bible section",
+      "confirm": "Create staging",
+      "hint": "Settle separately to commit canon",
+      "success": "Promoted to staging — open Bible to review"
+    },
+    "gate": {
+      "category": "Research",
+      "warnOnly": "Does not block settle"
+    },
+    "hub": {
+      "card": "Research",
+      "activeCount": "{count} active notes"
+    },
+    "table": {
+      "title": "Title",
+      "tags": "Tags",
+      "status": "Status",
+      "updated": "Updated"
+    }
+  },
+  "series": {
+    "hub": {
+      "title": "Series",
+      "books": "Books",
+      "shared_bible": "Shared Bible",
+      "empty": "No series yet",
+      "emptyDescription": "Create a series to share bible slices across books.",
+      "create": "Create series",
+      "errorLoad": "Failed to load series"
+    },
+    "detail": {
+      "attach": "Attach project",
+      "emptyBooks": "No books attached yet",
+      "errorLoad": "Failed to load series detail"
+    },
+    "badge": "In series",
+    "inherited": {
+      "title": "Inherited content",
+      "read_only": "Read-only — from series",
+      "drift_warn": "Series bible updated",
+      "viewChanges": "View changes",
+      "empty": "No inherited slice for this project"
+    },
+    "override": {
+      "title": "Override for this book",
+      "reason": "Override reason",
+      "confirm": "Create override staging",
+      "key": "Series key to override",
+      "content": "Override content",
+      "success": "Override staging created"
+    },
+    "attach": {
+      "title": "Attach project to series",
+      "project": "Project",
+      "select": "Select project…",
+      "confirm": "Attach"
+    },
+    "book_order": "Book order",
+    "gate": {
+      "category": "Series",
+      "warnOnly": "Does not block settle"
+    },
+    "book": {
+      "order": "Book {n}"
+    }
+  },
+  "export": {
+    "panel": {
+      "title": "Export",
+      "subtitle": "Export chapters and bible to portable formats"
+    },
+    "format": {
+      "epub": "EPUB",
+      "docx": "DOCX",
+      "git_md": "Git Markdown (zip)"
+    },
+    "scope": {
+      "settled_only": "Settled chapters only",
+      "settled_only_hint": "Draft chapters are excluded",
+      "include_drafts": "Include drafts",
+      "selected": "Select chapters",
+      "draftCount": "{count} drafts"
+    },
+    "options": {
+      "include_bible": "Include Story Bible",
+      "strip_secrets": "Hide unrevealed twists",
+      "author_notes": "Author notes"
+    },
+    "jobs": {
+      "title": "Export history",
+      "status": {
+        "pending": "Pending",
+        "running": "Running",
+        "done": "Done",
+        "failed": "Failed"
+      },
+      "download": "Download",
+      "error": "{message}",
+      "empty": "No export jobs yet",
+      "type": "Format",
+      "statusCol": "Status",
+      "created": "Created",
+      "size": "Size"
+    },
+    "enqueue": "Start export",
+    "polling": "Generating file…",
+    "noSettled": "No settled chapters — export may be empty",
+    "errorLoad": "Failed to load export jobs",
+    "hub": {
+      "quickAction": "Export",
+      "recent": "Recent exports"
+    }
   }
 }

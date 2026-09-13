@@ -50,6 +50,18 @@ function issueDeepLink(
       labelKey: "continuity.issues.linkPowerBible",
     };
   }
+  if (issue.category === "research") {
+    return {
+      href: `/projects/${projectId}/research`,
+      labelKey: "continuity.issues.linkResearch",
+    };
+  }
+  if (issue.category === "series") {
+    return {
+      href: `/projects/${projectId}/bible`,
+      labelKey: "continuity.issues.linkSeries",
+    };
+  }
   return {
     href: `/projects/${projectId}/chapters/${chapterId}?highlight=${issue.fingerprint}`,
     labelKey: "continuity.issues.linkFixInEditor",

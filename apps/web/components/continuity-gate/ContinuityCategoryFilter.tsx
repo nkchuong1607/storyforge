@@ -10,6 +10,8 @@ export const PHASE8_CATEGORIES: ContinuityCategory[] = [
   "stakes",
 ];
 
+export const PHASE9_CATEGORIES: ContinuityCategory[] = ["research", "series"];
+
 interface ContinuityCategoryFilterProps {
   selected: ContinuityCategory | "all";
   onChange: (category: ContinuityCategory | "all") => void;
@@ -28,6 +30,8 @@ export function ContinuityCategoryFilter({
     { key: "scene_structure", label: t("scene.gate.category") },
     { key: "relationship_arc", label: t("relationships.gate.category") },
     { key: "stakes", label: t("stakes.gate.category") },
+    { key: "research", label: t("research.gate.category") },
+    { key: "series", label: t("series.gate.category") },
   ];
 
   return (

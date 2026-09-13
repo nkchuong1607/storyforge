@@ -18,6 +18,8 @@ import { ensurePhase6MockData } from "./phase6-data";
 import { phase6Handlers } from "./phase6-handlers";
 import { phase8Handlers } from "./phase8-handlers";
 import { ensurePhase8MockData } from "./phase8-data";
+import { phase9Handlers } from "./phase9-handlers";
+import { ensurePhase9MockData } from "./phase9-data";
 
 const BASE = "http://localhost:8000";
 
@@ -105,6 +107,7 @@ export const handlers = [
     mockCharacters[project.id] = [];
     ensurePhase6MockData(project.id, body.genre_profile);
     ensurePhase8MockData(project.id);
+    ensurePhase9MockData(project.id);
     return HttpResponse.json(project, { status: 201 });
   }),
 
@@ -256,4 +259,5 @@ export const handlers = [
   ...phase5Handlers,
   ...phase6Handlers,
   ...phase8Handlers,
+  ...phase9Handlers,
 ];
