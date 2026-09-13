@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
+import { renderWithProviders } from "@/lib/test/render-with-providers";
 import { BasicsStep } from "./BasicsStep";
 import { GenreStep } from "./GenreStep";
 import { TemplateStep } from "./TemplateStep";
@@ -10,7 +11,7 @@ import { WizardLayout } from "./WizardLayout";
 describe("wizard steps", () => {
   it("BasicsStep fires onChange", async () => {
     const onChange = vi.fn();
-    render(
+    renderWithProviders(
       <BasicsStep
         data={{ title: "", description: "", language: "vi" }}
         onChange={onChange}
@@ -23,20 +24,20 @@ describe("wizard steps", () => {
 
   it("GenreStep selects genre", async () => {
     const onSelect = vi.fn();
-    render(<GenreStep selected={null} onSelect={onSelect} />);
+    renderWithProviders(<GenreStep selected={null} onSelect={onSelect} />);
     await userEvent.click(screen.getByRole("button", { name: "Trinh thám" }));
     expect(onSelect).toHaveBeenCalledWith("mystery");
   });
 
   it("TemplateStep selects template", async () => {
     const onSelect = vi.fn();
-    render(<TemplateStep selected={null} onSelect={onSelect} />);
+    renderWithProviders(<TemplateStep selected={null} onSelect={onSelect} />);
     await userEvent.click(screen.getByRole("button", { name: /Tiên hiệp khởi đầu/ }));
     expect(onSelect).toHaveBeenCalledWith("xianxia_starter");
   });
 
   it("ConfirmStep shows error and submitting", () => {
-    render(
+    renderWithProviders(
       <ConfirmStep
         data={{
           title: "T",
@@ -49,11 +50,11 @@ describe("wizard steps", () => {
       />,
     );
     expect(screen.getByText("Lỗi")).toBeInTheDocument();
-    expect(screen.getByText("Đang tạo dự án…")).toBeInTheDocument();
+    expect(screen.getByText("Đang tạo…")).toBeInTheDocument();
   });
 
   it("WizardLayout renders footer extra", () => {
-    render(
+    renderWithProviders(
       <WizardLayout
         currentStep={1}
         totalSteps={4}
