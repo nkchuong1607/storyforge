@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { TagListEditor } from "./TagListEditor";
 
 interface MoralBoundariesEditorProps {
@@ -15,12 +16,14 @@ export function MoralBoundariesEditor({
   error,
   required,
 }: MoralBoundariesEditorProps) {
+  const t = useTranslations();
+
   return (
     <TagListEditor
-      label="Moral boundaries"
+      label={t("psych.moralBoundaries.title")}
       values={values}
       onChange={onChange}
-      placeholder="VD: Không giết người vô tội"
+      placeholder={t("psych.moralBoundaries.placeholder")}
       error={error}
       required={required}
     />

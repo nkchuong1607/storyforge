@@ -1,7 +1,8 @@
 "use client";
 
 import type { BibleEntry } from "@/lib/api/types";
-import { BIBLE_SECTION_LABELS } from "@/lib/labels";
+import { useLabelHelpers } from "@/lib/labels";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface BibleTOCProps {
   entries: BibleEntry[];
@@ -24,19 +25,21 @@ export function groupEntriesBySection(entries: BibleEntry[]): Map<string, BibleE
 }
 
 export function BibleTOC({ entries, selectedId, onSelect, onCreate }: BibleTOCProps) {
+  const t = useTranslations();
+  const labels = useLabelHelpers(t);
   const groups = groupEntriesBySection(entries);
 
   if (entries.length === 0) {
     return (
       <div className="text-center">
-        <p className="text-sm text-slate-600">Chưa có mục bible</p>
+        <p className="text-sm text-slate-600">{t("bible.toc.empty")}</p>
         {onCreate ? (
           <button
             type="button"
             onClick={onCreate}
             className="mt-3 text-sm font-medium text-indigo-600 hover:text-indigo-800"
           >
-            + Tạo mục đầu tiên
+            {t("bible.toc.createFirst")}
           </button>
         ) : null}
       </div>
@@ -46,14 +49,14 @@ export function BibleTOC({ entries, selectedId, onSelect, onCreate }: BibleTOCPr
   return (
     <div>
       <div className="mb-3 flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
-        <h3 className="text-sm font-semibold text-slate-900">Mục lục</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{t("bible.toc.title")}</h3>
         {onCreate ? (
           <button
             type="button"
             onClick={onCreate}
             className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
           >
-            + Mới
+            {t("bible.toc.addNew")}
           </button>
         ) : null}
       </div>
@@ -61,7 +64,7 @@ export function BibleTOC({ entries, selectedId, onSelect, onCreate }: BibleTOCPr
         {Array.from(groups.entries()).map(([section, sectionEntries]) => (
           <div key={section}>
             <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-              {BIBLE_SECTION_LABELS[section] ?? section}
+              {labels.bibleSection(section)}
             </p>
             <ul className="space-y-0.5">
               {sectionEntries.map((entry) => (

@@ -11,6 +11,7 @@ import {
   type PsycheValidationErrors,
 } from "@/lib/psych-utils";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { ArcFlagsPanel } from "./ArcFlagsPanel";
 import { MoralBoundariesEditor } from "./MoralBoundariesEditor";
 import { PsycheCoreFields } from "./PsycheCoreFields";
@@ -34,6 +35,7 @@ export function PsycheCardForm({
   tier,
   onSaved,
 }: PsycheCardFormProps) {
+  const t = useTranslations();
   const [card, setCard] = useState<PsycheCard>(emptyPsycheCard());
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -60,7 +62,7 @@ export function PsycheCardForm({
   }, [loadCard]);
 
   const handleSave = async () => {
-    const validation = validatePsycheCard(tier, card);
+    const validation = validatePsycheCard(tier, card, t);
     setErrors(validation);
     if (Object.keys(validation).length > 0) return;
 
@@ -92,13 +94,13 @@ export function PsycheCardForm({
 
       {tier < 2 ? (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Nâng tier để bật OOC checks
+          {t("psych.tierWarning")}
         </div>
       ) : null}
 
       {!hasCard ? (
         <div className="mb-4 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
-          Tạo psyche card — khuyến nghị T2+ để bật continuity psychology
+          {t("psych.seedPsycheHint")}
         </div>
       ) : null}
 
@@ -136,7 +138,7 @@ export function PsycheCardForm({
         onClick={() => void handleSave()}
         className="mt-6 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
       >
-        {saving ? "Đang lưu..." : "Lưu psyche card"}
+        {saving ? t("common.saving") : t("psych.savePsycheCard")}
       </button>
     </div>
   );

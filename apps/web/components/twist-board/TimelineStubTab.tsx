@@ -1,4 +1,10 @@
+"use client";
+
+import { useTranslations } from "@/lib/i18n/use-translations";
+
 export function TimelineStubTab() {
+  const t = useTranslations();
+
   return (
     <div className="rounded-xl border border-dashed border-slate-300 bg-white p-12 text-center">
       <div className="mx-auto mb-4 flex h-24 max-w-md items-end justify-center gap-2">
@@ -10,8 +16,8 @@ export function TimelineStubTab() {
           />
         ))}
       </div>
-      <h2 className="text-lg font-semibold text-slate-800">Timeline board — Phase 8</h2>
-      <p className="mt-2 text-sm text-slate-500">Swimlane timeline sẽ có trong Phase 8.</p>
+      <h2 className="text-lg font-semibold text-slate-800">{t("twist.timelineStubTitle")}</h2>
+      <p className="mt-2 text-sm text-slate-500">{t("twist.timelineStub")}</p>
     </div>
   );
 }

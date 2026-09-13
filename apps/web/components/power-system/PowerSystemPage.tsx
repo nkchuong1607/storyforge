@@ -18,6 +18,7 @@ import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { PowerRankLadderEditor } from "./PowerRankLadderEditor";
 import { PowerSystemGate } from "./PowerSystemGate";
 import { PowerSystemSettingsForm } from "./PowerSystemSettingsForm";
@@ -30,6 +31,7 @@ interface PowerSystemPageProps {
 }
 
 export function PowerSystemPage({ projectId }: PowerSystemPageProps) {
+  const t = useTranslations();
   const [projectTitle, setProjectTitle] = useState("");
   const [settings, setSettings] = useState<PowerSystemSettings | null>(null);
   const [ranks, setRanks] = useState<PowerRank[]>([]);
@@ -85,7 +87,7 @@ export function PowerSystemPage({ projectId }: PowerSystemPageProps) {
   const handleAddRank = async () => {
     const created = await createPowerRank(projectId, {
       rank_key: `rank_${Date.now()}`,
-      display_name: "Cảnh giới mới",
+      display_name: t("power.defaultRankName"),
       sort_order: nextSortOrder(ranks),
     });
     setRanks((prev) => [...prev, created]);
@@ -108,7 +110,7 @@ export function PowerSystemPage({ projectId }: PowerSystemPageProps) {
     if (!minRank) return;
     const created = await createPowerTechnique(projectId, {
       technique_key: `tech_${Date.now()}`,
-      display_name: "Kỹ thuật mới",
+      display_name: t("power.defaultTechniqueName"),
       min_rank_id: minRank.id,
       resource_cost: { qi: 5 },
     });
@@ -126,13 +128,13 @@ export function PowerSystemPage({ projectId }: PowerSystemPageProps) {
           href={`/projects/${projectId}/bible`}
           className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
         >
-          ← Story Bible
+          {t("power.backToBible")}
         </Link>
       </div>
-      <h1 className="mb-4 text-2xl font-bold text-slate-900">Power System</h1>
+      <h1 className="mb-4 text-2xl font-bold text-slate-900">{t("power.title")}</h1>
 
       {loadState === "error" ? (
-        <ErrorBanner message="Không tải được power system" onRetry={() => void loadPage()} />
+        <ErrorBanner message={t("power.errorLoad")} onRetry={() => void loadPage()} />
       ) : null}
 
       {loadState === "loading" ? <LoadingSkeleton variant="content" count={3} /> : null}

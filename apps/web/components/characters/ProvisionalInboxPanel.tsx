@@ -1,6 +1,7 @@
 "use client";
 
 import type { Character, CharacterProvisional } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface ProvisionalInboxPanelProps {
   provisionals: CharacterProvisional[];
@@ -29,15 +30,17 @@ export function ProvisionalInboxPanel({
   onReject,
   onClose,
 }: ProvisionalInboxPanelProps) {
+  const t = useTranslations();
+
   return (
     <aside className="rounded-xl border border-slate-200 bg-white">
       <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-        <h2 className="text-sm font-semibold text-slate-900">Provisional inbox</h2>
+        <h2 className="text-sm font-semibold text-slate-900">{t("characters.inbox")}</h2>
         {onClose ? (
           <button
             type="button"
             onClick={onClose}
-            aria-label="Đóng inbox"
+            aria-label={t("characters.inboxCloseAria")}
             className="text-slate-400 hover:text-slate-600"
           >
             ×
@@ -45,7 +48,7 @@ export function ProvisionalInboxPanel({
         ) : null}
       </div>
       {provisionals.length === 0 ? (
-        <p className="px-4 py-6 text-sm text-slate-500">Không có đề cập đang chờ.</p>
+        <p className="px-4 py-6 text-sm text-slate-500">{t("characters.inboxEmptyPending")}</p>
       ) : (
         <ul className="divide-y divide-slate-100">
           {provisionals.map((provisional) => {
@@ -59,10 +62,12 @@ export function ProvisionalInboxPanel({
                       {provisional.snippet}
                     </p>
                     <p className="mt-1 text-xs text-slate-500">
-                      Chương {provisional.chapter_number}
+                      {t("characters.inboxChapter", { number: provisional.chapter_number })}
                     </p>
                     {matchName ? (
-                      <p className="mt-1 text-xs text-indigo-600">Gợi ý: {matchName}</p>
+                      <p className="mt-1 text-xs text-indigo-600">
+                        {t("characters.inboxSuggestion")} {matchName}
+                      </p>
                     ) : null}
                   </div>
                   <div className="flex shrink-0 flex-col gap-1">
@@ -71,21 +76,21 @@ export function ProvisionalInboxPanel({
                       onClick={() => onMerge(provisional)}
                       className="rounded border border-indigo-300 px-2 py-1 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
                     >
-                      Merge
+                      {t("characters.mergeAction")}
                     </button>
                     <button
                       type="button"
                       onClick={() => onPromoteNew(provisional)}
                       className="rounded border border-emerald-300 px-2 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
                     >
-                      Promote new
+                      {t("characters.promoteNew")}
                     </button>
                     <button
                       type="button"
                       onClick={() => onReject(provisional)}
                       className="rounded border border-slate-300 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50"
                     >
-                      Reject
+                      {t("characters.reject")}
                     </button>
                   </div>
                 </div>

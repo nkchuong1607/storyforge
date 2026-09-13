@@ -13,6 +13,7 @@ import { getGenreRulePack } from "@/lib/api/genre-rule-pack";
 import { getProject } from "@/lib/api/projects";
 import { isPowerSystemEnabled } from "@/lib/genre-utils";
 import type { BibleEntry, BibleVersionSummary, ProjectDetail } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
@@ -31,6 +32,7 @@ interface StoryBiblePageProps {
 }
 
 export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
+  const t = useTranslations();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [entries, setEntries] = useState<BibleEntry[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -96,7 +98,7 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
     const created = await createBibleEntry(projectId, {
       entry_key: `world_rules.new_entry_${Date.now()}`,
       section: "world_rules",
-      title: "Mục mới",
+      title: t("bible.defaultEntryTitle"),
       content_md: "",
       metadata: { type: "canon", status: "active" },
     });
@@ -109,9 +111,9 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
     return (
       <AppShell>
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy dự án</h1>
+          <h1 className="text-lg font-semibold text-slate-900">{t("hub.notFound")}</h1>
           <Link href="/" className="mt-4 inline-block text-sm font-medium text-indigo-600">
-            ← Về Dashboard
+            {t("common.backToDashboard")}
           </Link>
         </div>
       </AppShell>
@@ -126,36 +128,36 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
   return (
     <AppShell sidebar={sidebar}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-slate-900">Story Bible</h1>
+        <h1 className="text-2xl font-bold text-slate-900">{t("bible.title")}</h1>
         <div className="flex flex-wrap gap-2 text-sm">
           <span className="rounded-lg bg-indigo-50 px-3 py-1.5 font-medium text-indigo-700">
-            Bible
+            {t("bible.tabBible")}
           </span>
           {powerSystemEnabled ? (
             <Link
               href={`/projects/${projectId}/bible/power-system`}
               className="rounded-lg bg-violet-50 px-3 py-1.5 font-medium text-violet-700 hover:bg-violet-100"
             >
-              Power System
+              {t("power.title")}
             </Link>
           ) : null}
           <Link
             href={`/projects/${projectId}/settings/genre`}
             className="rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-50"
           >
-            Genre
+            {t("nav.genreSettings")}
           </Link>
           <span className="rounded-lg px-3 py-1.5 text-slate-400" title="Phase 2">
-            Graph (sắp ra mắt)
+            {t("bible.graphComingSoon")}
           </span>
           <span className="rounded-lg px-3 py-1.5 text-slate-400" title="Phase 2">
-            Tìm kiếm (sắp ra mắt)
+            {t("bible.searchComingSoon")}
           </span>
         </div>
       </div>
 
       {pageState === "error" ? (
-        <ErrorBanner message="Không tải được bible" onRetry={() => void loadPage()} />
+        <ErrorBanner message={t("bible.errorLoad")} onRetry={() => void loadPage()} />
       ) : null}
 
       {pageState === "loading" ? <LoadingSkeleton variant="content" /> : null}
@@ -172,7 +174,7 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
           }
           main={
             !selectedId ? (
-              <p className="py-12 text-center text-sm text-slate-500">Chọn mục từ mục lục</p>
+              <p className="py-12 text-center text-sm text-slate-500">{t("bible.noSelection")}</p>
             ) : entryLoading ? (
               <LoadingSkeleton variant="content" />
             ) : selectedEntry && editMode ? (
@@ -184,7 +186,7 @@ export function StoryBiblePage({ projectId }: StoryBiblePageProps) {
             ) : selectedEntry ? (
               <BibleEntryViewer entry={selectedEntry} onEdit={() => setEditMode(true)} />
             ) : (
-              <p className="py-12 text-center text-sm text-red-600">Không tải được mục</p>
+              <p className="py-12 text-center text-sm text-red-600">{t("bible.entryErrorLoad")}</p>
             )
           }
           sidebar={

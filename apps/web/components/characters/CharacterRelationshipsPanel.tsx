@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getPsycheCard } from "@/lib/api/psych";
 import { listPsychStates } from "@/lib/api/psych";
 import type { Character, RelationshipLensEntry } from "@/lib/api/types";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface CharacterRelationshipsPanelProps {
   projectId: string;
@@ -18,6 +18,7 @@ export function CharacterRelationshipsPanel({
   character,
   characterNames = {},
 }: CharacterRelationshipsPanelProps) {
+  const t = useTranslations();
   const [lens, setLens] = useState<RelationshipLensEntry[]>([]);
   const [stanceHistory, setStanceHistory] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,13 +51,13 @@ export function CharacterRelationshipsPanel({
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Relationships</h2>
-        <p className="mt-1 text-sm text-slate-500">Trust list từ relationship_lens (Phase 5 minimal)</p>
+        <h2 className="text-lg font-semibold text-slate-900">{t("characters.tabs.relationships")}</h2>
+        <p className="mt-1 text-sm text-slate-500">{t("characters.relationshipsSubtitle")}</p>
 
         {loading ? (
           <LoadingSkeleton variant="content" count={1} />
         ) : lens.length === 0 ? (
-          <p className="mt-4 text-sm text-slate-500">Chưa có quan hệ được ghi nhận.</p>
+          <p className="mt-4 text-sm text-slate-500">{t("characters.relationshipsEmpty")}</p>
         ) : (
           <ul className="mt-4 space-y-3">
             {lens.map((entry) => {
@@ -73,7 +74,7 @@ export function CharacterRelationshipsPanel({
                     <span className="text-xs text-slate-500">{entry.role_label}</span>
                   </div>
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs text-slate-500">Trust</span>
+                    <span className="text-xs text-slate-500">{t("characters.trustLabel")}</span>
                     <div className="h-2 flex-1 rounded-full bg-slate-100">
                       <div
                         className="h-2 rounded-full bg-indigo-500"
@@ -89,21 +90,15 @@ export function CharacterRelationshipsPanel({
           </ul>
         )}
 
-        <p className="mt-4 text-xs text-slate-500">
-          Chỉnh sửa relationship_lens trong tab{" "}
-          <Link
-            href={`/projects/${projectId}/characters/${character.id}?tab=psyche`}
-            className="font-medium text-indigo-600"
-          >
-            Psyche
-          </Link>
-        </p>
+        <p className="mt-4 text-xs text-slate-500">{t("characters.relationshipsEditHint")}</p>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-        <h3 className="text-sm font-semibold text-slate-900">History tail</h3>
+        <h3 className="text-sm font-semibold text-slate-900">
+          {t("characters.relationshipsHistoryTitle")}
+        </h3>
         {stanceHistory.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">Chưa có relationship stance từ timeline.</p>
+          <p className="mt-2 text-sm text-slate-500">{t("characters.relationshipsNoStance")}</p>
         ) : (
           <ul className="mt-2 list-disc pl-5 text-sm text-slate-600">
             {stanceHistory.map((stance, index) => (
@@ -112,7 +107,7 @@ export function CharacterRelationshipsPanel({
           </ul>
         )}
         <p className="mt-4 rounded-lg border border-dashed border-slate-300 px-4 py-3 text-center text-sm text-slate-500">
-          Graph view — Phase 8
+          {t("characters.relationshipsGraphStub")}
         </p>
       </div>
     </div>

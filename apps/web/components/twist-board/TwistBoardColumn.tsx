@@ -1,5 +1,8 @@
+"use client";
+
 import type { TwistBoardColumn as TwistBoardColumnType } from "@/lib/api/types";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { PayoffCard } from "./PayoffCard";
 import { PlantCard } from "./PlantCard";
 import { RevealedCard } from "./RevealedCard";
@@ -13,6 +16,13 @@ interface TwistBoardColumnProps {
   onCreateSecret?: () => void;
 }
 
+const COLUMN_KEYS: Record<string, string> = {
+  secrets: "twist.columns.secrets",
+  plants: "twist.columns.plants",
+  payoffs: "twist.columns.payoffs",
+  revealed: "twist.columns.revealed",
+};
+
 export function TwistBoardColumn({
   column,
   projectId,
@@ -20,26 +30,21 @@ export function TwistBoardColumn({
   onCardClick,
   onCreateSecret,
 }: TwistBoardColumnProps) {
-  const columnLabels: Record<string, string> = {
-    secrets: "Bí mật",
-    plants: "Plants",
-    payoffs: "Payoffs",
-    revealed: "Đã lộ",
-  };
+  const t = useTranslations();
+  const columnLabelKey = COLUMN_KEYS[column.id];
+  const columnLabel = columnLabelKey ? t(columnLabelKey) : column.label;
 
   return (
     <section className="flex min-h-[420px] flex-col rounded-xl border border-slate-200 bg-slate-50/60">
       <header className="border-b border-slate-200 px-4 py-3">
-        <h3 className="text-sm font-semibold text-slate-800">
-          {columnLabels[column.id] ?? column.label}
-        </h3>
-        <p className="text-xs text-slate-500">{column.cards.length} thẻ</p>
+        <h3 className="text-sm font-semibold text-slate-800">{columnLabel}</h3>
+        <p className="text-xs text-slate-500">{t("twist.cardCount", { count: column.cards.length })}</p>
       </header>
       <div className="flex flex-1 flex-col gap-2 p-3">
         {column.cards.length === 0 && column.id === "secrets" ? (
           <EmptyState
-            title="Chưa có secret"
-            description="Đăng ký secret đầu tiên để bắt đầu twist board."
+            title={t("twist.secretsEmptyTitle")}
+            description={t("twist.secretsEmptyDescription")}
             action={
               onCreateSecret ? (
                 <button
@@ -47,14 +52,14 @@ export function TwistBoardColumn({
                   onClick={onCreateSecret}
                   className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
                 >
-                  Đăng ký secret đầu tiên
+                  {t("twist.secretsEmptyCta")}
                 </button>
               ) : null
             }
           />
         ) : null}
         {column.cards.length === 0 && column.id === "revealed" ? (
-          <p className="py-8 text-center text-xs text-slate-400">Chưa có twist đã reveal</p>
+          <p className="py-8 text-center text-xs text-slate-400">{t("twist.revealedEmpty")}</p>
         ) : null}
         {column.cards.map((card) => {
           const key = card.plant_id ?? card.payoff_id ?? card.twist_id ?? card.title;

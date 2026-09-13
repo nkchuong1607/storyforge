@@ -10,6 +10,7 @@ import {
   updateTwist,
 } from "@/lib/api/twists";
 import type { Chapter, TwistPayoff, TwistPlan, TwistPlant } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface TwistDetailDrawerProps {
   projectId: string;
@@ -26,6 +27,7 @@ export function TwistDetailDrawer({
   onClose,
   onUpdated,
 }: TwistDetailDrawerProps) {
+  const t = useTranslations();
   const [twist, setTwist] = useState<TwistPlan | null>(null);
   const [plants, setPlants] = useState<TwistPlant[]>([]);
   const [payoff, setPayoff] = useState<TwistPayoff | null>(null);
@@ -111,22 +113,22 @@ export function TwistDetailDrawer({
   return (
     <div className="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-slate-200 bg-white shadow-xl">
       <header className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-        <h2 className="text-lg font-semibold text-slate-900">Chi tiết twist</h2>
+        <h2 className="text-lg font-semibold text-slate-900">{t("twist.detailTitle")}</h2>
         <button
           type="button"
           onClick={onClose}
           className="rounded-lg px-2 py-1 text-sm text-slate-500 hover:bg-slate-100"
         >
-          Đóng
+          {t("common.close")}
         </button>
       </header>
       <div className="flex-1 overflow-y-auto p-4">
-        {loading ? <p className="text-sm text-slate-500">Đang tải…</p> : null}
+        {loading ? <p className="text-sm text-slate-500">{t("common.loading")}</p> : null}
         {twist && !loading ? (
           <div className="space-y-6">
             <section className="space-y-3">
               <label className="block text-sm">
-                <span className="font-medium text-slate-700">Tiêu đề</span>
+                <span className="font-medium text-slate-700">{t("twist.fieldTitle")}</span>
                 <input
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
@@ -135,9 +137,9 @@ export function TwistDetailDrawer({
               </label>
               <label className="block text-sm">
                 <span className="font-medium text-slate-700">
-                  Secret truth
+                  {t("twist.fieldSecretTruth")}
                   <span className="ml-2 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] uppercase text-amber-700">
-                    Author only
+                    {t("twist.authorOnlyBadge")}
                   </span>
                 </span>
                 <textarea
@@ -152,16 +154,22 @@ export function TwistDetailDrawer({
                 onClick={() => void handleSave()}
                 className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white"
               >
-                Lưu thay đổi
+                {t("twist.saveChanges")}
               </button>
             </section>
 
             <section>
-              <h3 className="text-sm font-semibold text-slate-800">Plants ({plants.length})</h3>
+              <h3 className="text-sm font-semibold text-slate-800">
+                {t("twist.plantsSection", { count: plants.length })}
+              </h3>
               <ul className="mt-2 space-y-2">
                 {plants.map((plant) => (
                   <li key={plant.id} className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
-                    Ch.{plant.chapter_number}: {plant.snippet}
+                    {t("psych.timeline.chapterShort", {
+                      number: plant.chapter_number ?? "?",
+                    })}
+                    :{" "}
+                    {plant.snippet}
                   </li>
                 ))}
               </ul>
@@ -171,19 +179,22 @@ export function TwistDetailDrawer({
                     value={plantChapterId}
                     onChange={(event) => setPlantChapterId(event.target.value)}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    aria-label="Chọn chương"
+                    aria-label={t("twist.selectChapter")}
                   >
-                    <option value="">Chọn chương</option>
+                    <option value="">{t("twist.selectChapter")}</option>
                     {chapters.map((chapter) => (
                       <option key={chapter.id} value={chapter.id}>
-                        Ch.{chapter.number} — {chapter.title}
+                        {t("twist.outlineChapterLine", {
+                          number: chapter.number,
+                          title: chapter.title,
+                        })}
                       </option>
                     ))}
                   </select>
                   <textarea
                     value={plantSnippet}
                     onChange={(event) => setPlantSnippet(event.target.value)}
-                    placeholder="Snippet plant…"
+                    placeholder={t("twist.plantSnippetPlaceholder")}
                     rows={2}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                   />
@@ -192,17 +203,20 @@ export function TwistDetailDrawer({
                     onClick={() => void handleAddPlant()}
                     className="rounded-lg border border-emerald-300 px-3 py-2 text-sm text-emerald-800 hover:bg-emerald-50"
                   >
-                    Thêm plant
+                    {t("twist.addPlant")}
                   </button>
                 </div>
               ) : null}
             </section>
 
             <section>
-              <h3 className="text-sm font-semibold text-slate-800">Payoff</h3>
+              <h3 className="text-sm font-semibold text-slate-800">{t("twist.payoffSection")}</h3>
               {payoff ? (
                 <p className="mt-1 text-xs text-slate-600">
-                  Ch.{payoff.target_chapter_number} · min {payoff.min_plants} plants
+                  {t("twist.payoffSummary", {
+                    chapter: payoff.target_chapter_number,
+                    minPlants: payoff.min_plants,
+                  })}
                 </p>
               ) : twist.status !== "paid_off" && twist.status !== "abandoned" ? (
                 <div className="mt-2 space-y-2">
@@ -210,12 +224,15 @@ export function TwistDetailDrawer({
                     value={payoffChapterId}
                     onChange={(event) => setPayoffChapterId(event.target.value)}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    aria-label="Chọn chương payoff"
+                    aria-label={t("twist.selectPayoffChapter")}
                   >
-                    <option value="">Chọn chương payoff</option>
+                    <option value="">{t("twist.selectPayoffChapter")}</option>
                     {chapters.map((chapter) => (
                       <option key={chapter.id} value={chapter.id}>
-                        Ch.{chapter.number} — {chapter.title}
+                        {t("twist.outlineChapterLine", {
+                          number: chapter.number,
+                          title: chapter.title,
+                        })}
                       </option>
                     ))}
                   </select>
@@ -225,18 +242,18 @@ export function TwistDetailDrawer({
                     value={minPlants}
                     onChange={(event) => setMinPlants(Number(event.target.value))}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                    aria-label="Min plants"
+                    aria-label={t("twist.minPlantsAria")}
                   />
                   <button
                     type="button"
                     onClick={() => void handleRegisterPayoff()}
                     className="rounded-lg border border-indigo-300 px-3 py-2 text-sm text-indigo-800 hover:bg-indigo-50"
                   >
-                    Đăng ký payoff
+                    {t("twist.registerPayoff")}
                   </button>
                 </div>
               ) : (
-                <p className="mt-1 text-xs text-slate-500">Không có payoff</p>
+                <p className="mt-1 text-xs text-slate-500">{t("twist.noPayoff")}</p>
               )}
             </section>
 
@@ -246,7 +263,7 @@ export function TwistDetailDrawer({
                 onClick={() => void handleAbandon()}
                 className="text-sm text-red-600 underline"
               >
-                Abandon twist
+                {t("twist.abandon")}
               </button>
             ) : null}
           </div>

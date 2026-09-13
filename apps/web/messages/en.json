@@ -112,6 +112,32 @@
       "timeline": "Timeline",
       "characters": "Characters",
       "objects": "Objects"
+    },
+    "tabBible": "Bible",
+    "graphComingSoon": "Graph (coming soon)",
+    "searchComingSoon": "Search (coming soon)",
+    "entryErrorLoad": "Failed to load entry",
+    "defaultEntryTitle": "New entry",
+    "saveError": "Could not save. Please try again.",
+    "entryTitleLabel": "Title",
+    "contentLabel": "Content (Markdown)",
+    "stagingBadge": "Staging",
+    "toc": {
+      "empty": "No bible entries yet",
+      "createFirst": "+ Create first entry",
+      "title": "Table of contents",
+      "addNew": "+ New"
+    },
+    "versionHistory": {
+      "title": "Version history",
+      "empty": "No versions yet",
+      "entryCount": "{count} entries",
+      "settlePhase2": "Settle (Phase 2)",
+      "settleTitle": "Settle coming in Phase 2"
+    },
+    "entityLinks": {
+      "title": "Entity links",
+      "empty": "No links yet"
     }
   },
   "continuity": {
@@ -133,7 +159,36 @@
     "reject": "Reject",
     "requestRevise": "Request revision",
     "stateDiff": "State diff preview",
-    "issueTable": "Continuity issues table"
+    "issueTable": "Continuity issues table",
+    "notFoundReport": "Report not found",
+    "backToEditor": "← Back to Editor",
+    "refreshStateDiff": "Refresh state diff",
+    "settleDisabledReason": "Unresolved FAIL issues or missing override",
+    "settling": "Settling…",
+    "reportTitle": "Continuity Report — {chapterTitle}",
+    "statsSummary": "{passed} pass · {warnings} warn · {errors} fail",
+    "proseVersion": "Prose v{version}",
+    "markIntentionalTitle": "Mark intentional",
+    "overrideReasonPlaceholder": "Override reason…",
+    "issues": {
+      "empty": "No continuity issues.",
+      "colSeverity": "Severity",
+      "colCategory": "Category",
+      "colDescription": "Description",
+      "colChapter": "Chapter",
+      "colActions": "Actions",
+      "linkPowerBible": "Power bible",
+      "linkFixInEditor": "Fix in editor"
+    },
+    "stateDiffSections": {
+      "ledgerProposals": "Ledger proposals",
+      "noProposals": "No proposals",
+      "biblePatches": "Bible patch candidates",
+      "noPatches": "No patches",
+      "psychProposals": "Psych state proposals",
+      "psychePatches": "Psyche card patches",
+      "psychProposalLine": "Stress {level}/10 — {emotion}: {goal}"
+    }
   },
   "wizard": {
     "title": "Create new project",
@@ -150,7 +205,42 @@
     "validation": {
       "titleRequired": "Title is required",
       "slugRequired": "Slug is required",
-      "slugInvalid": "Slug must contain only lowercase letters, numbers, and hyphens"
+      "slugInvalid": "Slug must contain only lowercase letters, numbers, and hyphens",
+      "titleRequiredVi": "Please enter a project name"
+    },
+    "stepGenreSelect": "Choose genre",
+    "stepTemplateSelect": "Choose template",
+    "stepBasicsShort": "Basics",
+    "stepGenreShort": "Genre",
+    "stepTemplateShort": "Template",
+    "stepConfirmShort": "Confirm",
+    "stepProgress": "Step {current}/{total}",
+    "nextExtended": "Next",
+    "slugConflictSuggested": "Slug already exists. Suggested: {suggested}",
+    "basics": {
+      "projectName": "Project name",
+      "titlePlaceholder": "e.g. Kiếm Lai",
+      "description": "Description",
+      "descriptionPlaceholder": "Short project summary",
+      "language": "Language",
+      "languageVi": "Vietnamese",
+      "languageEn": "English",
+      "languageMixed": "Mixed"
+    },
+    "confirm": {
+      "projectName": "Project name",
+      "description": "Description",
+      "language": "Language",
+      "genre": "Genre",
+      "template": "Template"
+    },
+    "genre": {
+      "promisesHeading": "Genre promises"
+    },
+    "template": {
+      "blankDescription": "Start from a blank page, no bible seed.",
+      "xianxiaDescription": "Xianxia bible seed: ranks, factions, T0 characters.",
+      "mysteryDescription": "Mystery bible seed: setting, clues, T0 characters."
     }
   },
   "characters": {
@@ -187,7 +277,52 @@
       "ledger": "Ledger",
       "appearances": "Appearances"
     },
-    "relationshipsEmpty": "No relationships recorded yet."
+    "relationshipsEmpty": "No relationships recorded yet.",
+    "subtitle": "Manage cast and provisional inbox",
+    "errorLoadList": "Failed to load character list",
+    "emptyTitle": "No characters yet",
+    "appearances": "Appearances",
+    "actions": "Actions",
+    "promoteHint": "Promote suggestion",
+    "view": "View",
+    "create": "Create",
+    "filterAll": "All",
+    "filterActive": "Active",
+    "roleOneLiner": "Role (one line)",
+    "backToList": "← Back to character list",
+    "backLink": "← Characters",
+    "aliasesLabel": "Aliases (comma-separated)",
+    "tierLabel": "Tier:",
+    "statusLabel": "Status:",
+    "appearancesLabel": "Appearances:",
+    "appearanceCount": "{count} appearance(s)",
+    "hasChapterData": " — has chapter data",
+    "mergeMentionLabel": "Mention:",
+    "mergeSearch": "Find character",
+    "selectPlaceholder": "— Select —",
+    "merging": "Merging…",
+    "mergeAction": "Merge",
+    "promoteNew": "Promote new",
+    "reject": "Reject",
+    "inboxCloseAria": "Close inbox",
+    "inboxEmptyPending": "No pending mentions.",
+    "inboxChapter": "Chapter {number}",
+    "inboxSuggestion": "Suggestion:",
+    "relationshipsSubtitle": "Trust list from relationship_lens (Phase 5 minimal)",
+    "trustLabel": "Trust",
+    "relationshipsEditHint": "Edit relationship_lens in Psyche tab",
+    "relationshipsHistoryTitle": "History tail",
+    "relationshipsNoStance": "No relationship stance from timeline yet.",
+    "relationshipsGraphStub": "Graph view — Phase 8",
+    "toastPromotedNamed": "Promoted {name}",
+    "toastConfirmT3": "Confirm promote to T3",
+    "toastPromoteFailed": "Could not promote",
+    "toastArchivedNamed": "Archived {name}",
+    "toastAlreadyArchived": "Character already archived",
+    "toastArchiveFailed": "Could not archive",
+    "toastProvisionalPromoted": "Promoted {mention}",
+    "toastProvisionalRejected": "Rejected {mention}",
+    "toastProvisionalMerged": "Merged {mention}"
   },
   "twist": {
     "title": "Twist Board",
@@ -202,7 +337,50 @@
     "fairnessFail": "Missing plant for payoff",
     "errorLoad": "Failed to load twist board",
     "outlineStub": "Detailed outline — coming soon (Phase 8+)",
-    "timelineStub": "Timeline — coming soon (Phase 8+)"
+    "timelineStub": "Timeline — coming soon (Phase 8+)",
+    "headerTitle": "Outline / Twist",
+    "fairnessPayoffCount": "{count} payoff(s) need review",
+    "filterKindAria": "Filter twist kind",
+    "filterAllKinds": "All kinds",
+    "addSecret": "+ Secret",
+    "cardCount": "{count} cards",
+    "secretsEmptyTitle": "No secrets yet",
+    "secretsEmptyDescription": "Register your first secret to start the twist board.",
+    "secretsEmptyCta": "Register first secret",
+    "revealedEmpty": "No revealed twists yet",
+    "authorBadge": "Author",
+    "secretMeta": "{status} · {count} plants",
+    "plantMeta": "Ch.{number} · {salience}",
+    "plantTwistLink": "↳ {twistTitle}",
+    "payoffMeta": "Payoff ch.{chapter} · min {minPlants} plants · has {count}",
+    "openContinuityGate": "Open Continuity Gate",
+    "revealedMeta": "Revealed · {count} plants",
+    "createSecretError": "Could not create secret. Please try again.",
+    "createSecretTitle": "Register new secret",
+    "fieldTitle": "Title",
+    "fieldSecretTruth": "Secret truth",
+    "authorOnlyBadge": "Author only",
+    "createSecretSubmit": "Create secret",
+    "detailTitle": "Twist detail",
+    "saveChanges": "Save changes",
+    "plantsSection": "Plants ({count})",
+    "selectChapter": "Select chapter",
+    "plantSnippetPlaceholder": "Plant snippet…",
+    "addPlant": "Add plant",
+    "payoffSection": "Payoff",
+    "payoffSummary": "Ch.{chapter} · min {minPlants} plants",
+    "selectPayoffChapter": "Select payoff chapter",
+    "minPlantsAria": "Min plants",
+    "registerPayoff": "Register payoff",
+    "noPayoff": "No payoff",
+    "abandon": "Abandon twist",
+    "tabTimeline": "Timeline",
+    "outlineChapterLine": "Ch.{number} — {title}",
+    "timelineStubTitle": "Timeline board — Phase 8",
+    "fairness": {
+      "title": "Fairness check",
+      "allPass": "All payoffs meet plant requirements."
+    }
   },
   "power": {
     "title": "Power System",
@@ -213,14 +391,95 @@
     "errorLoad": "Failed to load power system",
     "validationMonotonic": "Rank order must be monotonic",
     "ranks": "Ranks",
-    "techniques": "Techniques"
+    "techniques": "Techniques",
+    "backToBible": "← Story Bible",
+    "defaultRankName": "New rank",
+    "defaultTechniqueName": "New technique",
+    "disabledInstructions": "Enable Power System module in Project Settings → Genre",
+    "addTechnique": "Add technique",
+    "techniquesEmpty": "No techniques yet",
+    "techniqueColName": "Name",
+    "techniqueColMinRank": "Min rank",
+    "techniqueColSect": "Sect",
+    "techniqueColCost": "Cost",
+    "techniqueColNotes": "Notes",
+    "seedXianxiaTemplate": "Seed xianxia template",
+    "addRankButton": "Add rank",
+    "emptyRanksAction": "Add first rank",
+    "rankNameAria": "Rank name {name}",
+    "subStagesLabel": "Sub-stages:",
+    "constraintsPlaceholder": "Constraints (markdown)…",
+    "settings": {
+      "title": "System settings",
+      "enabled": "Enable power system",
+      "priorityGap": "Priority gap",
+      "maxRankJump": "Max rank jump / chapter",
+      "requireBreakthrough": "Require breakthrough"
+    },
+    "antiCreepTip": "Priority gap {gap} — weaker characters ≥{gap} ranks below struggle to win. Max {maxJump} rank(s)/chapter.",
+    "validationMonotonicDetail": "Rank \"{name}\" must have higher order than \"{prevName}\""
   },
   "psych": {
     "emptyPsyche": "No psyche card yet",
     "seedPsyche": "Create psyche card",
     "timelineEmpty": "No psych events yet",
     "errorLoad": "Failed to load psych data",
-    "toastSaved": "Psyche card saved"
+    "toastSaved": "Psyche card saved",
+    "savePsycheCard": "Save psyche card",
+    "saveError": "Save error",
+    "headerTitle": "Psyche — {displayName}",
+    "tierWarning": "Raise tier to enable OOC checks",
+    "seedPsycheHint": "Create psyche card — T2+ recommended for continuity psychology",
+    "removeTagAria": "Remove {value}",
+    "tagInputPlaceholder": "Type and press Enter to add",
+    "fields": {
+      "drive": "Drive",
+      "need": "Need",
+      "wound": "Wound",
+      "fear": "Fear",
+      "defense": "Defense"
+    },
+    "valueHierarchy": {
+      "title": "Value hierarchy",
+      "empty": "No values yet.",
+      "defaultValue": "Value {index}",
+      "valueAria": "Value {index}"
+    },
+    "moveUpAria": "Move up",
+    "moveDownAria": "Move down",
+    "removeValueAria": "Remove value",
+    "moralBoundaries": {
+      "title": "Moral boundaries",
+      "placeholder": "e.g. Do not kill innocents"
+    },
+    "voiceTaboo": {
+      "title": "Voice taboo",
+      "placeholder": "e.g. No begging"
+    },
+    "stressBehavior": {
+      "title": "Stress behavior"
+    },
+    "arcFlags": {
+      "title": "Arc flags",
+      "allowMoralBreak": "Allow moral break",
+      "expectedBeats": "Expected arc beats",
+      "beatPlaceholder": "Add arc beat",
+      "currentBeat": "Current arc beat"
+    },
+    "validation": {
+      "valueHierarchy": "T3 requires value hierarchy",
+      "moralBoundaries": "T3 requires at least one moral boundary"
+    },
+    "timeline": {
+      "title": "PsychState timeline",
+      "detailAria": "PsychState detail",
+      "chapter": "Chapter {number}",
+      "chapterShort": "Ch.{number}",
+      "activeGoal": "Active goal",
+      "arcBeat": "Arc beat",
+      "beliefUpdates": "Belief updates",
+      "relationshipStance": "Relationship stance"
+    }
   },
   "labels": {
     "genre": {
@@ -252,5 +511,74 @@
     "network": "Network error",
     "boundary": "Something went wrong",
     "boundaryRetry": "Reload page"
+  },
+  "editor": {
+    "notFound": "Chapter not found",
+    "backToHub": "← Back to Project Hub",
+    "errorLoad": "Failed to load chapter",
+    "lockedBanner": "Chapter locked after settle — view only, no edits.",
+    "lockedAfterSettle": "Locked after settle",
+    "saveNewVersion": "Save new version",
+    "extracting": "Scanning…",
+    "extractCharacters": "Scan characters",
+    "checkingContinuity": "Checking…",
+    "continuityCheck": "Continuity Check",
+    "emptyContent": "No content",
+    "emptyProse": "Start writing…",
+    "proseAriaLabel": "Chapter content",
+    "wordCount": "{count} words",
+    "updatedAt": "Updated: {date}",
+    "toast": {
+      "chapterLockedSave": "Chapter is locked — cannot save",
+      "continuityCheckFailed": "Could not run continuity check",
+      "charactersExtracted": "Extracted {count} character(s)",
+      "chapterLockedExtract": "Chapter is locked — cannot extract",
+      "extractFailed": "Could not scan characters",
+      "chapterLockedBeat": "Chapter is locked — cannot edit beat",
+      "chapterLockedAddBeat": "Chapter is locked — cannot add beat"
+    },
+    "beats": {
+      "title": "Scene beats",
+      "empty": "No beats yet",
+      "defaultSummary": "New beat",
+      "completeAria": "Complete beat {beatKey}"
+    },
+    "versions": {
+      "empty": "No versions yet",
+      "selectAria": "Select prose version",
+      "optionLabel": "v{version} — {wordCount} words ({source})"
+    },
+    "promptEdit": {
+      "title": "Prompt Edit",
+      "instructionPlaceholder": "Describe edits for AI…",
+      "instructionAria": "Prompt Edit instruction",
+      "running": "Running…",
+      "send": "Send",
+      "apply": "Apply",
+      "regenerate": "Regenerate",
+      "compare": "Compare",
+      "noProposal": "No proposal yet",
+      "previewLabel": "Preview (diff hint)",
+      "compareTitle": "Compare versions",
+      "compareBase": "Base",
+      "compareProposed": "Proposed",
+      "lineDiff": "Line diff",
+      "turnLogEmpty": "Describe an edit to get started…",
+      "turnError": "Error: {errorCode}",
+      "processing": "Processing…",
+      "lockedBanner": "Chapter locked —",
+      "unlockLink": "unlock",
+      "lockedBannerSuffix": "to edit.",
+      "versionSaved": "Saved version {version}",
+      "error": {
+        "llmRegenerate": "LLM provider error — try Regenerate",
+        "chapterLocked": "Chapter locked",
+        "sendFailed": "Could not send instruction",
+        "llmRetry": "LLM provider error — try again",
+        "regenerateFailed": "Could not regenerate",
+        "applyFailed": "Could not apply",
+        "compareLoadFailed": "Could not load compare content"
+      }
+    }
   }
 }

@@ -1,3 +1,7 @@
+"use client";
+
+import { useTranslations } from "@/lib/i18n/use-translations";
+
 interface PromptEditActionBarProps {
   onSend: () => void;
   onApply: () => void;
@@ -21,6 +25,7 @@ export function PromptEditActionBar({
   canCompare,
   disabled,
 }: PromptEditActionBarProps) {
+  const t = useTranslations();
   const btnClass =
     "rounded-lg px-2 py-1.5 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-40";
 
@@ -32,7 +37,7 @@ export function PromptEditActionBar({
         disabled={disabled || running}
         className={`${btnClass} flex-1 bg-indigo-600 text-white hover:bg-indigo-700`}
       >
-        {running ? "Đang chạy…" : "Send"}
+        {running ? t("editor.promptEdit.running") : t("editor.promptEdit.send")}
       </button>
       <button
         type="button"
@@ -40,7 +45,7 @@ export function PromptEditActionBar({
         disabled={disabled || !canApply || running}
         className={`${btnClass} flex-1 bg-emerald-600 text-white hover:bg-emerald-700`}
       >
-        Apply
+        {t("editor.promptEdit.apply")}
       </button>
       <button
         type="button"
@@ -48,7 +53,7 @@ export function PromptEditActionBar({
         disabled={disabled || !canRegenerate || running}
         className={`${btnClass} flex-1 bg-slate-200 text-slate-700 hover:bg-slate-300`}
       >
-        Regenerate
+        {t("editor.promptEdit.regenerate")}
       </button>
       <button
         type="button"
@@ -56,7 +61,7 @@ export function PromptEditActionBar({
         disabled={disabled || !canCompare || running}
         className={`${btnClass} flex-1 bg-slate-200 text-slate-700 hover:bg-slate-300`}
       >
-        Compare
+        {t("editor.promptEdit.compare")}
       </button>
     </div>
   );

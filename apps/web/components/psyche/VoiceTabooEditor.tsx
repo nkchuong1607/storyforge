@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { TagListEditor } from "./TagListEditor";
 
 interface VoiceTabooEditorProps {
@@ -8,12 +9,14 @@ interface VoiceTabooEditorProps {
 }
 
 export function VoiceTabooEditor({ values, onChange }: VoiceTabooEditorProps) {
+  const t = useTranslations();
+
   return (
     <TagListEditor
-      label="Voice taboo"
+      label={t("psych.voiceTaboo.title")}
       values={values}
       onChange={onChange}
-      placeholder="VD: Không van xin"
+      placeholder={t("psych.voiceTaboo.placeholder")}
     />
   );
 }

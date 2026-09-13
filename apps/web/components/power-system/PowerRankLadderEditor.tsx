@@ -2,6 +2,7 @@
 
 import type { PowerRank } from "@/lib/api/types";
 import { validateRankMonotonic } from "@/lib/power-utils";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { PowerRankRow } from "./PowerRankRow";
 
 interface PowerRankLadderEditorProps {
@@ -17,13 +18,14 @@ export function PowerRankLadderEditor({
   onAddRank,
   onSeedTemplate,
 }: PowerRankLadderEditorProps) {
-  const validationError = validateRankMonotonic(ranks);
+  const t = useTranslations();
+  const validationError = validateRankMonotonic(ranks, t);
   const sorted = [...ranks].sort((a, b) => a.sort_order - b.sort_order);
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-900">Thang cảnh giới</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{t("power.ranks")}</h3>
         <div className="flex gap-2">
           {ranks.length === 0 ? (
             <button
@@ -31,7 +33,7 @@ export function PowerRankLadderEditor({
               onClick={onSeedTemplate}
               className="rounded-lg bg-violet-100 px-3 py-1.5 text-xs font-medium text-violet-700"
             >
-              Seed xianxia template
+              {t("power.seedXianxiaTemplate")}
             </button>
           ) : null}
           <button
@@ -39,7 +41,7 @@ export function PowerRankLadderEditor({
             onClick={onAddRank}
             className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white"
           >
-            Thêm cảnh giới
+            {t("power.addRankButton")}
           </button>
         </div>
       </div>
@@ -49,7 +51,7 @@ export function PowerRankLadderEditor({
       ) : null}
 
       {sorted.length === 0 ? (
-        <p className="py-8 text-center text-sm text-slate-500">Thêm cảnh giới đầu tiên</p>
+        <p className="py-8 text-center text-sm text-slate-500">{t("power.emptyRanksAction")}</p>
       ) : (
         <div className="space-y-2">
           {sorted.map((rank) => (

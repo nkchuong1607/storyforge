@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import type { Character } from "@/lib/api/types";
-import { CHARACTER_STATUS_LABELS, CHARACTER_TIER_LABELS } from "@/lib/labels";
+import { useLabelHelpers } from "@/lib/labels";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface CharacterTableProps {
   projectId: string;
@@ -24,28 +25,31 @@ export function CharacterTable({
   onPromote,
   onArchive,
 }: CharacterTableProps) {
+  const t = useTranslations();
+  const labels = useLabelHelpers(t);
+
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <table className="min-w-full divide-y divide-slate-200">
         <thead className="bg-slate-50">
           <tr>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Hạng
+              {t("characters.tier")}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Tên nhân vật
+              {t("characters.displayName")}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Vai trò
+              {t("characters.role")}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Xuất hiện
+              {t("characters.appearances")}
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Trạng thái
+              {t("characters.status")}
             </th>
             <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Hành động
+              {t("characters.actions")}
             </th>
           </tr>
         </thead>
@@ -56,9 +60,12 @@ export function CharacterTable({
                 <span
                   className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${tierBadgeClass(character.tier)}`}
                 >
-                  {CHARACTER_TIER_LABELS[character.tier]}
+                  {labels.characterTier(character.tier)}
                   {character.tier_suggest ? (
-                    <span className="h-2 w-2 rounded-full bg-amber-400" title="Gợi ý promote" />
+                    <span
+                      className="h-2 w-2 rounded-full bg-amber-400"
+                      title={t("characters.promoteHint")}
+                    />
                   ) : null}
                 </span>
               </td>
@@ -75,7 +82,7 @@ export function CharacterTable({
               </td>
               <td className="px-4 py-3 text-sm text-slate-600">{character.appearance_count}</td>
               <td className="px-4 py-3 text-sm text-slate-600">
-                {CHARACTER_STATUS_LABELS[character.status]}
+                {labels.characterStatus(character.status)}
               </td>
               <td className="px-4 py-3 text-right">
                 <div className="flex justify-end gap-2">
@@ -83,7 +90,7 @@ export function CharacterTable({
                     href={`/projects/${projectId}/characters/${character.id}`}
                     className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
                   >
-                    Xem
+                    {t("characters.view")}
                   </Link>
                   {character.tier < 3 && character.status !== "archived" ? (
                     <button
@@ -91,7 +98,7 @@ export function CharacterTable({
                       onClick={() => onPromote(character)}
                       className="rounded-lg border border-indigo-300 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-50"
                     >
-                      Promote
+                      {t("characters.promote")}
                     </button>
                   ) : null}
                   {character.status !== "archived" ? (
@@ -100,7 +107,7 @@ export function CharacterTable({
                       onClick={() => onArchive(character)}
                       className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50"
                     >
-                      Lưu trữ
+                      {t("characters.archive")}
                     </button>
                   ) : null}
                 </div>

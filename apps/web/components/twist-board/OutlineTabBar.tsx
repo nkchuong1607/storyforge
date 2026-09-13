@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 export type OutlineTab = "outline" | "timeline" | "twist-board";
 
@@ -7,16 +10,17 @@ interface OutlineTabBarProps {
   activeTab: OutlineTab;
 }
 
-const TABS: { id: OutlineTab; label: string }[] = [
-  { id: "outline", label: "Outline" },
-  { id: "timeline", label: "Timeline" },
-  { id: "twist-board", label: "Twist Board" },
-];
-
 export function OutlineTabBar({ projectId, activeTab }: OutlineTabBarProps) {
+  const t = useTranslations();
+  const tabs: { id: OutlineTab; label: string }[] = [
+    { id: "outline", label: t("nav.outline") },
+    { id: "timeline", label: t("twist.tabTimeline") },
+    { id: "twist-board", label: t("twist.title") },
+  ];
+
   return (
     <nav className="mb-6 flex gap-2 border-b border-slate-200 pb-1">
-      {TABS.map((tab) => {
+      {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
         const href =
           tab.id === "twist-board"

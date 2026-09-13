@@ -1,7 +1,9 @@
 "use client";
 
-import type { ProjectCreateRequest } from "@/lib/api/types";
-import { GENRE_LABELS, TEMPLATE_LABELS } from "@/lib/labels";
+import type { ProjectCreateRequest, ProjectLanguage } from "@/lib/api/types";
+import type { Translator } from "@/lib/i18n/get-messages";
+import { useLabelHelpers } from "@/lib/labels";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface ConfirmStepProps {
   data: ProjectCreateRequest;
@@ -9,33 +11,45 @@ interface ConfirmStepProps {
   isSubmitting?: boolean;
 }
 
+function languageLabel(language: ProjectLanguage, t: Translator): string {
+  const labels: Record<ProjectLanguage, string> = {
+    vi: t("wizard.basics.languageVi"),
+    en: t("wizard.basics.languageEn"),
+    mixed: t("wizard.basics.languageMixed"),
+  };
+  return labels[language];
+}
+
 export function ConfirmStep({ data, error, isSubmitting }: ConfirmStepProps) {
+  const t = useTranslations();
+  const labels = useLabelHelpers(t);
+
   return (
     <div className="space-y-4">
       <dl className="divide-y divide-slate-100">
         <div className="flex justify-between py-3">
-          <dt className="text-sm text-slate-500">Tên dự án</dt>
+          <dt className="text-sm text-slate-500">{t("wizard.confirm.projectName")}</dt>
           <dd className="text-sm font-medium text-slate-900">{data.title}</dd>
         </div>
         {data.description ? (
           <div className="flex justify-between py-3">
-            <dt className="text-sm text-slate-500">Mô tả</dt>
+            <dt className="text-sm text-slate-500">{t("wizard.confirm.description")}</dt>
             <dd className="max-w-xs text-right text-sm text-slate-900">{data.description}</dd>
           </div>
         ) : null}
         <div className="flex justify-between py-3">
-          <dt className="text-sm text-slate-500">Ngôn ngữ</dt>
-          <dd className="text-sm font-medium text-slate-900">{data.language}</dd>
+          <dt className="text-sm text-slate-500">{t("wizard.confirm.language")}</dt>
+          <dd className="text-sm font-medium text-slate-900">{languageLabel(data.language, t)}</dd>
         </div>
         <div className="flex justify-between py-3">
-          <dt className="text-sm text-slate-500">Thể loại</dt>
+          <dt className="text-sm text-slate-500">{t("wizard.confirm.genre")}</dt>
           <dd className="text-sm font-medium text-slate-900">
-            {GENRE_LABELS[data.genre_profile]}
+            {labels.genre(data.genre_profile)}
           </dd>
         </div>
         <div className="flex justify-between py-3">
-          <dt className="text-sm text-slate-500">Mẫu</dt>
-          <dd className="text-sm font-medium text-slate-900">{TEMPLATE_LABELS[data.template]}</dd>
+          <dt className="text-sm text-slate-500">{t("wizard.confirm.template")}</dt>
+          <dd className="text-sm font-medium text-slate-900">{labels.template(data.template)}</dd>
         </div>
       </dl>
       {error ? (
@@ -46,7 +60,7 @@ export function ConfirmStep({ data, error, isSubmitting }: ConfirmStepProps) {
       {isSubmitting ? (
         <p className="flex items-center gap-2 text-sm text-slate-600">
           <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-          Đang tạo dự án…
+          {t("wizard.creating")}
         </p>
       ) : null}
     </div>

@@ -1,7 +1,8 @@
 "use client";
 
 import type { Character } from "@/lib/api/types";
-import { CHARACTER_STATUS_LABELS, CHARACTER_TIER_LABELS } from "@/lib/labels";
+import { useLabelHelpers } from "@/lib/labels";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface CharacterOverviewTabProps {
   character: Character;
@@ -22,6 +23,9 @@ export function CharacterOverviewTab({
   onPromote,
   onArchive,
 }: CharacterOverviewTabProps) {
+  const t = useTranslations();
+  const labels = useLabelHelpers(t);
+
   return (
     <div className="space-y-6">
       <form
@@ -39,7 +43,7 @@ export function CharacterOverviewTab({
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-medium text-slate-700">
-            Tên hiển thị
+            {t("characters.displayName")}
             <input
               name="display_name"
               defaultValue={character.display_name}
@@ -48,7 +52,7 @@ export function CharacterOverviewTab({
             />
           </label>
           <label className="block text-sm font-medium text-slate-700">
-            Vai trò
+            {t("characters.role")}
             <input
               name="role_one_liner"
               defaultValue={character.role_one_liner ?? ""}
@@ -56,7 +60,7 @@ export function CharacterOverviewTab({
             />
           </label>
           <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-            Aliases (phân tách bằng dấu phẩy)
+            {t("characters.aliasesLabel")}
             <input
               name="aliases"
               defaultValue={character.aliases.join(", ")}
@@ -66,13 +70,16 @@ export function CharacterOverviewTab({
         </div>
         <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600">
           <span>
-            Hạng: <strong>{CHARACTER_TIER_LABELS[character.tier]}</strong>
+            {t("characters.tierLabel")}{" "}
+            <strong>{labels.characterTier(character.tier)}</strong>
           </span>
           <span>
-            Trạng thái: <strong>{CHARACTER_STATUS_LABELS[character.status]}</strong>
+            {t("characters.statusLabel")}{" "}
+            <strong>{labels.characterStatus(character.status)}</strong>
           </span>
           <span>
-            Xuất hiện: <strong>{character.appearance_count}</strong>
+            {t("characters.appearancesLabel")}{" "}
+            <strong>{character.appearance_count}</strong>
           </span>
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -81,7 +88,7 @@ export function CharacterOverviewTab({
             disabled={saving}
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >
-            {saving ? "Đang lưu…" : "Lưu"}
+            {saving ? t("common.saving") : t("common.save")}
           </button>
           {character.tier < 3 && character.status !== "archived" ? (
             <button
@@ -89,7 +96,7 @@ export function CharacterOverviewTab({
               onClick={onPromote}
               className="rounded-lg border border-indigo-300 px-4 py-2 text-sm font-medium text-indigo-700"
             >
-              Promote tier
+              {t("characters.promote")}
             </button>
           ) : null}
           {character.status !== "archived" ? (
@@ -98,16 +105,16 @@ export function CharacterOverviewTab({
               onClick={onArchive}
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600"
             >
-              Lưu trữ
+              {t("characters.archive")}
             </button>
           ) : null}
         </div>
       </form>
       <section className="rounded-xl border border-slate-200 bg-white p-6">
-        <h3 className="text-sm font-semibold text-slate-900">Appearances</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{t("characters.appearances")}</h3>
         <p className="mt-2 text-sm text-slate-600">
-          {character.appearance_count} lần xuất hiện
-          {character.first_seen_chapter_id ? " — có dữ liệu chương" : ""}
+          {t("characters.appearanceCount", { count: character.appearance_count })}
+          {character.first_seen_chapter_id ? t("characters.hasChapterData") : ""}
         </p>
       </section>
     </div>

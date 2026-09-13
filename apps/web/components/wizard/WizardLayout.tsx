@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "@/lib/i18n/use-translations";
+
 interface WizardLayoutProps {
   currentStep: number;
   totalSteps: number;
@@ -13,8 +15,6 @@ interface WizardLayoutProps {
   footerExtra?: React.ReactNode;
 }
 
-const STEP_LABELS = ["Cơ bản", "Thể loại", "Mẫu", "Xác nhận"];
-
 export function WizardLayout({
   currentStep,
   totalSteps,
@@ -22,16 +22,24 @@ export function WizardLayout({
   children,
   onBack,
   onNext,
-  nextLabel = "Tiếp theo",
+  nextLabel,
   nextDisabled = false,
   showBack = true,
   footerExtra,
 }: WizardLayoutProps) {
+  const t = useTranslations();
+  const stepLabels = [
+    t("wizard.stepBasicsShort"),
+    t("wizard.stepGenreShort"),
+    t("wizard.stepTemplateShort"),
+    t("wizard.stepConfirmShort"),
+  ];
+
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-8">
         <div className="mb-4 flex items-center justify-between gap-2">
-          {STEP_LABELS.map((label, index) => {
+          {stepLabels.map((label, index) => {
             const stepNum = index + 1;
             const isActive = stepNum === currentStep;
             const isDone = stepNum < currentStep;
@@ -54,7 +62,7 @@ export function WizardLayout({
           })}
         </div>
         <p className="text-sm text-slate-500">
-          Bước {currentStep}/{totalSteps}
+          {t("wizard.stepProgress", { current: currentStep, total: totalSteps })}
         </p>
         <h1 className="mt-1 text-2xl font-bold text-slate-900">{stepTitle}</h1>
       </div>
@@ -68,7 +76,7 @@ export function WizardLayout({
             onClick={onBack}
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
-            Quay lại
+            {t("wizard.back")}
           </button>
         ) : (
           <span />
@@ -82,7 +90,7 @@ export function WizardLayout({
               disabled={nextDisabled}
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {nextLabel}
+              {nextLabel ?? t("wizard.nextExtended")}
             </button>
           ) : null}
         </div>

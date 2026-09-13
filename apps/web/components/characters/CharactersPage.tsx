@@ -19,6 +19,7 @@ import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { AddCharacterModal } from "./AddCharacterModal";
 import { CharacterFilters, type CharacterFilterValues } from "./CharacterFilters";
 import { CharacterTable } from "./CharacterTable";
@@ -35,6 +36,7 @@ interface CharactersPageProps {
 }
 
 export function CharactersPage({ projectId, initialChapterFilter }: CharactersPageProps) {
+  const t = useTranslations();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [characters, setCharacters] = useState<Character[]>([]);
   const [provisionals, setProvisionals] = useState<CharacterProvisional[]>([]);
@@ -93,8 +95,8 @@ export function CharactersPage({ projectId, initialChapterFilter }: CharactersPa
 
   useEffect(() => {
     if (loadState !== "success") return;
-    void loadCharacters().catch(() => setToast("Không tải được danh sách nhân vật"));
-  }, [loadState, loadCharacters]);
+    void loadCharacters().catch(() => setToast(t("characters.errorLoadList")));
+  }, [loadState, loadCharacters, t]);
 
   useEffect(() => {
     if (!toast) return;
@@ -108,7 +110,7 @@ export function CharactersPage({ projectId, initialChapterFilter }: CharactersPa
 
   const handleCreate = async (values: { display_name: string; role_one_liner: string }) => {
     await createCharacter(projectId, values);
-    setToast("Đã tạo nhân vật");
+    setToast(t("characters.toastCreated"));
     await refreshAll();
   };
 
@@ -116,13 +118,13 @@ export function CharactersPage({ projectId, initialChapterFilter }: CharactersPa
     try {
       const confirmT3 = character.tier === 2;
       await promoteCharacterTier(projectId, character.id, { confirm_t3: confirmT3 });
-      setToast(`Đã promote ${character.display_name}`);
+      setToast(t("characters.toastPromotedNamed", { name: character.display_name }));
       await refreshAll();
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 422) {
-        setToast("Cần xác nhận promote lên T3");
+        setToast(t("characters.toastConfirmT3"));
       } else {
-        setToast("Không thể promote");
+        setToast(t("characters.toastPromoteFailed"));
       }
     }
   };
@@ -130,26 +132,26 @@ export function CharactersPage({ projectId, initialChapterFilter }: CharactersPa
   const handleArchive = async (character: Character) => {
     try {
       await updateCharacter(projectId, character.id, { status: "archived" });
-      setToast(`Đã lưu trữ ${character.display_name}`);
+      setToast(t("characters.toastArchivedNamed", { name: character.display_name }));
       await refreshAll();
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 409) {
-        setToast("Nhân vật đã lưu trữ");
+        setToast(t("characters.toastAlreadyArchived"));
       } else {
-        setToast("Không thể lưu trữ");
+        setToast(t("characters.toastArchiveFailed"));
       }
     }
   };
 
   const handlePromoteNew = async (provisional: CharacterProvisional) => {
     await mergeCharacterProvisional(projectId, provisional.id, { create_new: true });
-    setToast(`Đã promote ${provisional.mention_text}`);
+    setToast(t("characters.toastProvisionalPromoted", { mention: provisional.mention_text }));
     await refreshAll();
   };
 
   const handleReject = async (provisional: CharacterProvisional) => {
     await rejectCharacterProvisional(projectId, provisional.id);
-    setToast(`Đã reject ${provisional.mention_text}`);
+    setToast(t("characters.toastProvisionalRejected", { mention: provisional.mention_text }));
     await refreshAll();
   };
 
@@ -158,7 +160,7 @@ export function CharactersPage({ projectId, initialChapterFilter }: CharactersPa
     await mergeCharacterProvisional(projectId, mergeTarget.id, {
       target_character_id: targetCharacterId,
     });
-    setToast(`Đã merge ${mergeTarget.mention_text}`);
+    setToast(t("characters.toastProvisionalMerged", { mention: mergeTarget.mention_text }));
     setMergeTarget(null);
     await refreshAll();
   };
@@ -180,9 +182,9 @@ export function CharactersPage({ projectId, initialChapterFilter }: CharactersPa
     return (
       <AppShell>
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy dự án</h1>
+          <h1 className="text-lg font-semibold text-slate-900">{t("hub.notFound")}</h1>
           <Link href="/" className="mt-4 inline-block text-sm font-medium text-indigo-600">
-            ← Về Dashboard
+            {t("common.backToDashboard")}
           </Link>
         </div>
       </AppShell>
@@ -192,7 +194,7 @@ export function CharactersPage({ projectId, initialChapterFilter }: CharactersPa
   return (
     <AppShell sidebar={sidebar}>
       {loadState === "error" ? (
-        <ErrorBanner message="Không tải được dự án" onRetry={() => void loadPage()} />
+        <ErrorBanner message={t("hub.errorLoad")} onRetry={() => void loadPage()} />
       ) : null}
       {toast ? (
         <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">

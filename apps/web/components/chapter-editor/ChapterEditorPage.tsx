@@ -22,6 +22,7 @@ import { PromptEditPanel } from "./PromptEditPanel";
 import { ProseEditor } from "./ProseEditor";
 import { SceneBeatsPanel } from "./SceneBeatsPanel";
 import { VersionDropdown } from "./VersionDropdown";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 type LoadState = "loading" | "success" | "error" | "not_found";
 
@@ -31,6 +32,7 @@ interface ChapterEditorPageProps {
 }
 
 export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPageProps) {
+  const t = useTranslations();
   const router = useRouter();
   const [projectTitle, setProjectTitle] = useState("");
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -120,7 +122,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
     } catch (err: unknown) {
       setSaveState("idle");
       if (err instanceof ApiError && err.code === "chapter_locked") {
-        setToast("Chương đã bị khóa — không thể lưu");
+        setToast(t("editor.toast.chapterLockedSave"));
       }
     }
   };
@@ -134,7 +136,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
       });
       router.push(`/projects/${projectId}/chapters/${chapterId}/continuity`);
     } catch {
-      setToast("Không thể chạy continuity check");
+      setToast(t("editor.toast.continuityCheckFailed"));
     } finally {
       setCheckingContinuity(false);
     }
@@ -147,13 +149,13 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
       const result = await extractCharactersFromChapter(projectId, chapterId, {
         prose_version: selectedVersion ?? undefined,
       });
-      setToast(`Đã extract ${result.created_count} nhân vật`);
+      setToast(t("editor.toast.charactersExtracted", { count: result.created_count }));
       router.push(`/projects/${projectId}/characters?chapter_id=${chapterId}`);
     } catch (err: unknown) {
       if (err instanceof ApiError && err.code === "chapter_locked") {
-        setToast("Chương đã bị khóa — không thể extract");
+        setToast(t("editor.toast.chapterLockedExtract"));
       } else {
-        setToast("Không thể quét nhân vật");
+        setToast(t("editor.toast.extractFailed"));
       }
     } finally {
       setExtractingCharacters(false);
@@ -167,7 +169,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
       setBeats((prev) => prev.map((b) => (b.id === beatId ? updated : b)));
     } catch (err: unknown) {
       if (err instanceof ApiError && err.code === "chapter_locked") {
-        setToast("Chương đã bị khóa — không thể sửa beat");
+        setToast(t("editor.toast.chapterLockedBeat"));
       }
     }
   };
@@ -178,13 +180,13 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
     try {
       const created = await createBeat(projectId, chapterId, {
         beat_key: `${chapter?.number ?? 1}.${nextOrder}`,
-        summary: "Beat mới",
+        summary: t("editor.beats.defaultSummary"),
         sort_order: nextOrder,
       });
       setBeats((prev) => [...prev, created]);
     } catch (err: unknown) {
       if (err instanceof ApiError && err.code === "chapter_locked") {
-        setToast("Chương đã bị khóa — không thể thêm beat");
+        setToast(t("editor.toast.chapterLockedAddBeat"));
       }
     }
   };
@@ -193,9 +195,9 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
     return (
       <AppShell>
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy chương</h1>
+          <h1 className="text-lg font-semibold text-slate-900">{t("editor.notFound")}</h1>
           <Link href={`/projects/${projectId}`} className="mt-4 inline-block text-sm font-medium text-indigo-600">
-            ← Về Project Hub
+            {t("editor.backToHub")}
           </Link>
         </div>
       </AppShell>
@@ -209,7 +211,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
   return (
     <AppShell sidebar={sidebar}>
       {loadState === "error" ? (
-        <ErrorBanner message="Không tải được chương" onRetry={() => void loadEditor()} />
+        <ErrorBanner message={t("editor.errorLoad")} onRetry={() => void loadEditor()} />
       ) : null}
 
       {toast ? (
@@ -218,7 +220,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
 
       {readOnly && chapter ? (
         <div className="mb-4 rounded-lg bg-slate-100 px-4 py-2 text-sm text-slate-700">
-          Chương đã bị khóa sau settle — chỉ xem, không chỉnh sửa.
+          {t("editor.lockedBanner")}
         </div>
       ) : null}
 

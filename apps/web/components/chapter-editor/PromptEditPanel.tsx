@@ -18,6 +18,7 @@ import { PromptEditInstructionInput } from "./PromptEditInstructionInput";
 import { PromptEditPanelHeader } from "./PromptEditPanelHeader";
 import { PromptEditProposalPreview } from "./PromptEditProposalPreview";
 import { PromptEditTurnLog } from "./PromptEditTurnLog";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface PromptEditPanelProps {
   projectId: string;
@@ -36,6 +37,7 @@ export function PromptEditPanel({
   onApplied,
   onToast,
 }: PromptEditPanelProps) {
+  const t = useTranslations();
   const [sessions, setSessions] = useState<PromptEditSessionSummary[]>([]);
   const [instruction, setInstruction] = useState("");
   const [running, setRunning] = useState(false);
@@ -75,11 +77,11 @@ export function PromptEditPanel({
       void response;
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 502) {
-        setError("Lỗi LLM provider — thử Regenerate");
+        setError(t("editor.promptEdit.error.llmRegenerate"));
       } else if (err instanceof ApiError && err.code === "chapter_locked") {
-        setError("Chương đã khóa");
+        setError(t("editor.promptEdit.error.chapterLocked"));
       } else {
-        setError("Không thể gửi instruction");
+        setError(t("editor.promptEdit.error.sendFailed"));
       }
     } finally {
       setRunning(false);
@@ -98,9 +100,9 @@ export function PromptEditPanel({
       await loadSessions();
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 502) {
-        setError("Lỗi LLM provider — thử lại");
+        setError(t("editor.promptEdit.error.llmRetry"));
       } else {
-        setError("Không thể regenerate");
+        setError(t("editor.promptEdit.error.regenerateFailed"));
       }
     } finally {
       setRunning(false);
@@ -123,10 +125,10 @@ export function PromptEditPanel({
         created_by: response.prose_version.created_by,
         created_at: response.prose_version.created_at,
       });
-      onToast(`Đã lưu phiên bản ${response.prose_version.version}`);
+      onToast(t("editor.promptEdit.versionSaved", { version: response.prose_version.version }));
       await loadSessions();
     } catch {
-      setError("Không thể apply");
+      setError(t("editor.promptEdit.error.applyFailed"));
     } finally {
       setRunning(false);
     }
@@ -144,7 +146,7 @@ export function PromptEditPanel({
       setCompareRight(latestTurn.proposed_content);
       setCompareOpen(true);
     } catch {
-      setError("Không thể tải nội dung so sánh");
+      setError(t("editor.promptEdit.error.compareLoadFailed"));
     }
   };
 
@@ -155,11 +157,11 @@ export function PromptEditPanel({
 
         {readOnly ? (
           <div className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            Chương đã khóa —{" "}
+            {t("editor.promptEdit.lockedBanner")}{" "}
             <Link href={`/projects/${projectId}`} className="font-medium underline">
-              mở khóa
+              {t("editor.promptEdit.unlockLink")}
             </Link>{" "}
-            để chỉnh sửa.
+            {t("editor.promptEdit.lockedBannerSuffix")}
           </div>
         ) : null}
 

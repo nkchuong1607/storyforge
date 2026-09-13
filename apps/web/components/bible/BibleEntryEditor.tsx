@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { BibleEntry } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { MetadataBlock } from "./MetadataBlock";
 
 interface BibleEntryEditorProps {
@@ -11,6 +12,7 @@ interface BibleEntryEditorProps {
 }
 
 export function BibleEntryEditor({ entry, onSave, onCancel }: BibleEntryEditorProps) {
+  const t = useTranslations();
   const [title, setTitle] = useState(entry.title);
   const [content, setContent] = useState(entry.content_md);
   const [saving, setSaving] = useState(false);
@@ -22,7 +24,7 @@ export function BibleEntryEditor({ entry, onSave, onCancel }: BibleEntryEditorPr
     try {
       await onSave({ title, content_md: content });
     } catch {
-      setError("Không lưu được. Vui lòng thử lại.");
+      setError(t("bible.saveError"));
       setSaving(false);
     }
   };
@@ -31,7 +33,7 @@ export function BibleEntryEditor({ entry, onSave, onCancel }: BibleEntryEditorPr
     <div>
       <div className="mb-4">
         <label htmlFor="entry-title" className="block text-sm font-medium text-slate-700">
-          Tiêu đề
+          {t("bible.entryTitleLabel")}
         </label>
         <input
           id="entry-title"
@@ -44,7 +46,7 @@ export function BibleEntryEditor({ entry, onSave, onCancel }: BibleEntryEditorPr
       <MetadataBlock entry={entry} />
       <div className="mb-4">
         <label htmlFor="entry-content" className="block text-sm font-medium text-slate-700">
-          Nội dung (Markdown)
+          {t("bible.contentLabel")}
         </label>
         <textarea
           id="entry-content"
@@ -70,7 +72,7 @@ export function BibleEntryEditor({ entry, onSave, onCancel }: BibleEntryEditorPr
           {saving ? (
             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
           ) : null}
-          Lưu
+          {t("common.save")}
         </button>
         <button
           type="button"
@@ -78,7 +80,7 @@ export function BibleEntryEditor({ entry, onSave, onCancel }: BibleEntryEditorPr
           disabled={saving}
           className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
         >
-          Hủy
+          {t("common.cancel")}
         </button>
       </div>
     </div>

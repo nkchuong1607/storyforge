@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { ApiError } from "@/lib/api/client";
 import { createProject } from "@/lib/api/projects";
 import type { GenreProfile, ProjectCreateRequest, ProjectTemplate } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { AppShell } from "@/components/ui/AppShell";
 import { BasicsStep, validateBasics, type BasicsFormData } from "./BasicsStep";
 import { ConfirmStep } from "./ConfirmStep";
@@ -15,6 +16,7 @@ import { WizardLayout } from "./WizardLayout";
 const TOTAL_STEPS = 4;
 
 export function NewProjectWizard() {
+  const t = useTranslations();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [basics, setBasics] = useState<BasicsFormData>({
@@ -41,11 +43,17 @@ export function NewProjectWizard() {
     };
   }, [basics, genre, template]);
 
-  const stepTitle = ["Thông tin cơ bản", "Chọn thể loại", "Chọn mẫu", "Xác nhận"][step - 1];
+  const stepTitles = [
+    t("wizard.stepBasics"),
+    t("wizard.stepGenreSelect"),
+    t("wizard.stepTemplateSelect"),
+    t("wizard.stepConfirm"),
+  ];
+  const stepTitle = stepTitles[step - 1];
 
   const handleNext = () => {
     if (step === 1) {
-      const errors = validateBasics(basics);
+      const errors = validateBasics(basics, t);
       setBasicsErrors(errors);
       if (Object.keys(errors).length > 0) return;
     }
@@ -72,11 +80,11 @@ export function NewProjectWizard() {
         const suggested = err.details?.[0]?.suggested_slug as string | undefined;
         setSubmitError(
           suggested
-            ? `Slug đã tồn tại. Gợi ý: ${suggested}`
-            : "Slug đã tồn tại. Vui lòng đổi tên dự án.",
+            ? t("wizard.slugConflictSuggested", { suggested })
+            : t("wizard.slugConflict"),
         );
       } else {
-        setSubmitError("Không thể tạo dự án. Vui lòng thử lại.");
+        setSubmitError(t("wizard.errorCreate"));
       }
       setIsSubmitting(false);
     }
@@ -96,7 +104,7 @@ export function NewProjectWizard() {
         stepTitle={stepTitle}
         onBack={step > 1 ? handleBack : undefined}
         onNext={step < TOTAL_STEPS ? handleNext : handleSubmit}
-        nextLabel={step === TOTAL_STEPS ? "Tạo dự án" : "Tiếp theo"}
+        nextLabel={step === TOTAL_STEPS ? t("wizard.create") : t("wizard.nextExtended")}
         nextDisabled={nextDisabled}
         showBack={step > 1}
       >

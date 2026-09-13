@@ -13,6 +13,7 @@ import { getProject } from "@/lib/api/projects";
 import { hasUnresolvedFail } from "@/lib/continuity-utils";
 import type { Chapter, ContinuityOverride, ContinuityReport, StateDiff } from "@/lib/api/types";
 import { ApiError } from "@/lib/api/client";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
@@ -30,6 +31,7 @@ interface ContinuityGatePageProps {
 }
 
 export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageProps) {
+  const t = useTranslations();
   const router = useRouter();
   const [projectTitle, setProjectTitle] = useState("");
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -104,13 +106,13 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
         { report_id: report.report_id, approve_state_diff: true },
         crypto.randomUUID(),
       );
-      setToast({ type: "success", message: "Settle thành công — chương đã khóa" });
+      setToast({ type: "success", message: t("continuity.settleSuccess") });
       setTimeout(() => router.push(`/projects/${projectId}`), 1500);
     } catch (err: unknown) {
       if (err instanceof ApiError && err.code === "continuity_fail_blocks_settle") {
-        setToast({ type: "error", message: "FAIL chưa được giải quyết — không thể settle" });
+        setToast({ type: "error", message: t("continuity.settleDisabled") });
       } else {
-        setToast({ type: "error", message: "Settle thất bại" });
+        setToast({ type: "error", message: t("continuity.settleError") });
       }
     } finally {
       setSettling(false);
@@ -121,12 +123,12 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
     return (
       <AppShell>
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy báo cáo</h1>
+          <h1 className="text-lg font-semibold text-slate-900">{t("continuity.notFoundReport")}</h1>
           <Link
             href={`/projects/${projectId}/chapters/${chapterId}`}
             className="mt-4 inline-block text-sm font-medium text-indigo-600"
           >
-            ← Về Editor
+            {t("continuity.backToEditor")}
           </Link>
         </div>
       </AppShell>
@@ -144,12 +146,12 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
           href={`/projects/${projectId}/chapters/${chapterId}`}
           className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
         >
-          ← Về Editor
+          {t("continuity.backToEditor")}
         </Link>
       </div>
 
       {loadState === "error" ? (
-        <ErrorBanner message="Không tải được báo cáo continuity" onRetry={() => void loadGate()} />
+        <ErrorBanner message={t("continuity.errorLoad")} onRetry={() => void loadGate()} />
       ) : null}
 
       {toast ? (
@@ -188,7 +190,7 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
                 onClick={() => void refreshStateDiff()}
                 className="mt-2 text-xs font-medium text-indigo-600 hover:text-indigo-800"
               >
-                Làm mới state diff
+                {t("continuity.refreshStateDiff")}
               </button>
             </div>
           </div>
@@ -197,7 +199,7 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
             settling={settling}
             readOnly={readOnly}
             settleDisabledReason={
-              unresolvedFail ? "Còn FAIL chưa giải quyết hoặc override" : undefined
+              unresolvedFail ? t("continuity.settleDisabledReason") : undefined
             }
             onReject={() => void handleReject()}
             onRequestRevise={() => void handleRequestRevise()}

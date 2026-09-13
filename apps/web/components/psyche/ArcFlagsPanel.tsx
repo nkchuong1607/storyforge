@@ -1,6 +1,7 @@
 "use client";
 
 import type { PsycheArcFlags } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { TagListEditor } from "./TagListEditor";
 
 interface ArcFlagsPanelProps {
@@ -9,11 +10,12 @@ interface ArcFlagsPanelProps {
 }
 
 export function ArcFlagsPanel({ arcFlags, onChange }: ArcFlagsPanelProps) {
+  const t = useTranslations();
   const beats = arcFlags.expected_arc_beats ?? [];
 
   return (
     <div className="space-y-4 rounded-lg border border-slate-200 bg-slate-50 p-4">
-      <h3 className="text-sm font-semibold text-slate-900">Arc flags</h3>
+      <h3 className="text-sm font-semibold text-slate-900">{t("psych.arcFlags.title")}</h3>
       <label className="flex items-center gap-2 text-sm text-slate-700">
         <input
           type="checkbox"
@@ -22,17 +24,17 @@ export function ArcFlagsPanel({ arcFlags, onChange }: ArcFlagsPanelProps) {
             onChange({ ...arcFlags, allow_moral_break: event.target.checked })
           }
         />
-        Cho phép moral break
+        {t("psych.arcFlags.allowMoralBreak")}
       </label>
       <TagListEditor
-        label="Expected arc beats"
+        label={t("psych.arcFlags.expectedBeats")}
         values={beats}
         onChange={(values) => onChange({ ...arcFlags, expected_arc_beats: values })}
-        placeholder="Thêm arc beat"
+        placeholder={t("psych.arcFlags.beatPlaceholder")}
       />
       <div>
         <label htmlFor="current-arc-beat" className="block text-sm font-medium text-slate-700">
-          Current arc beat
+          {t("psych.arcFlags.currentBeat")}
         </label>
         <input
           id="current-arc-beat"

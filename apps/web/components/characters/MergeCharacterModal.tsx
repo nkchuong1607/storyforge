@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Character } from "@/lib/api/types";
 import { searchCharacters } from "@/lib/api/characters";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface MergeCharacterModalProps {
   open: boolean;
@@ -23,6 +24,7 @@ export function MergeCharacterModal({
   onClose,
   onMerge,
 }: MergeCharacterModalProps) {
+  const t = useTranslations();
   const [query, setQuery] = useState(mentionText);
   const [results, setResults] = useState<Character[]>(characters);
   const [selectedId, setSelectedId] = useState(suggestedCharacterId ?? "");
@@ -70,14 +72,14 @@ export function MergeCharacterModal({
         className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-xl"
       >
         <h2 id="merge-character-title" className="text-lg font-semibold text-slate-900">
-          Merge vào nhân vật có sẵn
+          {t("characters.merge")}
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Đề cập: <strong>{mentionText}</strong>
+          {t("characters.mergeMentionLabel")} <strong>{mentionText}</strong>
         </p>
         <form onSubmit={(event) => void handleSubmit(event)} className="mt-4 space-y-4">
           <label className="block text-sm font-medium text-slate-700">
-            Tìm nhân vật
+            {t("characters.mergeSearch")}
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -85,14 +87,14 @@ export function MergeCharacterModal({
             />
           </label>
           <label className="block text-sm font-medium text-slate-700">
-            Chọn nhân vật
+            {t("characters.selectCharacter")}
             <select
               value={selectedId}
               onChange={(event) => setSelectedId(event.target.value)}
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
               required
             >
-              <option value="">— Chọn —</option>
+              <option value="">{t("characters.selectPlaceholder")}</option>
               {results.map((character) => (
                 <option key={character.id} value={character.id}>
                   {character.display_name} ({character.tier})
@@ -106,14 +108,14 @@ export function MergeCharacterModal({
               onClick={onClose}
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
             >
-              Hủy
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
               disabled={submitting || !selectedId}
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
-              {submitting ? "Đang merge…" : "Merge"}
+              {submitting ? t("characters.merging") : t("characters.mergeAction")}
             </button>
           </div>
         </form>

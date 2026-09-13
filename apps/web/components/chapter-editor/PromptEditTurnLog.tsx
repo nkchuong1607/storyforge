@@ -1,4 +1,7 @@
+"use client";
+
 import type { PromptEditSessionSummary } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { PromptEditTurnItem } from "./PromptEditTurnItem";
 
 interface PromptEditTurnLogProps {
@@ -6,11 +9,12 @@ interface PromptEditTurnLogProps {
 }
 
 export function PromptEditTurnLog({ sessions }: PromptEditTurnLogProps) {
+  const t = useTranslations();
   const turns = sessions.flatMap((s) => s.turns);
 
   if (turns.length === 0) {
     return (
-      <p className="flex-1 text-sm text-slate-400">Mô tả chỉnh sửa để bắt đầu…</p>
+      <p className="flex-1 text-sm text-slate-400">{t("editor.promptEdit.turnLogEmpty")}</p>
     );
   }
 
