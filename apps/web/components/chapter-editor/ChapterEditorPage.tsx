@@ -4,13 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { createBeat, listBeats, updateBeat } from "@/lib/api/beats";
-import { extractCharactersFromChapter } from "@/lib/api/characters";
+import { extractCharactersFromChapter, listCharacters } from "@/lib/api/characters";
 import { getChapter } from "@/lib/api/chapters";
 import { runContinuityCheck } from "@/lib/api/continuity";
 import { getProseVersion, listProseVersions, saveProseVersion } from "@/lib/api/prose";
 import { getProject } from "@/lib/api/projects";
+import { runSceneLint } from "@/lib/api/scene";
 import { countWords } from "@/lib/continuity-utils";
-import type { Chapter, ProseVersionSummary, SceneBeat } from "@/lib/api/types";
+import type { Chapter, ContinuityIssue, ProseVersionSummary, SceneBeat } from "@/lib/api/types";
 import { ApiError } from "@/lib/api/client";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
@@ -37,6 +38,10 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
   const [projectTitle, setProjectTitle] = useState("");
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [beats, setBeats] = useState<SceneBeat[]>([]);
+  const [lintIssues, setLintIssues] = useState<ContinuityIssue[]>([]);
+  const [lintLoading, setLintLoading] = useState(false);
+  const [lintError, setLintError] = useState(false);
+  const [characterOptions, setCharacterOptions] = useState<{ id: string; name: string }[]>([]);
   const [versions, setVersions] = useState<ProseVersionSummary[]>([]);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [proseContent, setProseContent] = useState("");
@@ -48,18 +53,36 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
 
   const readOnly = chapter?.status === "locked";
 
+  const refreshSceneLint = useCallback(async () => {
+    if (!chapterId) return;
+    setLintLoading(true);
+    setLintError(false);
+    try {
+      const result = await runSceneLint(projectId, chapterId);
+      setLintIssues(result.issues);
+    } catch {
+      setLintError(true);
+    } finally {
+      setLintLoading(false);
+    }
+  }, [projectId, chapterId]);
+
   const loadEditor = useCallback(async () => {
     setLoadState("loading");
     try {
-      const [projectData, chapterData, beatsData, versionsData] = await Promise.all([
+      const [projectData, chapterData, beatsData, versionsData, charactersData] = await Promise.all([
         getProject(projectId),
         getChapter(projectId, chapterId),
         listBeats(projectId, chapterId),
         listProseVersions(projectId, chapterId),
+        listCharacters(projectId, { page_size: 50 }).catch(() => ({ items: [] })),
       ]);
       setProjectTitle(projectData.title);
       setChapter(chapterData);
       setBeats(beatsData.items);
+      setCharacterOptions(
+        charactersData.items.map((c) => ({ id: c.id, name: c.display_name })),
+      );
       setVersions(versionsData.items);
       const latestVersion =
         chapterData.current_prose_version ?? versionsData.items[0]?.version ?? null;
@@ -71,6 +94,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
         setProseContent("");
       }
       setLoadState("success");
+      void refreshSceneLint();
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 404) {
         setLoadState("not_found");
@@ -78,7 +102,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
         setLoadState("error");
       }
     }
-  }, [projectId, chapterId]);
+  }, [projectId, chapterId, refreshSceneLint]);
 
   useEffect(() => {
     void loadEditor();
@@ -174,6 +198,25 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
     }
   };
 
+  const handleUpdateBeat = async (beatId: string, fields: Partial<SceneBeat>) => {
+    if (readOnly) return;
+    setBeats((prev) =>
+      prev.map((b) => (b.id === beatId ? { ...b, ...fields } : b)),
+    );
+    try {
+      const updated = await updateBeat(projectId, chapterId, beatId, fields);
+      setBeats((prev) => prev.map((b) => (b.id === beatId ? updated : b)));
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.code === "chapter_locked") {
+        setToast(t("editor.toast.chapterLockedBeat"));
+      }
+    }
+  };
+
+  const handleBeatBlur = () => {
+    void refreshSceneLint();
+  };
+
   const handleAddBeat = async () => {
     if (readOnly) return;
     const nextOrder = beats.length > 0 ? Math.max(...beats.map((b) => b.sort_order)) + 1 : 1;
@@ -184,6 +227,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
         sort_order: nextOrder,
       });
       setBeats((prev) => [...prev, created]);
+      void refreshSceneLint();
     } catch (err: unknown) {
       if (err instanceof ApiError && err.code === "chapter_locked") {
         setToast(t("editor.toast.chapterLockedAddBeat"));
@@ -251,10 +295,19 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
           />
           <div className="grid gap-4 lg:grid-cols-[240px_1fr_240px]">
             <SceneBeatsPanel
+              projectId={projectId}
+              chapterNumber={chapter.number}
               beats={beats}
+              lintIssues={lintIssues}
+              lintLoading={lintLoading}
+              lintError={lintError}
               readOnly={readOnly}
+              characterOptions={characterOptions}
               onToggleComplete={(id, c) => void handleToggleBeat(id, c)}
+              onUpdateBeat={(id, fields) => void handleUpdateBeat(id, fields)}
               onAddBeat={() => void handleAddBeat()}
+              onLintRetry={() => void refreshSceneLint()}
+              onBeatBlur={handleBeatBlur}
             />
             <div className="flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="mb-3 flex items-center justify-between gap-2">

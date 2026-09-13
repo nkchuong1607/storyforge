@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getPsycheCard } from "@/lib/api/psych";
-import { listPsychStates } from "@/lib/api/psych";
-import type { Character, RelationshipLensEntry } from "@/lib/api/types";
-import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { getPsycheCard, listPsychStates } from "@/lib/api/psych";
+import { getRelationshipGraph } from "@/lib/api/relationships";
+import type { Character, RelationshipGraphEdge, RelationshipLensEntry } from "@/lib/api/types";
 import { useTranslations } from "@/lib/i18n/use-translations";
+import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { RelationshipGraphList } from "@/components/relationships/RelationshipGraphCanvas";
 
 interface CharacterRelationshipsPanelProps {
   projectId: string;
@@ -21,6 +23,10 @@ export function CharacterRelationshipsPanel({
   const t = useTranslations();
   const [lens, setLens] = useState<RelationshipLensEntry[]>([]);
   const [stanceHistory, setStanceHistory] = useState<string[]>([]);
+  const [subgraphEdges, setSubgraphEdges] = useState<RelationshipGraphEdge[]>([]);
+  const [subgraphNodes, setSubgraphNodes] = useState<
+    Awaited<ReturnType<typeof getRelationshipGraph>>["nodes"]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,8 +35,9 @@ export function CharacterRelationshipsPanel({
     void Promise.all([
       getPsycheCard(projectId, character.id),
       listPsychStates(projectId, character.id, { page_size: 10 }),
+      getRelationshipGraph(projectId, { character_ids: [character.id] }),
     ])
-      .then(([cardResponse, statesResponse]) => {
+      .then(([cardResponse, statesResponse, graphResponse]) => {
         if (cancelled) return;
         setLens(cardResponse.psyche_card.relationship_lens ?? []);
         const stances = statesResponse.items
@@ -39,6 +46,8 @@ export function CharacterRelationshipsPanel({
           .filter(Boolean)
           .slice(-3);
         setStanceHistory(stances);
+        setSubgraphEdges(graphResponse.edges);
+        setSubgraphNodes(graphResponse.nodes);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -51,8 +60,18 @@ export function CharacterRelationshipsPanel({
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-slate-900">{t("characters.tabs.relationships")}</h2>
-        <p className="mt-1 text-sm text-slate-500">{t("characters.relationshipsSubtitle")}</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">{t("characters.tabs.relationships")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("characters.relationshipsSubtitle")}</p>
+          </div>
+          <Link
+            href={`/projects/${projectId}/relationships/graph?character_ids=${character.id}`}
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+          >
+            {t("relationships.graph.openFull")}
+          </Link>
+        </div>
 
         {loading ? (
           <LoadingSkeleton variant="content" count={1} />
@@ -94,6 +113,24 @@ export function CharacterRelationshipsPanel({
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+        <h3 className="text-sm font-semibold text-slate-900">{t("relationships.graph.subgraphTitle")}</h3>
+        {loading ? (
+          <LoadingSkeleton variant="table" count={2} />
+        ) : subgraphEdges.length === 0 ? (
+          <p className="mt-2 text-sm text-slate-500">{t("relationships.empty")}</p>
+        ) : (
+          <div className="mt-3">
+            <RelationshipGraphList
+              nodes={subgraphNodes}
+              edges={subgraphEdges}
+              selectedEdgeId={null}
+              onSelectEdge={() => undefined}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-6">
         <h3 className="text-sm font-semibold text-slate-900">
           {t("characters.relationshipsHistoryTitle")}
         </h3>
@@ -106,9 +143,6 @@ export function CharacterRelationshipsPanel({
             ))}
           </ul>
         )}
-        <p className="mt-4 rounded-lg border border-dashed border-slate-300 px-4 py-3 text-center text-sm text-slate-500">
-          {t("characters.relationshipsGraphStub")}
-        </p>
       </div>
     </div>
   );

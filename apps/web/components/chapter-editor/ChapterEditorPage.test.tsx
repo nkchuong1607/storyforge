@@ -14,7 +14,7 @@ describe("ChapterEditorPage", () => {
     render(<ChapterEditorPage projectId={PROJECT_1_ID} chapterId={CHAPTER_2_ID} />);
     expect(await screen.findByText("Chương 2 — Tu luyện")).toBeInTheDocument();
     expect(screen.getByText("Scene beats")).toBeInTheDocument();
-    expect(screen.getByText("2.1")).toBeInTheDocument();
+    expect(screen.getAllByText("2.1").length).toBeGreaterThan(0);
     expect(screen.getByLabelText("Nội dung chương")).toBeInTheDocument();
     expect(screen.getByText("Prompt Edit")).toBeInTheDocument();
   });
@@ -58,6 +58,12 @@ describe("ChapterEditorPage", () => {
         `/projects/${PROJECT_1_ID}/characters?chapter_id=${CHAPTER_2_ID}`,
       );
     });
+  });
+
+  it("shows scene lint panel after load", async () => {
+    render(<ChapterEditorPage projectId={PROJECT_1_ID} chapterId={CHAPTER_2_ID} />);
+    expect(await screen.findByText("Chương 2 — Tu luyện")).toBeInTheDocument();
+    expect(await screen.findByText("Cấu trúc cảnh")).toBeInTheDocument();
   });
 
   it("shows not found for unknown chapter", async () => {

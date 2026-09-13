@@ -196,7 +196,7 @@ describe("CharacterDetailPage", () => {
     activeTabParam = "relationships";
     render(<CharacterDetailPage projectId={projectId} characterId={CHARACTER_1_ID} />);
     await screen.findByRole("heading", { name: "Lý Phong" });
-    expect(await screen.findByText("Graph view — Phase 8")).toBeInTheDocument();
+    expect(await screen.findByText("Đồ thị con nhân vật")).toBeInTheDocument();
     expect(screen.getByText("Đồng môn thân thiết")).toBeInTheDocument();
   });
 

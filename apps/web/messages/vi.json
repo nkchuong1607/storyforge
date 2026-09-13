@@ -178,7 +178,14 @@
       "colChapter": "Chương",
       "colActions": "Hành động",
       "linkPowerBible": "Power bible",
-      "linkFixInEditor": "Fix in editor"
+      "linkFixInEditor": "Sửa trong editor",
+      "linkFixBeat": "Sửa beat",
+      "linkRelationships": "Xem quan hệ",
+      "linkStakes": "Mở bảng stakes"
+    },
+    "filter": {
+      "label": "Lọc theo danh mục",
+      "all": "Tất cả danh mục"
     },
     "stateDiffSections": {
       "ledgerProposals": "Ledger proposals",
@@ -580,5 +587,133 @@
         "compareLoadFailed": "Không thể tải nội dung so sánh"
       }
     }
+  },
+  "scene": {
+    "panel": {
+      "title": "Cấu trúc cảnh"
+    },
+    "fields": {
+      "goal": "Mục tiêu",
+      "conflict": "Xung đột",
+      "outcome": "Kết quả",
+      "stakes_level": "Mức stakes",
+      "scene_type": "Loại cảnh",
+      "pov_none": "Không POV"
+    },
+    "types": {
+      "scene": "Cảnh",
+      "sequel": "Hậu cảnh",
+      "transition": "Chuyển cảnh",
+      "exposition": "Giải thích"
+    },
+    "lint": {
+      "missing_outcome": "Thiếu outcome",
+      "missing_conflict": "Thiếu xung đột",
+      "missing_goal": "Thiếu mục tiêu",
+      "loading": "Đang kiểm tra…",
+      "error": "Không thể chạy scene lint"
+    },
+    "gate": {
+      "category": "Cấu trúc cảnh"
+    },
+    "expandStructure": "Trường cấu trúc",
+    "collapseStructure": "Ẩn cấu trúc",
+    "stakesHint": {
+      "peak": "Mức đỉnh hồi {level}/5 · {count} checkpoint",
+      "openBoard": "Mở bảng stakes"
+    }
+  },
+  "relationships": {
+    "graph": {
+      "title": "Sơ đồ quan hệ",
+      "subtitle": "Cặp nhân vật và lịch sử tin cậy từ sự kiện đã settle",
+      "canvasHint": "Chọn cạnh trong danh sách để xem chi tiết",
+      "denseHint": "Đồ thị dày — dùng bộ lọc để thu hẹp",
+      "showCanvas": "Chế độ đồ thị",
+      "openFull": "Mở sơ đồ đầy đủ",
+      "subgraphTitle": "Đồ thị con nhân vật"
+    },
+    "list": {
+      "title": "Quan hệ nhân vật",
+      "colA": "Nhân vật A",
+      "colB": "Nhân vật B",
+      "colType": "Loại"
+    },
+    "types": {
+      "ally": "Đồng minh",
+      "rival": "Đối thủ",
+      "mentor": "Sư phụ",
+      "family": "Gia đình",
+      "romantic": "Lãng mạn",
+      "enemy": "Kẻ thù",
+      "custom": "Tùy chỉnh"
+    },
+    "intensity": {
+      "label": "Cường độ tin cậy"
+    },
+    "events": {
+      "timeline": "Lịch sử",
+      "empty": "Chưa có sự kiện settle",
+      "chapter": "Ch. {n}"
+    },
+    "empty": "Chưa có quan hệ",
+    "gate": {
+      "category": "Cung quan hệ"
+    },
+    "filters": {
+      "act": "Hồi",
+      "allActs": "Tất cả hồi",
+      "apply": "Áp dụng bộ lọc"
+    },
+    "detail": {
+      "selectEdge": "Chọn quan hệ để xem timeline"
+    },
+    "register": {
+      "button": "Đăng ký cặp",
+      "first": "Đăng ký quan hệ đầu tiên",
+      "title": "Đăng ký quan hệ",
+      "characterA": "Nhân vật A",
+      "characterB": "Nhân vật B",
+      "select": "Chọn…",
+      "submit": "Đăng ký",
+      "error": "Không thể đăng ký quan hệ"
+    },
+    "errorLoad": "Không thể tải sơ đồ quan hệ"
+  },
+  "stakes": {
+    "board": {
+      "title": "Bảng stakes",
+      "subtitle": "Checkpoint leo thang theo hồi",
+      "settingsLink": "Cài đặt cấu trúc hồi"
+    },
+    "act": {
+      "label": "Hồi {n}",
+      "chapters": "Ch. {start}–{end}"
+    },
+    "status": {
+      "planned": "Đã lên kế hoạch",
+      "planted": "Đã gieo",
+      "resolved": "Đã giải quyết",
+      "abandoned": "Đã bỏ"
+    },
+    "target_level": "Mức mục tiêu",
+    "flat_middle": {
+      "warn": "Giữa truyện phẳng"
+    },
+    "gate": {
+      "category": "Stakes"
+    },
+    "emptyAct": "Chưa có checkpoint trong hồi này",
+    "addCheckpoint": "Thêm checkpoint",
+    "create": {
+      "title": "Checkpoint mới",
+      "name": "Tiêu đề"
+    },
+    "linkedTwist": "Twist liên kết",
+    "markPlanted": "Đánh dấu đã gieo",
+    "hub": {
+      "badge": "Stakes — cần leo thang ({count})"
+    },
+    "errorLoad": "Không thể tải bảng stakes"
   }
 }

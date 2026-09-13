@@ -17,6 +17,45 @@ interface ContinuityIssueTableProps {
   onMarkIntentional: (fingerprint: string, reason: string) => Promise<void>;
 }
 
+function issueDeepLink(
+  projectId: string,
+  chapterId: string,
+  issue: ContinuityIssue,
+): { href: string; labelKey: string } | null {
+  if (issue.category === "scene_structure") {
+    const beatId = issue.entity_ids?.[0];
+    return {
+      href: `/projects/${projectId}/chapters/${chapterId}?beat=${beatId ?? ""}`,
+      labelKey: "continuity.issues.linkFixBeat",
+    };
+  }
+  if (issue.category === "relationship_arc") {
+    const ids = issue.entity_ids?.join(",") ?? "";
+    return {
+      href: `/projects/${projectId}/relationships/graph?character_ids=${ids}`,
+      labelKey: "continuity.issues.linkRelationships",
+    };
+  }
+  if (issue.category === "stakes") {
+    const actMatch = issue.fingerprint.match(/act(\d+)/);
+    const act = actMatch?.[1] ?? "";
+    return {
+      href: `/projects/${projectId}/stakes${act ? `?act=${act}` : ""}`,
+      labelKey: "continuity.issues.linkStakes",
+    };
+  }
+  if (issue.category === "power_system") {
+    return {
+      href: `/projects/${projectId}/bible/power-system`,
+      labelKey: "continuity.issues.linkPowerBible",
+    };
+  }
+  return {
+    href: `/projects/${projectId}/chapters/${chapterId}?highlight=${issue.fingerprint}`,
+    labelKey: "continuity.issues.linkFixInEditor",
+  };
+}
+
 export function ContinuityIssueTable({
   projectId,
   chapterId,
@@ -75,6 +114,7 @@ export function ContinuityIssueTable({
           <tbody className="divide-y divide-slate-100">
             {issues.map((issue) => {
               const isOverridden = overridden.has(issue.fingerprint);
+              const link = issueDeepLink(projectId, chapterId, issue);
               return (
                 <tr key={issue.fingerprint} className="text-sm text-slate-700">
                   <td className="px-4 py-3">
@@ -96,21 +136,14 @@ export function ContinuityIssueTable({
                   <td className="px-4 py-3">{issue.chapter_refs.join(", ")}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-2">
-                      {issue.category === "power_system" ? (
+                      {link ? (
                         <Link
-                          href={`/projects/${projectId}/bible/power-system`}
-                          className="text-xs font-medium text-violet-700 hover:text-violet-900"
-                        >
-                          {t("continuity.issues.linkPowerBible")}
-                        </Link>
-                      ) : (
-                        <Link
-                          href={`/projects/${projectId}/chapters/${chapterId}?highlight=${issue.fingerprint}`}
+                          href={link.href}
                           className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
                         >
-                          {t("continuity.issues.linkFixInEditor")}
+                          {t(link.labelKey)}
                         </Link>
-                      )}
+                      ) : null}
                       {!readOnly && (issue.severity === "fail" || issue.severity === "warn") ? (
                         <button
                           type="button"

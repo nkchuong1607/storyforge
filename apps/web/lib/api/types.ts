@@ -28,13 +28,29 @@ export interface ChapterUpdateRequest {
   status?: ChapterStatus;
 }
 
+export type SceneType = "scene" | "sequel" | "transition" | "exposition";
+
+export interface PressureTag {
+  tag: string;
+  source?: string;
+  weight?: number;
+}
+
 export interface SceneBeat {
   id: string;
+  project_id?: string;
   chapter_id: string;
   beat_key: string;
   summary: string;
   sort_order: number;
   completed: boolean;
+  goal?: string;
+  conflict?: string;
+  outcome?: string;
+  stakes_level?: number | null;
+  pressure_tags?: PressureTag[];
+  pov_character_id?: string | null;
+  scene_type?: SceneType;
   created_at: string;
   updated_at: string;
 }
@@ -44,6 +60,13 @@ export interface SceneBeatCreateRequest {
   summary: string;
   sort_order: number;
   completed?: boolean;
+  goal?: string;
+  conflict?: string;
+  outcome?: string;
+  stakes_level?: number | null;
+  pressure_tags?: PressureTag[];
+  pov_character_id?: string | null;
+  scene_type?: SceneType;
 }
 
 export interface SceneBeatUpdateRequest {
@@ -51,6 +74,13 @@ export interface SceneBeatUpdateRequest {
   summary?: string;
   sort_order?: number;
   completed?: boolean;
+  goal?: string;
+  conflict?: string;
+  outcome?: string;
+  stakes_level?: number | null;
+  pressure_tags?: PressureTag[];
+  pov_character_id?: string | null;
+  scene_type?: SceneType;
 }
 
 export interface SceneBeatListResponse {
@@ -864,4 +894,212 @@ export interface PromptEditSessionSummary {
 
 export interface PromptEditSessionListResponse {
   items: PromptEditSessionSummary[];
+}
+
+export interface SceneLintStats {
+  fail: number;
+  warn: number;
+  pass: number;
+}
+
+export interface SceneLintResponse {
+  chapter_id: string;
+  result: ContinuitySeverity;
+  issues: ContinuityIssue[];
+  stats: SceneLintStats;
+}
+
+export interface SceneEngineSettings {
+  project_id: string;
+  enabled: boolean;
+  require_conflict: boolean;
+  require_outcome_on_complete: boolean;
+  min_goal_length: number;
+  llm_auditor_enabled: boolean;
+  strictness: GenreStrictness;
+  updated_at: string;
+}
+
+export type RelationType =
+  | "ally"
+  | "rival"
+  | "mentor"
+  | "family"
+  | "romantic"
+  | "enemy"
+  | "custom";
+
+export interface Relationship {
+  id: string;
+  project_id: string;
+  character_a_id: string;
+  character_b_id: string;
+  character_a_name?: string;
+  character_b_name?: string;
+  relation_type: RelationType;
+  custom_label?: string | null;
+  baseline_intensity: number;
+  current_intensity: number;
+  notes_md?: string;
+  event_count?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RelationshipCreateRequest {
+  character_a_id: string;
+  character_b_id: string;
+  relation_type: RelationType;
+  custom_label?: string;
+  baseline_intensity?: number;
+  notes_md?: string;
+}
+
+export interface RelationshipUpdateRequest {
+  relation_type?: RelationType;
+  custom_label?: string | null;
+  baseline_intensity?: number;
+  notes_md?: string;
+}
+
+export interface RelationshipListResponse {
+  items: Relationship[];
+  pagination: PaginationMeta;
+}
+
+export interface RelationshipGraphNode {
+  id: string;
+  display_name: string;
+  tier: number;
+  degree: number;
+}
+
+export interface RelationshipGraphEdgeLastEvent {
+  chapter_number: number;
+  event_type: string;
+  intensity_delta: number;
+}
+
+export interface RelationshipGraphEdge {
+  id: string;
+  source_id: string;
+  target_id: string;
+  relation_type: RelationType;
+  intensity: number;
+  last_event?: RelationshipGraphEdgeLastEvent;
+  event_count: number;
+}
+
+export interface RelationshipGraphMeta {
+  filtered_character_ids: string[];
+  act_number: number | null;
+  generated_at: string;
+}
+
+export interface RelationshipGraphResponse {
+  nodes: RelationshipGraphNode[];
+  edges: RelationshipGraphEdge[];
+  meta: RelationshipGraphMeta;
+}
+
+export interface RelationshipEvent {
+  id: string;
+  relationship_id: string;
+  event_type: string;
+  intensity_delta: number;
+  intensity_after: number;
+  relation_type_after?: RelationType | null;
+  chapter_number: number;
+  settled_at?: string | null;
+  payload?: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface RelationshipEventListResponse {
+  items: RelationshipEvent[];
+}
+
+export type StakesEntryStatus = "planned" | "planted" | "resolved" | "abandoned";
+
+export interface StakesLedgerEntry {
+  id: string;
+  project_id: string;
+  act_number: number;
+  checkpoint_key: string;
+  title: string;
+  description_md: string;
+  target_level: number;
+  status: StakesEntryStatus;
+  plant_chapter_id?: string | null;
+  resolve_chapter_id?: string | null;
+  linked_twist_id?: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StakesEntryCreateRequest {
+  act_number: number;
+  checkpoint_key: string;
+  title: string;
+  description_md?: string;
+  target_level: number;
+  sort_order?: number;
+  linked_twist_id?: string;
+}
+
+export interface StakesEntryUpdateRequest {
+  title?: string;
+  description_md?: string;
+  target_level?: number;
+  status?: StakesEntryStatus;
+  plant_chapter_id?: string | null;
+  resolve_chapter_id?: string | null;
+  linked_twist_id?: string | null;
+  sort_order?: number;
+}
+
+export interface ActChapterBoundary {
+  act_number: number;
+  start_chapter: number;
+  end_chapter: number;
+  label?: string;
+}
+
+export interface ActStructureSettings {
+  project_id: string;
+  act_count: number;
+  chapters_per_act: ActChapterBoundary[];
+  enabled: boolean;
+  flat_middle_window_chapters: number;
+  updated_at: string;
+}
+
+export interface ActStructureSettingsUpdateRequest {
+  act_count?: number;
+  chapters_per_act?: ActChapterBoundary[];
+  enabled?: boolean;
+  flat_middle_window_chapters?: number;
+}
+
+export interface StakesActColumn {
+  act_number: number;
+  label?: string;
+  start_chapter?: number;
+  end_chapter?: number;
+  entries: StakesLedgerEntry[];
+}
+
+export interface StakesBoardWarnings {
+  flat_middle?: boolean;
+  open_fail_count?: number;
+}
+
+export interface StakesBoardResponse {
+  settings: {
+    act_count: number;
+    enabled: boolean;
+  };
+  acts: StakesActColumn[];
+  warnings?: StakesBoardWarnings;
 }

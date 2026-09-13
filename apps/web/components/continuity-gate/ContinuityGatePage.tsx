@@ -11,7 +11,7 @@ import {
 } from "@/lib/api/continuity";
 import { getProject } from "@/lib/api/projects";
 import { hasUnresolvedFail } from "@/lib/continuity-utils";
-import type { Chapter, ContinuityOverride, ContinuityReport, StateDiff } from "@/lib/api/types";
+import type { Chapter, ContinuityCategory, ContinuityOverride, ContinuityReport, StateDiff } from "@/lib/api/types";
 import { ApiError } from "@/lib/api/client";
 import { useTranslations } from "@/lib/i18n/use-translations";
 import { AppShell } from "@/components/ui/AppShell";
@@ -19,6 +19,7 @@ import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
 import { ContinuityActionsBar } from "./ContinuityActionsBar";
+import { ContinuityCategoryFilter } from "./ContinuityCategoryFilter";
 import { ContinuityIssueTable } from "./ContinuityIssueTable";
 import { ContinuityReportHeader } from "./ContinuityReportHeader";
 import { StateDiffPanel } from "./StateDiffPanel";
@@ -41,10 +42,21 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [settling, setSettling] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState<ContinuityCategory | "all">("all");
 
   const readOnly = chapter?.status === "locked";
   const unresolvedFail = report ? hasUnresolvedFail(report.issues, overrides) : true;
   const canSettle = !readOnly && chapter?.status === "reviewing" && report !== null && !unresolvedFail;
+
+  const filteredIssues =
+    report && categoryFilter !== "all"
+      ? report.issues.filter((i) => i.category === categoryFilter)
+      : report?.issues ?? [];
+
+  const issueCounts = (report?.issues ?? []).reduce<Record<string, number>>((acc, issue) => {
+    acc[issue.category] = (acc[issue.category] ?? 0) + 1;
+    return acc;
+  }, {});
 
   const loadGate = useCallback(async () => {
     setLoadState("loading");
@@ -174,11 +186,16 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
       {loadState === "success" && chapter && report && stateDiff ? (
         <>
           <ContinuityReportHeader chapterTitle={chapter.title} report={report} />
+          <ContinuityCategoryFilter
+            selected={categoryFilter}
+            onChange={setCategoryFilter}
+            issueCounts={issueCounts}
+          />
           <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
             <ContinuityIssueTable
               projectId={projectId}
               chapterId={chapterId}
-              issues={report.issues}
+              issues={filteredIssues}
               overrides={overrides}
               readOnly={readOnly}
               onMarkIntentional={handleMarkIntentional}

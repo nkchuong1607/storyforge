@@ -1,0 +1,37 @@
+{
+  "chapter_id": "770e8400-e29b-41d4-a716-446655440002",
+  "result": "warn",
+  "issues": [
+    {
+      "fingerprint": "scene_structure:aa0e8400-e29b-41d4-a716-446655440001:missing_conflict",
+      "severity": "warn",
+      "category": "scene_structure",
+      "code": "scene_missing_conflict",
+      "message": "Beat 2.1 thiếu xung đột",
+      "chapter_refs": [2],
+      "entity_ids": ["aa0e8400-e29b-41d4-a716-446655440001"],
+      "evidence": {
+        "beat_key": "2.1",
+        "sort_order": 1
+      }
+    },
+    {
+      "fingerprint": "scene_structure:aa0e8400-e29b-41d4-a716-446655440002:missing_outcome",
+      "severity": "fail",
+      "category": "scene_structure",
+      "code": "scene_missing_outcome",
+      "message": "Beat 2.2 đánh dấu hoàn thành nhưng thiếu outcome",
+      "chapter_refs": [2],
+      "entity_ids": ["aa0e8400-e29b-41d4-a716-446655440002"],
+      "evidence": {
+        "beat_key": "2.2",
+        "sort_order": 2
+      }
+    }
+  ],
+  "stats": {
+    "fail": 1,
+    "warn": 1,
+    "pass": 0
+  }
+}
