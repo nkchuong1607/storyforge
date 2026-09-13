@@ -1,4 +1,7 @@
+"use client";
+
 import type { ProseVersionSummary } from "@/lib/api/types";
+import { useLocale, useTranslations } from "@/lib/i18n/use-translations";
 
 interface VersionDropdownProps {
   versions: ProseVersionSummary[];
@@ -13,8 +16,11 @@ export function VersionDropdown({
   onSelect,
   disabled,
 }: VersionDropdownProps) {
+  const t = useTranslations();
+  const { locale } = useLocale();
+
   if (versions.length === 0) {
-    return <span className="text-sm text-slate-500">Chưa có phiên bản</span>;
+    return <span className="text-sm text-slate-500">{t("editor.versions.empty")}</span>;
   }
 
   return (
@@ -23,11 +29,15 @@ export function VersionDropdown({
       onChange={(e) => onSelect(Number(e.target.value))}
       disabled={disabled}
       className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700"
-      aria-label="Chọn phiên bản prose"
+      aria-label={t("editor.versions.selectAria")}
     >
       {versions.map((v) => (
         <option key={v.version} value={v.version}>
-          v{v.version} — {v.word_count} từ ({v.source})
+          {t("editor.versions.optionLabel", {
+            version: v.version,
+            wordCount: v.word_count.toLocaleString(locale === "vi" ? "vi-VN" : "en-US"),
+            source: v.source,
+          })}
         </option>
       ))}
     </select>

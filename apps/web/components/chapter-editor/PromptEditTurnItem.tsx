@@ -3,12 +3,14 @@
 import { useState } from "react";
 import type { PromptEditTurn } from "@/lib/api/types";
 import { truncatePreview } from "@/lib/prompt-edit-utils";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface PromptEditTurnItemProps {
   turn: PromptEditTurn;
 }
 
 export function PromptEditTurnItem({ turn }: PromptEditTurnItemProps) {
+  const t = useTranslations();
   const [expanded, setExpanded] = useState(false);
   const preview = turn.proposed_content ? truncatePreview(turn.proposed_content) : null;
 
@@ -26,11 +28,13 @@ export function PromptEditTurnItem({ turn }: PromptEditTurnItemProps) {
         <span className="shrink-0 text-slate-400">{expanded ? "▲" : "▼"}</span>
       </button>
       {turn.error_code ? (
-        <p className="mt-1 text-red-600">Lỗi: {turn.error_code}</p>
+        <p className="mt-1 text-red-600">
+          {t("editor.promptEdit.turnError", { errorCode: turn.error_code })}
+        </p>
       ) : preview ? (
         <p className="mt-1 text-slate-500">{expanded ? turn.proposed_content : preview}</p>
       ) : (
-        <p className="mt-1 text-slate-400">Đang xử lý…</p>
+        <p className="mt-1 text-slate-400">{t("editor.promptEdit.processing")}</p>
       )}
     </div>
   );
