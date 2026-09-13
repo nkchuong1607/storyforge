@@ -47,6 +47,12 @@ class Project(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         server_default=ProjectStatus.active.value,
     )
     bible_version_current: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
+    series_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("series.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    last_seen_series_slice_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
     settings: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default="{}")
     genre_rule_pack_json: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default="{}")
     created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)

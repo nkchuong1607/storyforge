@@ -18,13 +18,16 @@ from app.routers import (
     chapters,
     characters,
     context_packs,
+    export,
     genre,
     health,
     power,
     projects,
     prompt_edit,
     relationships,
+    research,
     scene_engine,
+    series,
     stakes,
     twists,
 )
@@ -61,3 +64,6 @@ app.include_router(prompt_edit.router)
 app.include_router(scene_engine.router)
 app.include_router(relationships.router)
 app.include_router(stakes.router)
+app.include_router(research.router)
+app.include_router(series.router)
+app.include_router(export.router)
