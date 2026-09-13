@@ -34,11 +34,13 @@ from app.schemas.prose import (
     ProseVersionDetail,
     ProseVersionListResponse,
 )
+from app.schemas.scene_engine import SceneLintResponse
 from app.services.beat import BeatService
 from app.services.chapter import ChapterService
 from app.services.character_extract import CharacterExtractService
 from app.services.continuity_service import ContinuityService
 from app.services.prose import ProseService
+from app.services.scene_engine import SceneEngineService
 from app.services.settle import SettleService
 from app.utils.pagination import clamp_page_params
 
@@ -177,6 +179,15 @@ async def get_prose_version(
 ) -> ProseVersionDetail:
     service = ProseService(session)
     return await service.get_version(chapter, version)
+
+
+@router.post("/{chapter_id}/scene-lint", response_model=SceneLintResponse)
+async def run_scene_lint(
+    chapter: ChapterAccess,
+    project: ProjectAccess,
+    session: DbSession,
+) -> SceneLintResponse:
+    return await SceneEngineService(session).run_scene_lint(project, chapter)
 
 
 @router.post("/{chapter_id}/continuity-check", response_model=ContinuityReport)

@@ -255,6 +255,50 @@ class PromptEditAlreadyAppliedError(AppError):
         super().__init__(status_code=409, code="prompt_edit_already_applied", message=message)
 
 
+class InvalidRelationshipPairError(AppError):
+    def __init__(self, message: str = "Invalid relationship character pair") -> None:
+        super().__init__(status_code=422, code="invalid_relationship_pair", message=message)
+
+
+class RelationshipExistsError(AppError):
+    def __init__(self, message: str = "Relationship already exists for character pair") -> None:
+        super().__init__(status_code=409, code="relationship_exists", message=message)
+
+
+class RelationshipEventImmutableError(AppError):
+    def __init__(self, message: str = "Settled relationship event cannot be modified") -> None:
+        super().__init__(status_code=409, code="relationship_event_immutable", message=message)
+
+
+class InvalidStakesLevelError(AppError):
+    def __init__(self, message: str = "stakes_level must be between 0 and 5") -> None:
+        super().__init__(status_code=422, code="invalid_stakes_level", message=message)
+
+
+class InvalidActNumberError(AppError):
+    def __init__(self, message: str = "act_number exceeds act_count") -> None:
+        super().__init__(status_code=422, code="invalid_act_number", message=message)
+
+
+class InvalidSceneTypeError(AppError):
+    def __init__(self, scene_type: str) -> None:
+        super().__init__(
+            status_code=422,
+            code="invalid_scene_type",
+            message=f"Unknown scene_type '{scene_type}'",
+        )
+
+
+class SceneMissingOutcomeError(AppError):
+    def __init__(self, message: str = "Completed beat requires outcome") -> None:
+        super().__init__(status_code=422, code="scene_missing_outcome", message=message)
+
+
+class SceneLLMAuditorError(AppError):
+    def __init__(self, message: str = "Scene LLM auditor error") -> None:
+        super().__init__(status_code=502, code="scene_llm_auditor_error", message=message)
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

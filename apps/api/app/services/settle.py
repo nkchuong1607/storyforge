@@ -23,16 +23,21 @@ from app.models.enums import (
 )
 from app.models.ledger_event import LedgerEvent
 from app.models.psych_state import PsychState
+from app.models.relationship_event import RelationshipEvent
 from app.repositories.bible import BibleRepository
 from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
 from app.repositories.ledger import LedgerRepository
 from app.repositories.power import PowerRepository
 from app.repositories.psych_state import PsychStateRepository
+from app.repositories.relationship import RelationshipRepository
+from app.repositories.stakes import StakesRepository
 from app.repositories.twist import TwistRepository
 from app.schemas.continuity import SettleChapterRequest, SettleChapterResponse
 from app.services.continuity.engine import _normalize_content, _snapshot_entries_map
 from app.services.continuity.power import build_power_snapshot
+from app.services.continuity.relationship import compute_intensity
+from app.services.continuity.stakes import build_stakes_snapshot
 from app.utils.psyche_validation import merge_psyche_card
 
 
@@ -46,6 +51,8 @@ class SettleService:
         self.characters = CharacterRepository(session)
         self.psych_states = PsychStateRepository(session)
         self.power = PowerRepository(session)
+        self.relationships = RelationshipRepository(session)
+        self.stakes = StakesRepository(session)
 
     async def _get_cached_response(
         self, chapter_id: uuid.UUID, idempotency_key: uuid.UUID | None
@@ -165,11 +172,42 @@ class SettleService:
                 power_settings, power_ranks, power_techniques
             )
             merged_snapshot["world"] = world
+
+        stakes_settings = await self.stakes.ensure_settings(project.id)
+        stakes_entries = await self.stakes.list_entries(project.id)
+        if stakes_settings.enabled or state_diff.get("stakes_ledger_proposals"):
+            world = dict(merged_snapshot.get("world") or {})
+            world["stakes"] = build_stakes_snapshot(stakes_entries, stakes_settings)
+            merged_snapshot["world"] = world
+
+        for candidate in state_diff.get("bible_patch_candidates", []):
+            path = candidate.get("path")
+            op = candidate.get("op")
+            if path == "world.scene_structure_summary" and op == "merge":
+                world = dict(merged_snapshot.get("world") or {})
+                existing = dict(world.get("scene_structure_summary") or {})
+                value = candidate.get("value") or {}
+                if isinstance(value, dict):
+                    existing.update(value)
+                world["scene_structure_summary"] = existing
+                merged_snapshot["world"] = world
+            elif candidate.get("path") == "world.stakes" and candidate.get("op") == "replace":
+                world = dict(merged_snapshot.get("world") or {})
+                world["stakes"] = candidate.get("value") or {}
+                merged_snapshot["world"] = world
+
         bible_after = bible_before + 1
         now = datetime.now(UTC)
         ledger_proposals = state_diff.get("ledger_proposals", [])
         ledger_count = 0
         psych_count = 0
+        relationship_count = 0
+        stakes_count = 0
+        snapshot_includes: list[str] = []
+        if merged_snapshot.get("world", {}).get("stakes"):
+            snapshot_includes.append("world.stakes")
+        if merged_snapshot.get("world", {}).get("scene_structure_summary"):
+            snapshot_includes.append("world.scene_structure_summary")
 
         for proposal in ledger_proposals:
             entity_type = LedgerEntityType(proposal.get("entity_type", "character"))
@@ -243,6 +281,97 @@ class SettleService:
             await self.psych_states.create(psych_state)
             psych_count += 1
 
+        for proposal in state_diff.get("relationship_event_proposals", []):
+            rel_id = uuid.UUID(proposal["relationship_id"])
+            rel = await self.relationships.get(project.id, rel_id)
+            if rel is None:
+                continue
+            settled = [
+                e
+                for e in await self.relationships.list_events(project.id, rel_id)
+                if e.settled_at is not None
+            ]
+            intensity_after = compute_intensity(
+                rel.baseline_intensity,
+                settled,
+            ) + int(proposal.get("intensity_delta", 0))
+            intensity_after = max(-5, min(5, intensity_after))
+            rel_event = RelationshipEvent(
+                project_id=project.id,
+                relationship_id=rel_id,
+                event_type=str(proposal.get("event_type", "relationship_change")),
+                intensity_delta=int(proposal.get("intensity_delta", 0)),
+                intensity_after=intensity_after,
+                relation_type_after=proposal.get("relation_type_after"),
+                payload=proposal.get("payload") or {},
+                chapter_id=chapter.id,
+                chapter_number=chapter.number,
+                prose_version=report.prose_version,
+                settled_at=now,
+            )
+            await self.relationships.create_event(rel_event)
+            relationship_count += 1
+
+            ledger_event = LedgerEvent(
+                project_id=project.id,
+                entity_type=LedgerEntityType.relationship,
+                entity_id=rel_id,
+                event_type=LedgerEventType.relationship_change,
+                payload={
+                    "intensity_delta": proposal.get("intensity_delta", 0),
+                    "intensity_after": intensity_after,
+                    "relation_type_after": proposal.get("relation_type_after"),
+                    "event_type": proposal.get("event_type"),
+                },
+                chapter_id=chapter.id,
+                chapter_number=chapter.number,
+                prose_version=report.prose_version,
+                settled_at=now,
+            )
+            await self.ledger.create(ledger_event)
+            ledger_count += 1
+
+            if proposal.get("relation_type_after"):
+                rel.relation_type = proposal["relation_type_after"]
+
+        for proposal in state_diff.get("stakes_ledger_proposals", []):
+            entry_id = uuid.UUID(proposal["entry_id"])
+            entry = await self.stakes.get_entry(project.id, entry_id)
+            if entry is None:
+                continue
+            from_level = entry.target_level
+            if proposal.get("status"):
+                entry.status = proposal["status"]
+            if proposal.get("plant_chapter_id"):
+                entry.plant_chapter_id = uuid.UUID(proposal["plant_chapter_id"])
+            if proposal.get("resolve_chapter_id"):
+                entry.resolve_chapter_id = uuid.UUID(proposal["resolve_chapter_id"])
+            if proposal.get("target_level") is not None:
+                entry.target_level = int(proposal["target_level"])
+            entry.updated_at = now
+            await self.stakes.update_entry(entry)
+            stakes_count += 1
+
+            to_level = int(proposal.get("target_level", entry.target_level))
+            ledger_event = LedgerEvent(
+                project_id=project.id,
+                entity_type=LedgerEntityType.stakes,
+                entity_id=entry_id,
+                event_type=LedgerEventType.stakes_escalation,
+                payload={
+                    "act_number": entry.act_number,
+                    "from_level": from_level,
+                    "to_level": to_level,
+                    "checkpoint_key": entry.checkpoint_key,
+                },
+                chapter_id=chapter.id,
+                chapter_number=chapter.number,
+                prose_version=report.prose_version,
+                settled_at=now,
+            )
+            await self.ledger.create(ledger_event)
+            ledger_count += 1
+
         await insert_bible_version(
             self.bible,
             project_id=project.id,
@@ -266,6 +395,9 @@ class SettleService:
             bible_version_after=bible_after,
             ledger_events_appended=ledger_count,
             psych_states_appended=psych_count,
+            relationship_events_appended=relationship_count,
+            stakes_entries_updated=stakes_count,
+            snapshot_includes=snapshot_includes,
             settled_at=now,
         )
 

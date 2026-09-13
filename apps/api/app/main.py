@@ -23,6 +23,9 @@ from app.routers import (
     power,
     projects,
     prompt_edit,
+    relationships,
+    scene_engine,
+    stakes,
     twists,
 )
 
@@ -55,3 +58,6 @@ app.include_router(twists.router)
 app.include_router(power.router)
 app.include_router(genre.router)
 app.include_router(prompt_edit.router)
+app.include_router(scene_engine.router)
+app.include_router(relationships.router)
+app.include_router(stakes.router)

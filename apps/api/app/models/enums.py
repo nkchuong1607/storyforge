@@ -79,6 +79,9 @@ class ContinuityCategory(StrEnum):
     foreshadow = "foreshadow"
     psychology = "psychology"
     power_system = "power_system"
+    scene_structure = "scene_structure"
+    relationship_arc = "relationship_arc"
+    stakes = "stakes"
 
 
 class TwistPlanStatus(StrEnum):
@@ -114,6 +117,8 @@ class LedgerEntityType(StrEnum):
     object = "object"
     knowledge = "knowledge"
     promise = "promise"
+    relationship = "relationship"
+    stakes = "stakes"
 
 
 class LedgerEventType(StrEnum):
@@ -124,6 +129,38 @@ class LedgerEventType(StrEnum):
     cultivation_change = "cultivation_change"
     technique_learned = "technique_learned"
     resource_consumed = "resource_consumed"
+    relationship_change = "relationship_change"
+    stakes_escalation = "stakes_escalation"
+
+
+class SceneType(StrEnum):
+    scene = "scene"
+    sequel = "sequel"
+    transition = "transition"
+    exposition = "exposition"
+
+
+class RelationType(StrEnum):
+    ally = "ally"
+    rival = "rival"
+    mentor = "mentor"
+    family = "family"
+    romantic = "romantic"
+    enemy = "enemy"
+    custom = "custom"
+
+
+class StakesEntryStatus(StrEnum):
+    planned = "planned"
+    planted = "planted"
+    resolved = "resolved"
+    abandoned = "abandoned"
+
+
+class SceneStrictness(StrEnum):
+    relaxed = "relaxed"
+    standard = "standard"
+    strict = "strict"
 
 
 class CharacterStatus(StrEnum):

@@ -1,0 +1,10 @@
+{
+  "issues": [
+    {
+      "code": "scene_llm_weak_turn",
+      "message": "Scene turn lacks clear value shift (stub)",
+      "chapter_refs": [1],
+      "evidence": {"source": "fake_llm"}
+    }
+  ]
+}

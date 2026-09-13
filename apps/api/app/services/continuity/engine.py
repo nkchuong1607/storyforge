@@ -12,7 +12,9 @@ from app.models.bible import BibleEntryStaging
 from app.models.character import Character
 from app.models.enums import ContinuityCategory, ContinuityResult, ContinuitySeverity
 
-RULE_PACK_VERSION = "deterministic-v1+foreshadow-v1+psychology-v1+power-v1"
+RULE_PACK_VERSION = (
+    "deterministic-v1+foreshadow-v1+psychology-v1+power-v1+scene-v1+relationship-v1+stakes-v1"
+)
 
 DEATH_KEYWORDS = ("chết", "tử vong", "băng hà", "mất mạng")
 TRANSITION_KEYWORDS = ("đến", "tới", "rời", "đi tới", "quay về")
@@ -269,6 +271,9 @@ def build_state_diff_stub(
     psyche_card_patches: list[dict] | None = None,
     cultivation_proposals: list[dict] | None = None,
     power_snapshot_patch: dict | None = None,
+    relationship_event_proposals: list[dict] | None = None,
+    stakes_ledger_proposals: list[dict] | None = None,
+    scene_structure_summary: dict | None = None,
 ) -> dict[str, list | dict]:
     ledger_proposals: list[dict] = list(cultivation_proposals or [])
     bible_patch_candidates: list[dict] = []
@@ -308,11 +313,22 @@ def build_state_diff_stub(
                         }
                     )
 
+    if scene_structure_summary and chapter_id is not None:
+        bible_patch_candidates.append(
+            {
+                "path": "world.scene_structure_summary",
+                "op": "merge",
+                "value": {f"chapter_{chapter_id}": scene_structure_summary},
+            }
+        )
+
     result: dict[str, list | dict] = {
         "ledger_proposals": ledger_proposals,
         "bible_patch_candidates": bible_patch_candidates,
         "psych_state_proposals": psych_proposals,
         "psyche_card_patches": psyche_patches,
+        "relationship_event_proposals": list(relationship_event_proposals or []),
+        "stakes_ledger_proposals": list(stakes_ledger_proposals or []),
     }
     if power_snapshot_patch is not None:
         result["power_system_snapshot_patch"] = power_snapshot_patch
@@ -376,6 +392,12 @@ def run_continuity_checks(
     cultivation_proposals: list[dict] | None = None,
     power_snapshot_patch: dict | None = None,
     power_module_enabled: bool = False,
+    scene_issues: list[ContinuityIssue] | None = None,
+    relationship_issues: list[ContinuityIssue] | None = None,
+    stakes_issues: list[ContinuityIssue] | None = None,
+    relationship_event_proposals: list[dict] | None = None,
+    stakes_ledger_proposals: list[dict] | None = None,
+    scene_structure_summary: dict | None = None,
 ) -> tuple[list[dict], dict, dict, ContinuityResult]:
     """Run all Phase 2 + Phase 4 + Phase 5 rules; return issues, state_diff, stats, result."""
     raw_issues: list[ContinuityIssue] = []
@@ -420,6 +442,12 @@ def run_continuity_checks(
         raw_issues.extend(psychology_issues)
     if power_issues:
         raw_issues.extend(power_issues)
+    if scene_issues:
+        raw_issues.extend(scene_issues)
+    if relationship_issues:
+        raw_issues.extend(relationship_issues)
+    if stakes_issues:
+        raw_issues.extend(stakes_issues)
 
     state_diff = build_state_diff_stub(
         prose=prose,
@@ -430,6 +458,9 @@ def run_continuity_checks(
         psyche_card_patches=psyche_card_patches,
         cultivation_proposals=cultivation_proposals,
         power_snapshot_patch=power_snapshot_patch,
+        relationship_event_proposals=relationship_event_proposals,
+        stakes_ledger_proposals=stakes_ledger_proposals,
+        scene_structure_summary=scene_structure_summary,
     )
     for proposal in state_diff.get("ledger_proposals", []):
         if proposal.get("event_type") == "status_change":

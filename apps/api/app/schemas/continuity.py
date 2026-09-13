@@ -26,6 +26,8 @@ class StateDiff(BaseModel):
     psyche_card_patches: list[dict[str, Any]] = Field(default_factory=list)
     psych_state_proposals: list[dict[str, Any]] = Field(default_factory=list)
     power_system_snapshot_patch: dict[str, Any] | None = None
+    relationship_event_proposals: list[dict[str, Any]] = Field(default_factory=list)
+    stakes_ledger_proposals: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class ContinuityReport(BaseModel):
@@ -70,4 +72,7 @@ class SettleChapterResponse(BaseModel):
     bible_version_after: int
     ledger_events_appended: int
     psych_states_appended: int = 0
+    relationship_events_appended: int = 0
+    stakes_entries_updated: int = 0
+    snapshot_includes: list[str] = Field(default_factory=list)
     settled_at: datetime

@@ -107,6 +107,8 @@ async def test_beat_service_crud_success() -> None:
     service.beats.delete = AsyncMock()
     service.beats.list_for_chapter = AsyncMock(return_value=[beat])
     session.refresh = AsyncMock()
+    settings = MagicMock(require_outcome_on_complete=True)
+    service.scene_engine.settings_repo.ensure_settings = AsyncMock(return_value=settings)
 
     created = await service.create_beat(
         chapter, SceneBeatCreateRequest(beat_key="1.1", summary="s", sort_order=1)
@@ -114,7 +116,11 @@ async def test_beat_service_crud_success() -> None:
     assert created.beat_key == "1.1"
     listed = await service.list_beats(chapter)
     assert len(listed) == 1
-    updated = await service.update_beat(chapter, beat.id, SceneBeatUpdateRequest(completed=True))
+    updated = await service.update_beat(
+        chapter,
+        beat.id,
+        SceneBeatUpdateRequest(completed=True, outcome="Resolved outcome"),
+    )
     assert updated.beat_key == "1.1"
     await service.delete_beat(chapter, beat.id)
 
@@ -238,6 +244,18 @@ async def test_continuity_service_run_check() -> None:
     service.power.ensure_settings = AsyncMock(return_value=power_settings)
     service.power.list_ranks = AsyncMock(return_value=[])
     service.power.list_techniques = AsyncMock(return_value=[])
+    scene_settings = MagicMock(enabled=True, strictness="standard")
+    service.scene_engine.ensure_settings = AsyncMock(return_value=scene_settings)
+    stakes_settings = MagicMock(
+        enabled=True,
+        act_count=3,
+        chapters_per_act=[],
+        flat_middle_window_chapters=3,
+    )
+    service.stakes.ensure_settings = AsyncMock(return_value=stakes_settings)
+    service.stakes.list_entries = AsyncMock(return_value=[])
+    service.relationships.list_all_for_project = AsyncMock(return_value=[])
+    service.relationships.list_settled_events_for_project = AsyncMock(return_value=[])
     project.genre_profile = None
     project.genre_rule_pack_json = {}
     session.refresh = AsyncMock()
@@ -462,6 +480,9 @@ async def test_settle_service_success_path() -> None:
     service.twists.mark_payoffs_revealed_for_chapter = AsyncMock(return_value=0)
     power_settings = MagicMock(enabled=False)
     service.power.ensure_settings = AsyncMock(return_value=power_settings)
+    stakes_settings = MagicMock(enabled=False, act_count=3)
+    service.stakes.ensure_settings = AsyncMock(return_value=stakes_settings)
+    service.stakes.list_entries = AsyncMock(return_value=[])
     session.flush = AsyncMock()
 
     from app.services import settle as settle_module
