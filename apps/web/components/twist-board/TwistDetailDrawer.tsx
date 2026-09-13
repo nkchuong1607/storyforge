@@ -165,7 +165,10 @@ export function TwistDetailDrawer({
               <ul className="mt-2 space-y-2">
                 {plants.map((plant) => (
                   <li key={plant.id} className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
-                    {t("psych.timeline.chapterShort", { number: plant.chapter_number })}:{" "}
+                    {t("psych.timeline.chapterShort", {
+                      number: plant.chapter_number ?? "?",
+                    })}
+                    :{" "}
                     {plant.snippet}
                   </li>
                 ))}

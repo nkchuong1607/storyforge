@@ -38,7 +38,7 @@ describe("CharactersPage", () => {
     render(<CharactersPage projectId={projectId} />);
     expect(await screen.findByRole("heading", { name: "Nhân vật" })).toBeInTheDocument();
     expect(screen.getByText("Lý Phong")).toBeInTheDocument();
-    expect(screen.getByText("Hộp thư tạm")).toBeInTheDocument();
+    expect(screen.getAllByText("Hộp thư tạm").length).toBeGreaterThan(0);
     expect(screen.getByText("Lý Thanh Vân")).toBeInTheDocument();
   });
 
@@ -146,7 +146,7 @@ describe("CharacterDetailPage", () => {
   it("renders overview tab", async () => {
     render(<CharacterDetailPage projectId={projectId} characterId={CHARACTER_1_ID} />);
     expect(await screen.findByRole("heading", { name: "Lý Phong" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Overview" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tổng quan" })).toBeInTheDocument();
     expect(screen.getByDisplayValue("Lý Phong")).toBeInTheDocument();
   });
 
@@ -163,7 +163,7 @@ describe("CharacterDetailPage", () => {
     const user = userEvent.setup();
     render(<CharacterDetailPage projectId={projectId} characterId={CHARACTER_1_ID} />);
     await screen.findByRole("heading", { name: "Lý Phong" });
-    await user.click(screen.getByRole("button", { name: "Psyche" }));
+    await user.click(screen.getByRole("button", { name: "Tâm lý" }));
     expect(replace).toHaveBeenCalledWith(
       `/projects/${projectId}/characters/${CHARACTER_1_ID}?tab=psyche`,
     );
@@ -330,7 +330,7 @@ describe("character components", () => {
     render(
       <CharactersHeader pendingCount={3} showInbox onToggleInbox={onToggle} onAdd={vi.fn()} />,
     );
-    await user.click(screen.getByRole("button", { name: /Inbox/ }));
+    await user.click(screen.getByRole("button", { name: /Hộp thư tạm/ }));
     expect(onToggle).toHaveBeenCalled();
   });
 

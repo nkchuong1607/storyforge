@@ -127,7 +127,9 @@ describe("Twist Board components", () => {
         ]}
       />,
     );
-    expect(screen.getByText("Outline tree — Phase 8")).toBeInTheDocument();
+    expect(
+      screen.getByText("Dàn ý chi tiết — sắp ra mắt (Phase 8+)"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Ch.1 — Ch 1")).toBeInTheDocument();
 
     render(<TimelineStubTab />);
