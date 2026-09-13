@@ -24,6 +24,9 @@ from app.repositories.ledger import LedgerRepository
 from app.repositories.power import PowerRepository
 from app.repositories.prose import ProseRepository
 from app.repositories.psych_state import PsychStateRepository
+from app.repositories.relationship import RelationshipRepository
+from app.repositories.scene_engine import SceneEngineRepository
+from app.repositories.stakes import StakesRepository
 from app.repositories.twist import TwistRepository
 from app.schemas.continuity import (
     ContinuityCheckRequest,
@@ -56,6 +59,16 @@ from app.services.continuity.psychology import (
     build_psych_state_proposals,
     run_psychology_checks,
 )
+from app.services.continuity.relationship import (
+    build_relationship_event_proposals,
+    run_relationship_checks,
+)
+from app.services.continuity.scene import build_scene_structure_summary, run_scene_structure_checks
+from app.services.continuity.stakes import (
+    build_stakes_ledger_proposals,
+    resolve_act_for_chapter,
+    run_stakes_checks,
+)
 from app.services.genre_defaults import merged_genre_pack
 
 
@@ -72,6 +85,9 @@ class ContinuityService:
         self.twists = TwistRepository(session)
         self.psych_states = PsychStateRepository(session)
         self.power = PowerRepository(session)
+        self.scene_engine = SceneEngineRepository(session)
+        self.relationships = RelationshipRepository(session)
+        self.stakes = StakesRepository(session)
 
     def _report_schema(self, report: ContinuityReport) -> ContinuityReportSchema:
         return ContinuityReportSchema(
@@ -128,7 +144,22 @@ class ContinuityService:
         characters = await self.characters.list_all_for_project(project.id)
         staging = await self.bible.list_all_staging(project.id)
         beat_rows = await self.beats.list_for_chapter(chapter.id)
-        beats = [{"id": str(b.id), "summary": b.summary, "beat_key": b.beat_key} for b in beat_rows]
+        beats = [
+            {
+                "id": str(b.id),
+                "summary": b.summary,
+                "beat_key": b.beat_key,
+                "completed": b.completed,
+                "goal": b.goal,
+                "conflict": b.conflict,
+                "outcome": b.outcome,
+                "stakes_level": b.stakes_level,
+                "sort_order": b.sort_order,
+                "pov_character_id": str(b.pov_character_id) if b.pov_character_id else None,
+                "scene_type": b.scene_type,
+            }
+            for b in beat_rows
+        ]
         overrides = await self.continuity.active_override_fingerprints(chapter.id)
 
         payoff_rows = await self.twists.list_payoffs_with_twists_for_chapter(project.id, chapter.id)
@@ -259,6 +290,74 @@ class ContinuityService:
             else []
         )
 
+        scene_settings = await self.scene_engine.ensure_settings(project.id)
+        stakes_settings = await self.stakes.ensure_settings(project.id)
+        stakes_entries = await self.stakes.list_entries(project.id)
+        act_number, _, _ = resolve_act_for_chapter(chapter.number, stakes_settings)
+        act_stakes_entries = [e for e in stakes_entries if e.act_number == act_number]
+
+        all_relationships = await self.relationships.list_all_for_project(project.id)
+        settled_rel_events = await self.relationships.list_settled_events_for_project(project.id)
+        relationship_proposals = build_relationship_event_proposals(
+            prose=prose_row.content,
+            relationships=all_relationships,
+            characters=characters,
+            chapter_id=chapter.id,
+        )
+        stakes_proposals = build_stakes_ledger_proposals(
+            beats=beat_rows,
+            entries=act_stakes_entries,
+            chapter_id=chapter.id,
+            act_number=act_number,
+        )
+
+        scene_raw = run_scene_structure_checks(
+            beats=beat_rows,
+            chapter_number=chapter.number,
+            settings=scene_settings,
+            characters=characters,
+            genre_pack=genre_pack,
+            stakes_entries=act_stakes_entries,
+            relationship_event_proposals=relationship_proposals,
+        )
+        relationship_raw = run_relationship_checks(
+            prose=prose_row.content,
+            chapter_number=chapter.number,
+            characters=characters,
+            relationships=all_relationships,
+            settled_events=settled_rel_events,
+            relationship_event_proposals=relationship_proposals,
+            beats=beat_rows,
+        )
+        stakes_raw = run_stakes_checks(
+            project_id=project.id,
+            chapter_number=chapter.number,
+            settings=stakes_settings,
+            entries=stakes_entries,
+            beats=beat_rows,
+            genre_pack=genre_pack,
+            stakes_ledger_proposals=stakes_proposals,
+        )
+        scene_summary = build_scene_structure_summary(beat_rows)
+
+        for proposal in relationship_proposals:
+            rel_id = proposal.get("relationship_id")
+            if rel_id:
+                proposal.setdefault(
+                    "ledger_proposal",
+                    {
+                        "entity_type": "relationship",
+                        "entity_id": rel_id,
+                        "event_type": "relationship_change",
+                        "payload": {
+                            "intensity_delta": proposal.get("intensity_delta", 0),
+                            "intensity_after": proposal.get("intensity_after"),
+                            "relation_type_after": proposal.get("relation_type_after"),
+                            "event_type": proposal.get("event_type"),
+                        },
+                    },
+                )
+
         issues, state_diff, stats, result = run_continuity_checks(
             prose=prose_row.content,
             chapter_number=chapter.number,
@@ -278,6 +377,12 @@ class ContinuityService:
             cultivation_proposals=cultivation_proposals,
             power_snapshot_patch=power_snapshot_patch,
             power_module_enabled=power_enabled,
+            scene_issues=scene_raw,
+            relationship_issues=relationship_raw,
+            stakes_issues=stakes_raw,
+            relationship_event_proposals=relationship_proposals,
+            stakes_ledger_proposals=stakes_proposals,
+            scene_structure_summary=scene_summary,
         )
 
         report = ContinuityReport(

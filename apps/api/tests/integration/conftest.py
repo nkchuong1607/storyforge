@@ -12,6 +12,11 @@ async def reset_database(engine) -> AsyncGenerator[None, None]:
     tables = (
         "prompt_edit_turns",
         "prompt_edit_sessions",
+        "relationship_events",
+        "relationships",
+        "stakes_ledger_entries",
+        "act_structure_settings",
+        "scene_engine_settings",
         "power_techniques",
         "power_ranks",
         "power_system_settings",
