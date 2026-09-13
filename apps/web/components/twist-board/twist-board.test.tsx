@@ -269,7 +269,9 @@ describe("TwistBoardPage", () => {
 
   it("shows outline stub tab content", async () => {
     render(<TwistBoardPage projectId={PROJECT_1_ID} activeTab="outline" />);
-    expect(await screen.findByText("Outline tree — Phase 8")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Dàn ý chi tiết — sắp ra mắt (Phase 8+)"),
+    ).toBeInTheDocument();
   });
 
   it("shows timeline stub tab content", async () => {
@@ -289,7 +291,7 @@ describe("TwistBoardPage", () => {
       ),
     );
     render(<TwistBoardPage projectId={PROJECT_1_ID} activeTab="twist-board" />);
-    expect(await screen.findByText("Không tải được outline/twist")).toBeInTheDocument();
+    expect(await screen.findByText("Không tải được twist board")).toBeInTheDocument();
   });
 
   it("shows empty secrets CTA when no twists", async () => {

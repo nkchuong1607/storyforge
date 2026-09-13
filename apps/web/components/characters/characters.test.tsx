@@ -38,7 +38,7 @@ describe("CharactersPage", () => {
     render(<CharactersPage projectId={projectId} />);
     expect(await screen.findByRole("heading", { name: "Nhân vật" })).toBeInTheDocument();
     expect(screen.getByText("Lý Phong")).toBeInTheDocument();
-    expect(screen.getByText("Provisional inbox")).toBeInTheDocument();
+    expect(screen.getByText("Hộp thư tạm")).toBeInTheDocument();
     expect(screen.getByText("Lý Thanh Vân")).toBeInTheDocument();
   });
 
@@ -263,7 +263,7 @@ describe("character components", () => {
         onArchive={vi.fn()}
       />,
     );
-    await user.click(screen.getByRole("button", { name: "Promote" }));
+    await user.click(screen.getByRole("button", { name: "Promote tier" }));
     expect(onPromote).toHaveBeenCalled();
   });
 

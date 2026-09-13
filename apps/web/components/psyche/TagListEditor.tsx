@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "@/lib/i18n/use-translations";
+
 interface TagListEditorProps {
   label: string;
   values: string[];
@@ -17,6 +19,8 @@ export function TagListEditor({
   error,
   required,
 }: TagListEditorProps) {
+  const t = useTranslations();
+
   const addValue = (raw: string) => {
     const trimmed = raw.trim();
     if (!trimmed || values.includes(trimmed)) return;
@@ -38,7 +42,7 @@ export function TagListEditor({
             {value}
             <button
               type="button"
-              aria-label={`Xóa ${value}`}
+              aria-label={t("psych.removeTagAria", { value })}
               className="text-indigo-500 hover:text-indigo-800"
               onClick={() => onChange(values.filter((item) => item !== value))}
             >
@@ -49,7 +53,7 @@ export function TagListEditor({
       </div>
       <input
         type="text"
-        placeholder={placeholder ?? "Nhập và Enter để thêm"}
+        placeholder={placeholder ?? t("psych.tagInputPlaceholder")}
         className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
         onKeyDown={(event) => {
           if (event.key === "Enter") {

@@ -1,17 +1,24 @@
 import type { PowerRank } from "./api/types";
+import { createTranslator, type Translator } from "./i18n/get-messages";
+import { defaultLocale } from "./i18n/config";
 
-export function validateRankMonotonic(ranks: PowerRank[]): string | null {
+export function validateRankMonotonic(ranks: PowerRank[], t?: Translator): string | null {
+  const translate = t ?? createTranslator(defaultLocale);
   const sorted = [...ranks].sort((a, b) => a.sort_order - b.sort_order);
   for (let i = 1; i < sorted.length; i++) {
     if (sorted[i]!.sort_order <= sorted[i - 1]!.sort_order) {
-      return `Cảnh giới "${sorted[i]!.display_name}" phải có thứ tự cao hơn "${sorted[i - 1]!.display_name}"`;
+      return translate("power.validationMonotonicDetail", {
+        name: sorted[i]!.display_name,
+        prevName: sorted[i - 1]!.display_name,
+      });
     }
   }
   return null;
 }
 
-export function antiCreepTip(priorityGap: number, maxJump: number): string {
-  return `Priority gap ${priorityGap} — nhân vật yếu hơn ≥${priorityGap} rank khó thắng trận. Tối đa ${maxJump} rank/chương.`;
+export function antiCreepTip(priorityGap: number, maxJump: number, t?: Translator): string {
+  const translate = t ?? createTranslator(defaultLocale);
+  return translate("power.antiCreepTip", { gap: priorityGap, maxJump });
 }
 
 export function nextSortOrder(ranks: PowerRank[]): number {

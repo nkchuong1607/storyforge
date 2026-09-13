@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "@/lib/i18n/use-translations";
+
 interface ValueHierarchyEditorProps {
   values: string[];
   onChange: (values: string[]) => void;
@@ -13,6 +15,8 @@ export function ValueHierarchyEditor({
   error,
   required,
 }: ValueHierarchyEditorProps) {
+  const t = useTranslations();
+
   const move = (index: number, direction: -1 | 1) => {
     const next = [...values];
     const target = index + direction;
@@ -25,19 +29,24 @@ export function ValueHierarchyEditor({
     <div>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-slate-900">
-          Value hierarchy
+          {t("psych.valueHierarchy.title")}
           {required ? <span className="text-red-600"> *</span> : null}
         </h3>
         <button
           type="button"
           className="text-xs font-medium text-indigo-600"
-          onClick={() => onChange([...values, `Giá trị ${values.length + 1}`])}
+          onClick={() =>
+            onChange([
+              ...values,
+              t("psych.valueHierarchy.defaultValue", { index: values.length + 1 }),
+            ])
+          }
         >
-          + Thêm
+          + {t("common.add")}
         </button>
       </div>
       {values.length === 0 ? (
-        <p className="mt-2 text-sm text-slate-500">Chưa có giá trị nào.</p>
+        <p className="mt-2 text-sm text-slate-500">{t("psych.valueHierarchy.empty")}</p>
       ) : (
         <ol className="mt-2 space-y-2">
           {values.map((value, index) => (
@@ -47,7 +56,7 @@ export function ValueHierarchyEditor({
             >
               <span className="w-6 text-xs font-semibold text-slate-400">{index + 1}</span>
               <input
-                aria-label={`Giá trị ${index + 1}`}
+                aria-label={t("psych.valueHierarchy.valueAria", { index: index + 1 })}
                 value={value}
                 onChange={(event) => {
                   const next = [...values];
@@ -58,7 +67,7 @@ export function ValueHierarchyEditor({
               />
               <button
                 type="button"
-                aria-label="Di chuyển lên"
+                aria-label={t("psych.moveUpAria")}
                 disabled={index === 0}
                 className="text-xs text-slate-500 disabled:opacity-30"
                 onClick={() => move(index, -1)}
@@ -67,7 +76,7 @@ export function ValueHierarchyEditor({
               </button>
               <button
                 type="button"
-                aria-label="Di chuyển xuống"
+                aria-label={t("psych.moveDownAria")}
                 disabled={index === values.length - 1}
                 className="text-xs text-slate-500 disabled:opacity-30"
                 onClick={() => move(index, 1)}
@@ -76,7 +85,7 @@ export function ValueHierarchyEditor({
               </button>
               <button
                 type="button"
-                aria-label="Xóa giá trị"
+                aria-label={t("psych.removeValueAria")}
                 className="text-xs text-red-500"
                 onClick={() => onChange(values.filter((_, i) => i !== index))}
               >

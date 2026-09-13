@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   getCharacter,
   listCharacterProvisionals,
@@ -17,6 +17,7 @@ import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
 import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
 import { CharacterPsycheTab } from "@/components/psyche/CharacterPsycheTab";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { CharacterOverviewTab } from "./CharacterOverviewTab";
 import { CharacterRelationshipsPanel } from "./CharacterRelationshipsPanel";
 
@@ -28,18 +29,13 @@ interface CharacterDetailPageProps {
   characterId: string;
 }
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "psyche", label: "Psyche" },
-  { id: "relationships", label: "Relationships" },
-];
-
 function parseTab(value: string | null): TabId {
   if (value === "psyche" || value === "relationships") return value;
   return "overview";
 }
 
 export function CharacterDetailPage({ projectId, characterId }: CharacterDetailPageProps) {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = parseTab(searchParams.get("tab"));
@@ -49,6 +45,16 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
+  const tabs = useMemo(
+    () =>
+      [
+        { id: "overview" as const, label: t("characters.tabs.overview") },
+        { id: "psyche" as const, label: t("characters.tabs.psyche") },
+        { id: "relationships" as const, label: t("characters.tabs.relationships") },
+      ] as const,
+    [t],
+  );
 
   const loadPage = useCallback(async () => {
     setLoadState("loading");
@@ -98,12 +104,12 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
           .filter(Boolean),
       });
       setCharacter(updated);
-      setToast("Đã lưu nhân vật");
+      setToast(t("characters.toastSaved"));
     } catch (err: unknown) {
       if (err instanceof ApiError && err.status === 409) {
-        setToast("Nhân vật đã lưu trữ");
+        setToast(t("characters.toastAlreadyArchived"));
       } else {
-        setToast("Không thể lưu");
+        setToast(t("characters.toastError"));
       }
     } finally {
       setSaving(false);
@@ -117,9 +123,9 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
         confirm_t3: character.tier === 2,
       });
       setCharacter(updated);
-      setToast("Đã promote tier");
+      setToast(t("characters.toastPromoted"));
     } catch {
-      setToast("Không thể promote tier");
+      setToast(t("characters.toastPromoteFailed"));
     }
   };
 
@@ -128,9 +134,9 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
     try {
       const updated = await updateCharacter(projectId, character.id, { status: "archived" });
       setCharacter(updated);
-      setToast("Đã lưu trữ nhân vật");
+      setToast(t("characters.toastArchived"));
     } catch {
-      setToast("Không thể lưu trữ");
+      setToast(t("characters.toastArchiveFailed"));
     }
   };
 
@@ -138,12 +144,12 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
     return (
       <AppShell>
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy nhân vật</h1>
+          <h1 className="text-lg font-semibold text-slate-900">{t("characters.notFound")}</h1>
           <Link
             href={`/projects/${projectId}/characters`}
             className="mt-4 inline-block text-sm font-medium text-indigo-600"
           >
-            ← Về danh sách nhân vật
+            {t("characters.backToList")}
           </Link>
         </div>
       </AppShell>
@@ -163,7 +169,7 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
   return (
     <AppShell sidebar={sidebar}>
       {loadState === "error" ? (
-        <ErrorBanner message="Không tải được nhân vật" onRetry={() => void loadPage()} />
+        <ErrorBanner message={t("characters.errorLoad")} onRetry={() => void loadPage()} />
       ) : null}
       {toast ? (
         <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
@@ -180,12 +186,12 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
               href={`/projects/${projectId}/characters`}
               className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
             >
-              ← Nhân vật
+              {t("characters.backLink")}
             </Link>
             <h1 className="mt-2 text-xl font-bold text-slate-900">{character.display_name}</h1>
           </div>
           <div className="mb-4 flex flex-wrap gap-2 border-b border-slate-200">
-            {TABS.map((tab) => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
@@ -216,7 +222,7 @@ export function CharacterDetailPage({ projectId, characterId }: CharacterDetailP
             <CharacterPsycheTab
               projectId={projectId}
               character={character}
-              onSaved={() => setToast("Đã lưu psyche card")}
+              onSaved={() => setToast(t("psych.toastSaved"))}
             />
           ) : null}
           {activeTab === "relationships" ? (

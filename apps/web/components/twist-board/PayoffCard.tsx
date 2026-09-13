@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import type { TwistBoardCard } from "@/lib/api/types";
 import { continuityGatePath } from "@/lib/chapter-routes";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface PayoffCardProps {
   card: TwistBoardCard;
@@ -10,6 +13,7 @@ interface PayoffCardProps {
 }
 
 export function PayoffCard({ card, projectId, targetChapterId, onClick }: PayoffCardProps) {
+  const t = useTranslations();
   const fairness = card.fairness?.state ?? "ok";
   const borderClass =
     fairness === "fail"
@@ -23,8 +27,11 @@ export function PayoffCard({ card, projectId, targetChapterId, onClick }: Payoff
       <button type="button" onClick={onClick} className="w-full text-left">
         <h4 className="text-sm font-semibold text-slate-900">{card.twist_title}</h4>
         <p className="mt-1 text-xs text-slate-600">
-          Payoff ch.{card.target_chapter_number} · min {card.min_plants} plants · có{" "}
-          {card.plant_count ?? 0}
+          {t("twist.payoffMeta", {
+            chapter: card.target_chapter_number ?? "?",
+            minPlants: card.min_plants ?? 0,
+            count: card.plant_count ?? 0,
+          })}
         </p>
       </button>
       {fairness === "fail" && card.fairness?.issue_codes?.length ? (
@@ -35,7 +42,7 @@ export function PayoffCard({ card, projectId, targetChapterId, onClick }: Payoff
               href={continuityGatePath(projectId, targetChapterId)}
               className="mt-1 inline-block font-medium underline"
             >
-              Mở Continuity Gate
+              {t("twist.openContinuityGate")}
             </Link>
           ) : null}
         </div>

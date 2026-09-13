@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { listPsychStates } from "@/lib/api/psych";
 import type { PsychState } from "@/lib/api/types";
 import { LoadingSkeleton } from "@/components/ui/LoadingSkeleton";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { PsychStateDetailPopover } from "./PsychStateDetailPopover";
 import { StressBeliefChart } from "./StressBeliefChart";
 
@@ -13,6 +14,7 @@ interface PsychStateTimelineProps {
 }
 
 export function PsychStateTimeline({ projectId, characterId }: PsychStateTimelineProps) {
+  const t = useTranslations();
   const [states, setStates] = useState<PsychState[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<PsychState | null>(null);
@@ -38,7 +40,7 @@ export function PsychStateTimeline({ projectId, characterId }: PsychStateTimelin
   if (loading) {
     return (
       <div className="mt-6">
-        <h3 className="mb-2 text-sm font-semibold text-slate-900">PsychState timeline</h3>
+        <h3 className="mb-2 text-sm font-semibold text-slate-900">{t("psych.timeline.title")}</h3>
         <LoadingSkeleton variant="content" count={1} />
       </div>
     );
@@ -47,14 +49,14 @@ export function PsychStateTimeline({ projectId, characterId }: PsychStateTimelin
   if (states.length === 0) {
     return (
       <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        Chưa có PsychState — settle chương có nhân vật này
+        {t("psych.timelineEmpty")}
       </div>
     );
   }
 
   return (
     <div className="mt-6 space-y-4">
-      <h3 className="text-sm font-semibold text-slate-900">PsychState timeline</h3>
+      <h3 className="text-sm font-semibold text-slate-900">{t("psych.timeline.title")}</h3>
       <StressBeliefChart
         states={states}
         selectedId={selected?.id}

@@ -1,4 +1,6 @@
 import type { CharacterTier, PsycheCard } from "./api/types";
+import { createTranslator, type Translator } from "./i18n/get-messages";
+import { defaultLocale } from "./i18n/config";
 
 export interface PsycheValidationErrors {
   moral_boundaries?: string;
@@ -43,14 +45,19 @@ export function mergePsycheCard(current: PsycheCard, patch: PsycheCard): PsycheC
   };
 }
 
-export function validatePsycheCard(tier: CharacterTier, card: PsycheCard): PsycheValidationErrors {
+export function validatePsycheCard(
+  tier: CharacterTier,
+  card: PsycheCard,
+  t?: Translator,
+): PsycheValidationErrors {
+  const translate = t ?? createTranslator(defaultLocale);
   const errors: PsycheValidationErrors = {};
   if (tier >= 3) {
     if (!card.value_hierarchy?.length) {
-      errors.value_hierarchy = "T3 yêu cầu value hierarchy";
+      errors.value_hierarchy = translate("psych.validation.valueHierarchy");
     }
     if (!card.moral_boundaries?.length) {
-      errors.moral_boundaries = "T3 yêu cầu ít nhất một moral boundary";
+      errors.moral_boundaries = translate("psych.validation.moralBoundaries");
     }
   }
   return errors;

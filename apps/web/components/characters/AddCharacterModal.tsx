@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface AddCharacterModalProps {
   open: boolean;
@@ -9,6 +10,7 @@ interface AddCharacterModalProps {
 }
 
 export function AddCharacterModal({ open, onClose, onSubmit }: AddCharacterModalProps) {
+  const t = useTranslations();
   const [displayName, setDisplayName] = useState("");
   const [roleOneLiner, setRoleOneLiner] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -27,7 +29,7 @@ export function AddCharacterModal({ open, onClose, onSubmit }: AddCharacterModal
       setRoleOneLiner("");
       onClose();
     } catch {
-      setError("Không thể tạo nhân vật");
+      setError(t("characters.toastCreateError"));
     } finally {
       setSubmitting(false);
     }
@@ -41,11 +43,11 @@ export function AddCharacterModal({ open, onClose, onSubmit }: AddCharacterModal
         className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl"
       >
         <h2 id="add-character-title" className="text-lg font-semibold text-slate-900">
-          Thêm nhân vật
+          {t("characters.addCharacter")}
         </h2>
         <form onSubmit={(event) => void handleSubmit(event)} className="mt-4 space-y-4">
           <label className="block text-sm font-medium text-slate-700">
-            Tên hiển thị
+            {t("characters.displayName")}
             <input
               value={displayName}
               onChange={(event) => setDisplayName(event.target.value)}
@@ -54,7 +56,7 @@ export function AddCharacterModal({ open, onClose, onSubmit }: AddCharacterModal
             />
           </label>
           <label className="block text-sm font-medium text-slate-700">
-            Vai trò (một dòng)
+            {t("characters.roleOneLiner")}
             <input
               value={roleOneLiner}
               onChange={(event) => setRoleOneLiner(event.target.value)}
@@ -68,14 +70,14 @@ export function AddCharacterModal({ open, onClose, onSubmit }: AddCharacterModal
               onClick={onClose}
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700"
             >
-              Hủy
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
               disabled={submitting}
               className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
-              {submitting ? "Đang tạo…" : "Tạo"}
+              {submitting ? t("common.creating") : t("characters.create")}
             </button>
           </div>
         </form>

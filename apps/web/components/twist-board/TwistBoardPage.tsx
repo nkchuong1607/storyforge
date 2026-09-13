@@ -10,6 +10,7 @@ import { countFairnessFails } from "@/lib/twist-utils";
 import { AppShell } from "@/components/ui/AppShell";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { ProjectSidebar } from "@/components/hub/ProjectSidebar";
+import { useTranslations } from "@/lib/i18n/use-translations";
 import { CreateSecretModal } from "./CreateSecretModal";
 import { FairnessCheckPanel } from "./FairnessCheckPanel";
 import { OutlineStubTab } from "./OutlineStubTab";
@@ -27,6 +28,7 @@ interface TwistBoardPageProps {
 }
 
 export function TwistBoardPage({ projectId, activeTab }: TwistBoardPageProps) {
+  const t = useTranslations();
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [board, setBoard] = useState<Awaited<ReturnType<typeof getTwistBoard>> | null>(null);
@@ -110,9 +112,9 @@ export function TwistBoardPage({ projectId, activeTab }: TwistBoardPageProps) {
     return (
       <AppShell>
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
-          <h1 className="text-lg font-semibold text-slate-900">Không tìm thấy dự án</h1>
+          <h1 className="text-lg font-semibold text-slate-900">{t("hub.notFound")}</h1>
           <Link href="/" className="mt-4 inline-block text-sm font-medium text-indigo-600">
-            ← Về Dashboard
+            {t("common.backToDashboard")}
           </Link>
         </div>
       </AppShell>
@@ -132,7 +134,7 @@ export function TwistBoardPage({ projectId, activeTab }: TwistBoardPageProps) {
   return (
     <AppShell sidebar={sidebar}>
       {loadState === "error" ? (
-        <ErrorBanner message="Không tải được outline/twist" onRetry={() => void loadPage()} />
+        <ErrorBanner message={t("twist.errorLoad")} onRetry={() => void loadPage()} />
       ) : null}
 
       {project ? (

@@ -1,29 +1,27 @@
 "use client";
 
 import type { PsycheCard } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface PsycheCoreFieldsProps {
   card: PsycheCard;
   onChange: (card: PsycheCard) => void;
 }
 
-const FIELDS: { key: keyof PsycheCard; label: string; multiline?: boolean }[] = [
-  { key: "drive", label: "Drive", multiline: true },
-  { key: "need", label: "Need", multiline: true },
-  { key: "wound", label: "Wound", multiline: true },
-  { key: "fear", label: "Fear", multiline: true },
-  { key: "defense", label: "Defense" },
-];
+const FIELD_KEYS = ["drive", "need", "wound", "fear", "defense"] as const;
+const MULTILINE_KEYS = new Set<typeof FIELD_KEYS[number]>(["drive", "need", "wound", "fear"]);
 
 export function PsycheCoreFields({ card, onChange }: PsycheCoreFieldsProps) {
+  const t = useTranslations();
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {FIELDS.map(({ key, label, multiline }) => (
-        <div key={key} className={multiline ? "md:col-span-2" : undefined}>
+      {FIELD_KEYS.map((key) => (
+        <div key={key} className={MULTILINE_KEYS.has(key) ? "md:col-span-2" : undefined}>
           <label htmlFor={`psyche-${key}`} className="block text-sm font-medium text-slate-700">
-            {label}
+            {t(`psych.fields.${key}`)}
           </label>
-          {multiline ? (
+          {MULTILINE_KEYS.has(key) ? (
             <textarea
               id={`psyche-${key}`}
               rows={3}

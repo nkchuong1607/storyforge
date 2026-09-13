@@ -1,6 +1,7 @@
 "use client";
 
 import type { PsychState } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface StressBeliefChartProps {
   states: PsychState[];
@@ -9,6 +10,8 @@ interface StressBeliefChartProps {
 }
 
 export function StressBeliefChart({ states, selectedId, onSelect }: StressBeliefChartProps) {
+  const t = useTranslations();
+
   if (states.length === 0) return null;
 
   const maxChapter = Math.max(...states.map((s) => s.chapter_number ?? 1));
@@ -56,7 +59,9 @@ export function StressBeliefChart({ states, selectedId, onSelect }: StressBelief
             className="text-center hover:text-indigo-600"
             onClick={() => onSelect(state)}
           >
-            <div>Ch.{state.chapter_number}</div>
+            <div>
+              {t("psych.timeline.chapterShort", { number: state.chapter_number ?? "?" })}
+            </div>
             <div className="font-medium text-slate-700">{state.dominant_emotion}</div>
           </button>
         ))}

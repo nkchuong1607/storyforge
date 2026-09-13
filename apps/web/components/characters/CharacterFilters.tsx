@@ -1,7 +1,8 @@
 "use client";
 
 import type { CharacterStatus, CharacterTier } from "@/lib/api/types";
-import { CHARACTER_STATUS_LABELS, CHARACTER_TIER_LABELS } from "@/lib/labels";
+import { useLabelHelpers } from "@/lib/labels";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 export interface CharacterFilterValues {
   tier: "" | CharacterTier;
@@ -14,13 +15,19 @@ interface CharacterFiltersProps {
   onChange: (values: CharacterFilterValues) => void;
 }
 
+const TIERS: CharacterTier[] = [0, 1, 2, 3];
+const STATUSES: CharacterStatus[] = ["established", "provisional", "archived"];
+
 export function CharacterFilters({ values, onChange }: CharacterFiltersProps) {
+  const t = useTranslations();
+  const labels = useLabelHelpers(t);
+
   return (
     <div className="mb-4 flex flex-wrap gap-3">
       <label className="flex flex-col gap-1 text-xs font-medium text-slate-500">
-        Hạng
+        {t("characters.tier")}
         <select
-          aria-label="Lọc theo hạng"
+          aria-label={t("characters.filterTier")}
           value={values.tier === "" ? "" : String(values.tier)}
           onChange={(event) =>
             onChange({
@@ -30,18 +37,18 @@ export function CharacterFilters({ values, onChange }: CharacterFiltersProps) {
           }
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
         >
-          <option value="">Tất cả</option>
-          {(Object.keys(CHARACTER_TIER_LABELS) as unknown as CharacterTier[]).map((tier) => (
+          <option value="">{t("characters.filterAll")}</option>
+          {TIERS.map((tier) => (
             <option key={tier} value={tier}>
-              {CHARACTER_TIER_LABELS[tier]}
+              {labels.characterTier(tier)}
             </option>
           ))}
         </select>
       </label>
       <label className="flex flex-col gap-1 text-xs font-medium text-slate-500">
-        Trạng thái
+        {t("characters.status")}
         <select
-          aria-label="Lọc theo trạng thái"
+          aria-label={t("characters.filterStatus")}
           value={values.status}
           onChange={(event) =>
             onChange({
@@ -51,20 +58,20 @@ export function CharacterFilters({ values, onChange }: CharacterFiltersProps) {
           }
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
         >
-          <option value="">Đang hoạt động</option>
-          {(Object.keys(CHARACTER_STATUS_LABELS) as CharacterStatus[]).map((status) => (
+          <option value="">{t("characters.filterActive")}</option>
+          {STATUSES.map((status) => (
             <option key={status} value={status}>
-              {CHARACTER_STATUS_LABELS[status]}
+              {labels.characterStatus(status)}
             </option>
           ))}
         </select>
       </label>
       <label className="min-w-[220px] flex-1 flex-col gap-1 text-xs font-medium text-slate-500 sm:flex">
-        Tìm kiếm
+        {t("common.search")}
         <input
-          aria-label="Tìm kiếm nhân vật"
+          aria-label={t("characters.searchLabel")}
           type="search"
-          placeholder="Tìm kiếm nhân vật…"
+          placeholder={t("characters.searchPlaceholder")}
           value={values.q}
           onChange={(event) => onChange({ ...values, q: event.target.value })}
           className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"

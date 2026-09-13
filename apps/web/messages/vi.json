@@ -112,6 +112,32 @@
       "timeline": "Dòng thời gian",
       "characters": "Nhân vật",
       "objects": "Vật phẩm"
+    },
+    "tabBible": "Bible",
+    "graphComingSoon": "Graph (sắp ra mắt)",
+    "searchComingSoon": "Tìm kiếm (sắp ra mắt)",
+    "entryErrorLoad": "Không tải được mục",
+    "defaultEntryTitle": "Mục mới",
+    "saveError": "Không lưu được. Vui lòng thử lại.",
+    "entryTitleLabel": "Tiêu đề",
+    "contentLabel": "Nội dung (Markdown)",
+    "stagingBadge": "Staging",
+    "toc": {
+      "empty": "Chưa có mục bible",
+      "createFirst": "+ Tạo mục đầu tiên",
+      "title": "Mục lục",
+      "addNew": "+ Mới"
+    },
+    "versionHistory": {
+      "title": "Lịch sử phiên bản",
+      "empty": "Chưa có phiên bản",
+      "entryCount": "{count} mục",
+      "settlePhase2": "Settle (Phase 2)",
+      "settleTitle": "Settle sẽ có trong Phase 2"
+    },
+    "entityLinks": {
+      "title": "Liên kết thực thể",
+      "empty": "Chưa có liên kết"
     }
   },
   "continuity": {
@@ -133,7 +159,36 @@
     "reject": "Từ chối",
     "requestRevise": "Yêu cầu sửa",
     "stateDiff": "State diff preview",
-    "issueTable": "Bảng vấn đề continuity"
+    "issueTable": "Bảng vấn đề continuity",
+    "notFoundReport": "Không tìm thấy báo cáo",
+    "backToEditor": "← Về Editor",
+    "refreshStateDiff": "Làm mới state diff",
+    "settleDisabledReason": "Còn FAIL chưa giải quyết hoặc override",
+    "settling": "Đang settle…",
+    "reportTitle": "Continuity Report — {chapterTitle}",
+    "statsSummary": "{passed} pass · {warnings} warn · {errors} fail",
+    "proseVersion": "Prose v{version}",
+    "markIntentionalTitle": "Đánh dấu cố ý",
+    "overrideReasonPlaceholder": "Lý do override…",
+    "issues": {
+      "empty": "Không có vấn đề continuity nào.",
+      "colSeverity": "Mức",
+      "colCategory": "Danh mục",
+      "colDescription": "Mô tả",
+      "colChapter": "Chương",
+      "colActions": "Hành động",
+      "linkPowerBible": "Power bible",
+      "linkFixInEditor": "Fix in editor"
+    },
+    "stateDiffSections": {
+      "ledgerProposals": "Ledger proposals",
+      "noProposals": "Không có đề xuất",
+      "biblePatches": "Bible patch candidates",
+      "noPatches": "Không có patch",
+      "psychProposals": "Psych state proposals",
+      "psychePatches": "Psyche card patches",
+      "psychProposalLine": "Stress {level}/10 — {emotion}: {goal}"
+    }
   },
   "wizard": {
     "title": "Tạo dự án mới",
@@ -150,7 +205,42 @@
     "validation": {
       "titleRequired": "Tiêu đề là bắt buộc",
       "slugRequired": "Slug là bắt buộc",
-      "slugInvalid": "Slug chỉ chứa chữ thường, số và dấu gạch ngang"
+      "slugInvalid": "Slug chỉ chứa chữ thường, số và dấu gạch ngang",
+      "titleRequiredVi": "Vui lòng nhập tên dự án"
+    },
+    "stepGenreSelect": "Chọn thể loại",
+    "stepTemplateSelect": "Chọn mẫu",
+    "stepBasicsShort": "Cơ bản",
+    "stepGenreShort": "Thể loại",
+    "stepTemplateShort": "Mẫu",
+    "stepConfirmShort": "Xác nhận",
+    "stepProgress": "Bước {current}/{total}",
+    "nextExtended": "Tiếp theo",
+    "slugConflictSuggested": "Slug đã tồn tại. Gợi ý: {suggested}",
+    "basics": {
+      "projectName": "Tên dự án",
+      "titlePlaceholder": "Ví dụ: Kiếm Lai",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Tóm tắt ngắn về dự án",
+      "language": "Ngôn ngữ",
+      "languageVi": "Tiếng Việt",
+      "languageEn": "English",
+      "languageMixed": "Hỗn hợp"
+    },
+    "confirm": {
+      "projectName": "Tên dự án",
+      "description": "Mô tả",
+      "language": "Ngôn ngữ",
+      "genre": "Thể loại",
+      "template": "Mẫu"
+    },
+    "genre": {
+      "promisesHeading": "Genre promises"
+    },
+    "template": {
+      "blankDescription": "Bắt đầu từ trang trắng, không seed bible.",
+      "xianxiaDescription": "Seed bible tiên hiệp: cảnh giới, phe phái, nhân vật T0.",
+      "mysteryDescription": "Seed bible trinh thám: bối cảnh, manh mối, nhân vật T0."
     }
   },
   "characters": {
@@ -187,7 +277,52 @@
       "ledger": "Ledger",
       "appearances": "Xuất hiện"
     },
-    "relationshipsEmpty": "Chưa có quan hệ được ghi nhận."
+    "relationshipsEmpty": "Chưa có quan hệ được ghi nhận.",
+    "subtitle": "Quản lý cast và provisional inbox",
+    "errorLoadList": "Không tải được danh sách nhân vật",
+    "emptyTitle": "Chưa có nhân vật",
+    "appearances": "Xuất hiện",
+    "actions": "Hành động",
+    "promoteHint": "Gợi ý promote",
+    "view": "Xem",
+    "create": "Tạo",
+    "filterAll": "Tất cả",
+    "filterActive": "Đang hoạt động",
+    "roleOneLiner": "Vai trò (một dòng)",
+    "backToList": "← Về danh sách nhân vật",
+    "backLink": "← Nhân vật",
+    "aliasesLabel": "Aliases (phân tách bằng dấu phẩy)",
+    "tierLabel": "Hạng:",
+    "statusLabel": "Trạng thái:",
+    "appearancesLabel": "Xuất hiện:",
+    "appearanceCount": "{count} lần xuất hiện",
+    "hasChapterData": " — có dữ liệu chương",
+    "mergeMentionLabel": "Đề cập:",
+    "mergeSearch": "Tìm nhân vật",
+    "selectPlaceholder": "— Chọn —",
+    "merging": "Đang merge…",
+    "mergeAction": "Merge",
+    "promoteNew": "Promote new",
+    "reject": "Reject",
+    "inboxCloseAria": "Đóng inbox",
+    "inboxEmptyPending": "Không có đề cập đang chờ.",
+    "inboxChapter": "Chương {number}",
+    "inboxSuggestion": "Gợi ý:",
+    "relationshipsSubtitle": "Trust list từ relationship_lens (Phase 5 minimal)",
+    "trustLabel": "Trust",
+    "relationshipsEditHint": "Chỉnh sửa relationship_lens trong tab Psyche",
+    "relationshipsHistoryTitle": "History tail",
+    "relationshipsNoStance": "Chưa có relationship stance từ timeline.",
+    "relationshipsGraphStub": "Graph view — Phase 8",
+    "toastPromotedNamed": "Đã promote {name}",
+    "toastConfirmT3": "Cần xác nhận promote lên T3",
+    "toastPromoteFailed": "Không thể promote",
+    "toastArchivedNamed": "Đã lưu trữ {name}",
+    "toastAlreadyArchived": "Nhân vật đã lưu trữ",
+    "toastArchiveFailed": "Không thể lưu trữ",
+    "toastProvisionalPromoted": "Đã promote {mention}",
+    "toastProvisionalRejected": "Đã reject {mention}",
+    "toastProvisionalMerged": "Đã merge {mention}"
   },
   "twist": {
     "title": "Twist Board",
@@ -202,7 +337,50 @@
     "fairnessFail": "Thiếu plant cho payoff",
     "errorLoad": "Không tải được twist board",
     "outlineStub": "Dàn ý chi tiết — sắp ra mắt (Phase 8+)",
-    "timelineStub": "Timeline — sắp ra mắt (Phase 8+)"
+    "timelineStub": "Timeline — sắp ra mắt (Phase 8+)",
+    "headerTitle": "Outline / Twist",
+    "fairnessPayoffCount": "{count} payoff cần kiểm tra",
+    "filterKindAria": "Lọc loại twist",
+    "filterAllKinds": "Tất cả loại",
+    "addSecret": "+ Secret",
+    "cardCount": "{count} thẻ",
+    "secretsEmptyTitle": "Chưa có secret",
+    "secretsEmptyDescription": "Đăng ký secret đầu tiên để bắt đầu twist board.",
+    "secretsEmptyCta": "Đăng ký secret đầu tiên",
+    "revealedEmpty": "Chưa có twist đã reveal",
+    "authorBadge": "Author",
+    "secretMeta": "{status} · {count} plants",
+    "plantMeta": "Ch.{number} · {salience}",
+    "plantTwistLink": "↳ {twistTitle}",
+    "payoffMeta": "Payoff ch.{chapter} · min {minPlants} plants · có {count}",
+    "openContinuityGate": "Mở Continuity Gate",
+    "revealedMeta": "Đã reveal · {count} plants",
+    "createSecretError": "Không tạo được secret. Vui lòng thử lại.",
+    "createSecretTitle": "Đăng ký secret mới",
+    "fieldTitle": "Tiêu đề",
+    "fieldSecretTruth": "Secret truth",
+    "authorOnlyBadge": "Author only",
+    "createSecretSubmit": "Tạo secret",
+    "detailTitle": "Chi tiết twist",
+    "saveChanges": "Lưu thay đổi",
+    "plantsSection": "Plants ({count})",
+    "selectChapter": "Chọn chương",
+    "plantSnippetPlaceholder": "Snippet plant…",
+    "addPlant": "Thêm plant",
+    "payoffSection": "Payoff",
+    "payoffSummary": "Ch.{chapter} · min {minPlants} plants",
+    "selectPayoffChapter": "Chọn chương payoff",
+    "minPlantsAria": "Min plants",
+    "registerPayoff": "Đăng ký payoff",
+    "noPayoff": "Không có payoff",
+    "abandon": "Abandon twist",
+    "tabTimeline": "Timeline",
+    "outlineChapterLine": "Ch.{number} — {title}",
+    "timelineStubTitle": "Timeline board — Phase 8",
+    "fairness": {
+      "title": "Fairness check",
+      "allPass": "Tất cả payoff đạt yêu cầu plants."
+    }
   },
   "power": {
     "title": "Power System",
@@ -213,14 +391,95 @@
     "errorLoad": "Không tải được power system",
     "validationMonotonic": "Thứ tự cấp bậc phải tăng dần",
     "ranks": "Cấp bậc",
-    "techniques": "Kỹ thuật"
+    "techniques": "Kỹ thuật",
+    "backToBible": "← Story Bible",
+    "defaultRankName": "Cảnh giới mới",
+    "defaultTechniqueName": "Kỹ thuật mới",
+    "disabledInstructions": "Bật module Power System trong Project Settings → Genre",
+    "addTechnique": "Thêm kỹ thuật",
+    "techniquesEmpty": "Chưa có kỹ thuật nào",
+    "techniqueColName": "Tên",
+    "techniqueColMinRank": "Min rank",
+    "techniqueColSect": "Sect",
+    "techniqueColCost": "Cost",
+    "techniqueColNotes": "Ghi chú",
+    "seedXianxiaTemplate": "Seed xianxia template",
+    "addRankButton": "Thêm cảnh giới",
+    "emptyRanksAction": "Thêm cảnh giới đầu tiên",
+    "rankNameAria": "Tên cảnh giới {name}",
+    "subStagesLabel": "Sub-stages:",
+    "constraintsPlaceholder": "Ràng buộc (markdown)…",
+    "settings": {
+      "title": "Cài đặt hệ thống",
+      "enabled": "Bật power system",
+      "priorityGap": "Priority gap",
+      "maxRankJump": "Max rank jump / chương",
+      "requireBreakthrough": "Yêu cầu breakthrough"
+    },
+    "antiCreepTip": "Priority gap {gap} — nhân vật yếu hơn ≥{gap} rank khó thắng trận. Tối đa {maxJump} rank/chương.",
+    "validationMonotonicDetail": "Cảnh giới \"{name}\" phải có thứ tự cao hơn \"{prevName}\""
   },
   "psych": {
     "emptyPsyche": "Chưa có psyche card",
     "seedPsyche": "Tạo psyche card",
     "timelineEmpty": "Chưa có sự kiện tâm lý",
     "errorLoad": "Không tải được dữ liệu tâm lý",
-    "toastSaved": "Đã lưu psyche card"
+    "toastSaved": "Đã lưu psyche card",
+    "savePsycheCard": "Lưu psyche card",
+    "saveError": "Lỗi lưu",
+    "headerTitle": "Psyche — {displayName}",
+    "tierWarning": "Nâng tier để bật OOC checks",
+    "seedPsycheHint": "Tạo psyche card — khuyến nghị T2+ để bật continuity psychology",
+    "removeTagAria": "Xóa {value}",
+    "tagInputPlaceholder": "Nhập và Enter để thêm",
+    "fields": {
+      "drive": "Drive",
+      "need": "Need",
+      "wound": "Wound",
+      "fear": "Fear",
+      "defense": "Defense"
+    },
+    "valueHierarchy": {
+      "title": "Value hierarchy",
+      "empty": "Chưa có giá trị nào.",
+      "defaultValue": "Giá trị {index}",
+      "valueAria": "Giá trị {index}"
+    },
+    "moveUpAria": "Di chuyển lên",
+    "moveDownAria": "Di chuyển xuống",
+    "removeValueAria": "Xóa giá trị",
+    "moralBoundaries": {
+      "title": "Moral boundaries",
+      "placeholder": "VD: Không giết người vô tội"
+    },
+    "voiceTaboo": {
+      "title": "Voice taboo",
+      "placeholder": "VD: Không van xin"
+    },
+    "stressBehavior": {
+      "title": "Stress behavior"
+    },
+    "arcFlags": {
+      "title": "Arc flags",
+      "allowMoralBreak": "Cho phép moral break",
+      "expectedBeats": "Expected arc beats",
+      "beatPlaceholder": "Thêm arc beat",
+      "currentBeat": "Current arc beat"
+    },
+    "validation": {
+      "valueHierarchy": "T3 yêu cầu value hierarchy",
+      "moralBoundaries": "T3 yêu cầu ít nhất một moral boundary"
+    },
+    "timeline": {
+      "title": "PsychState timeline",
+      "detailAria": "PsychState detail",
+      "chapter": "Chương {number}",
+      "chapterShort": "Ch.{number}",
+      "activeGoal": "Active goal",
+      "arcBeat": "Arc beat",
+      "beliefUpdates": "Belief updates",
+      "relationshipStance": "Relationship stance"
+    }
   },
   "labels": {
     "genre": {
@@ -252,5 +511,74 @@
     "network": "Lỗi mạng",
     "boundary": "Đã xảy ra lỗi",
     "boundaryRetry": "Tải lại trang"
+  },
+  "editor": {
+    "notFound": "Không tìm thấy chương",
+    "backToHub": "← Về Project Hub",
+    "errorLoad": "Không tải được chương",
+    "lockedBanner": "Chương đã bị khóa sau settle — chỉ xem, không chỉnh sửa.",
+    "lockedAfterSettle": "Đã khóa sau settle",
+    "saveNewVersion": "Lưu phiên bản mới",
+    "extracting": "Đang quét…",
+    "extractCharacters": "Quét nhân vật",
+    "checkingContinuity": "Đang kiểm tra…",
+    "continuityCheck": "Continuity Check",
+    "emptyContent": "Không có nội dung",
+    "emptyProse": "Bắt đầu viết…",
+    "proseAriaLabel": "Nội dung chương",
+    "wordCount": "{count} từ",
+    "updatedAt": "Cập nhật: {date}",
+    "toast": {
+      "chapterLockedSave": "Chương đã bị khóa — không thể lưu",
+      "continuityCheckFailed": "Không thể chạy continuity check",
+      "charactersExtracted": "Đã extract {count} nhân vật",
+      "chapterLockedExtract": "Chương đã bị khóa — không thể extract",
+      "extractFailed": "Không thể quét nhân vật",
+      "chapterLockedBeat": "Chương đã bị khóa — không thể sửa beat",
+      "chapterLockedAddBeat": "Chương đã bị khóa — không thể thêm beat"
+    },
+    "beats": {
+      "title": "Scene beats",
+      "empty": "Chưa có beat nào",
+      "defaultSummary": "Beat mới",
+      "completeAria": "Hoàn thành beat {beatKey}"
+    },
+    "versions": {
+      "empty": "Chưa có phiên bản",
+      "selectAria": "Chọn phiên bản prose",
+      "optionLabel": "v{version} — {wordCount} từ ({source})"
+    },
+    "promptEdit": {
+      "title": "Prompt Edit",
+      "instructionPlaceholder": "Mô tả chỉnh sửa cho AI…",
+      "instructionAria": "Prompt Edit instruction",
+      "running": "Đang chạy…",
+      "send": "Send",
+      "apply": "Apply",
+      "regenerate": "Regenerate",
+      "compare": "Compare",
+      "noProposal": "Chưa có đề xuất",
+      "previewLabel": "Preview (diff hint)",
+      "compareTitle": "So sánh phiên bản",
+      "compareBase": "Base",
+      "compareProposed": "Proposed",
+      "lineDiff": "Line diff",
+      "turnLogEmpty": "Mô tả chỉnh sửa để bắt đầu…",
+      "turnError": "Lỗi: {errorCode}",
+      "processing": "Đang xử lý…",
+      "lockedBanner": "Chương đã khóa —",
+      "unlockLink": "mở khóa",
+      "lockedBannerSuffix": "để chỉnh sửa.",
+      "versionSaved": "Đã lưu phiên bản {version}",
+      "error": {
+        "llmRegenerate": "Lỗi LLM provider — thử Regenerate",
+        "chapterLocked": "Chương đã khóa",
+        "sendFailed": "Không thể gửi instruction",
+        "llmRetry": "Lỗi LLM provider — thử lại",
+        "regenerateFailed": "Không thể regenerate",
+        "applyFailed": "Không thể apply",
+        "compareLoadFailed": "Không thể tải nội dung so sánh"
+      }
+    }
   }
 }

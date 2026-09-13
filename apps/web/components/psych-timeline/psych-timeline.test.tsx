@@ -50,7 +50,7 @@ describe("psych timeline components", () => {
   it("PsychStateTimeline shows empty state", async () => {
     render(<PsychStateTimeline projectId={PROJECT_1_ID} characterId={CHARACTER_2_ID} />);
     expect(
-      await screen.findByText(/Chưa có PsychState/),
+      await screen.findByText(/Chưa có sự kiện tâm lý/),
     ).toBeInTheDocument();
   });
 

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CharacterTier } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
 
 interface PsycheTabHeaderProps {
   displayName: string;
@@ -9,19 +10,22 @@ interface PsycheTabHeaderProps {
 }
 
 export function PsycheTabHeader({ displayName, tier, saveStatus }: PsycheTabHeaderProps) {
+  const t = useTranslations();
   const statusLabel =
     saveStatus === "saving"
-      ? "Đang lưu..."
+      ? t("common.saving")
       : saveStatus === "saved"
-        ? "Đã lưu"
+        ? t("common.saved")
         : saveStatus === "error"
-          ? "Lỗi lưu"
+          ? t("psych.saveError")
           : "";
 
   return (
     <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
       <div>
-        <h2 className="text-lg font-semibold text-slate-900">Psyche — {displayName}</h2>
+        <h2 className="text-lg font-semibold text-slate-900">
+          {t("psych.headerTitle", { displayName })}
+        </h2>
         <span className="mt-1 inline-block rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800">
           T{tier}
         </span>
