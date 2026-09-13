@@ -8,7 +8,8 @@ Entity list and key tables for Postgres. **Not migrated yet** — reference for 
 > **Phase 4 canonical schema:** [docs/specs/phase-4/schema.md](specs/phase-4/schema.md) — twist plans, plants, payoffs  
 > **Phase 5 canonical schema:** [docs/specs/phase-5/schema.md](specs/phase-5/schema.md) — psyche card, psych_states  
 > **Phase 6 canonical schema:** [docs/specs/phase-6/schema.md](specs/phase-6/schema.md) — power system, genre rule pack, prompt edit  
-> This draft remains for Phase 7+ tables not yet specified in detail.
+> **Phase 8 canonical schema:** [docs/specs/phase-8/schema.md](specs/phase-8/schema.md) — scene engine, relationships, stakes ledger  
+> This draft remains for Phase 9+ tables not yet specified in detail.
 
 ## Naming Conventions
 

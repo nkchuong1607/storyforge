@@ -18,7 +18,8 @@ This file is a short index. See the build plan for full detail.
 | **5** | PsychState, OOC | Planned |
 | **6** | Power system, genre contracts, Prompt Edit AI | Planned |
 | **7** | UI polish | Planned |
-| **8+** | Scene engine, relationships, research, export, series | Planned |
+| **8** | Scene engine, relationship arcs, stakes ledger (Slice 1) | Specs |
+| **9+** | Research, series, export, Neo4j, collaboration | Planned |
 
 ## MVP (explicit)
 

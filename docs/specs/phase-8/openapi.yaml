@@ -1,0 +1,1614 @@
+openapi: 3.1.0
+info:
+  title: StoryForge API
+  version: 0.8.0-phase8-slice1
+  description: |
+    Phase 8 Slice 1 contract — extends Phase 6 with scene engine structure fields,
+    scene_structure / relationship_arc / stakes continuity categories, relationship ledger + graph,
+    stakes ledger + act board, and progressive context packs.
+
+    Phase 1–7 routes remain authoritative in prior phase OpenAPI files except where
+    **SceneBeat** schema is extended here (goal, conflict, outcome, stakes_level, pressure_tags,
+    pov_character_id, scene_type).
+
+    **Auth (MVP stub):** Send `X-User-Id: <uuid>` on every request except `/health`.
+
+    **Canon rule:** Relationship history and stakes checkpoints commit on settle via approved state_diff.
+    Graph UI is read-only derived from settled events.
+
+    **LLM:** Optional scene auditor stub — FakeLLM default when enabled in tests.
+servers:
+  - url: http://localhost:8000
+    description: Local API dev
+tags:
+  - name: Health
+  - name: Chapters
+  - name: SceneEngine
+  - name: Relationships
+  - name: Stakes
+  - name: Context
+  - name: Continuity
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /projects/{project_id}/scene-engine/settings:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [SceneEngine]
+      operationId: getSceneEngineSettings
+      summary: Get scene engine settings for project
+      responses:
+        "200":
+          description: Settings row (created with defaults if missing)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneEngineSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [SceneEngine]
+      operationId: updateSceneEngineSettings
+      summary: Update scene engine settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SceneEngineSettingsUpdateRequest"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneEngineSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/chapters/{chapter_id}/scene-lint:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [SceneEngine]
+      operationId: runSceneLint
+      summary: Run deterministic scene structure lint (no continuity report persist)
+      responses:
+        "200":
+          description: Lint result for chapter beats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneLintResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/chapters/{chapter_id}/beats:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Chapters]
+      operationId: listSceneBeatsPhase8
+      summary: List scene beats (Phase 8 extended schema)
+      responses:
+        "200":
+          description: Beats ordered by sort_order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneBeatListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Chapters]
+      operationId: createSceneBeatPhase8
+      summary: Create scene beat with structure fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SceneBeatCreateRequest"
+      responses:
+        "201":
+          description: Beat created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneBeat"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /projects/{project_id}/chapters/{chapter_id}/beats/{beat_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/BeatId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    patch:
+      tags: [Chapters]
+      operationId: updateSceneBeatPhase8
+      summary: Update scene beat including goal/conflict/outcome
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SceneBeatUpdateRequest"
+      responses:
+        "200":
+          description: Updated beat
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneBeat"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/relationships:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Relationships]
+      operationId: listRelationships
+      summary: List relationship registry with latest settled intensity
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - name: character_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter edges touching this character
+      responses:
+        "200":
+          description: Paginated relationships
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationshipListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Relationships]
+      operationId: createRelationship
+      summary: Register canonical character pair relationship
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationshipCreateRequest"
+      responses:
+        "201":
+          description: Relationship created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Relationship"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Duplicate pair
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/relationships/graph:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Relationships]
+      operationId: getRelationshipGraph
+      summary: Graph read model (nodes + edges from settled events)
+      parameters:
+        - name: character_ids
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          style: form
+          explode: true
+        - name: act_number
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: min_intensity
+          in: query
+          schema:
+            type: integer
+            minimum: -5
+            maximum: 5
+        - name: relation_types
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/RelationType"
+          style: form
+          explode: true
+      responses:
+        "200":
+          description: Graph payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationshipGraphResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/relationships/{relationship_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/RelationshipId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Relationships]
+      operationId: getRelationship
+      summary: Get relationship detail
+      responses:
+        "200":
+          description: Relationship with latest intensity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Relationship"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Relationships]
+      operationId: updateRelationship
+      summary: Update relationship metadata (not event history)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationshipUpdateRequest"
+      responses:
+        "200":
+          description: Updated relationship
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Relationship"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Relationships]
+      operationId: deleteRelationship
+      summary: Delete relationship (blocked if settled events exist)
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Has settled events
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/relationships/{relationship_id}/events:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/RelationshipId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Relationships]
+      operationId: listRelationshipEvents
+      summary: Settled relationship event timeline
+      parameters:
+        - name: include_draft
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: Events ordered by chapter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationshipEventListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/stakes/settings:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Stakes]
+      operationId: getStakesSettings
+      summary: Get act structure settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActStructureSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Stakes]
+      operationId: updateStakesSettings
+      summary: Update act structure settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActStructureSettingsUpdateRequest"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActStructureSettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/stakes/entries:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Stakes]
+      operationId: listStakesEntries
+      summary: List stakes ledger entries
+      parameters:
+        - name: act_number
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/StakesEntryStatus"
+      responses:
+        "200":
+          description: Entry list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StakesEntryListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [Stakes]
+      operationId: createStakesEntry
+      summary: Create stakes checkpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StakesEntryCreateRequest"
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StakesLedgerEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/stakes/entries/{entry_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/StakesEntryId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Stakes]
+      operationId: getStakesEntry
+      summary: Get stakes checkpoint
+      responses:
+        "200":
+          description: Entry detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StakesLedgerEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Stakes]
+      operationId: updateStakesEntry
+      summary: Update stakes checkpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StakesEntryUpdateRequest"
+      responses:
+        "200":
+          description: Updated entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StakesLedgerEntry"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Stakes]
+      operationId: deleteStakesEntry
+      summary: Delete planned checkpoint only
+      responses:
+        "204":
+          description: Deleted
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Entry not in planned status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects/{project_id}/stakes/board:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [Stakes]
+      operationId: getStakesBoard
+      summary: Act-grouped board view with escalation warnings
+      parameters:
+        - name: act_number
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+          description: Highlight single act column
+      responses:
+        "200":
+          description: Board columns
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StakesBoardResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/context-packs/scene:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [Context]
+      operationId: buildSceneContextPack
+      summary: Progressive scene beat structure slice for Writer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SceneContextPackRequest"
+      responses:
+        "200":
+          description: Beat structure slice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SceneContextPackResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/context-packs/relationships:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [Context]
+      operationId: buildRelationshipsContextPack
+      summary: Progressive relationship slice for scene cast
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationshipsContextPackRequest"
+      responses:
+        "200":
+          description: Edge slice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationshipsContextPackResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/context-packs/stakes:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [Context]
+      operationId: buildStakesContextPack
+      summary: Progressive stakes slice for current act/chapter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StakesContextPackRequest"
+      responses:
+        "200":
+          description: Act stakes slice
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StakesContextPackResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    UserIdHeader:
+      name: X-User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ChapterId:
+      name: chapter_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    BeatId:
+      name: beat_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RelationshipId:
+      name: relationship_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    StakesEntryId:
+      name: entry_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid X-User-Id
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found or cross-tenant
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Conflict with current state
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          example: ok
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    ContinuitySeverity:
+      type: string
+      enum: [pass, warn, fail]
+
+    ContinuityCategory:
+      type: string
+      description: Phase 8 extends Phase 6 enum with scene_structure, relationship_arc, stakes
+      enum:
+        - character
+        - timeline
+        - location
+        - world_rule
+        - bible_staging
+        - foreshadow
+        - psychology
+        - power_system
+        - scene_structure
+        - relationship_arc
+        - stakes
+
+    ContinuityIssue:
+      type: object
+      required: [fingerprint, severity, category, code, message]
+      properties:
+        fingerprint:
+          type: string
+        severity:
+          $ref: "#/components/schemas/ContinuitySeverity"
+        category:
+          $ref: "#/components/schemas/ContinuityCategory"
+        code:
+          type: string
+        message:
+          type: string
+        chapter_refs:
+          type: array
+          items:
+            type: integer
+        entity_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        evidence:
+          type: object
+          additionalProperties: true
+
+    SceneType:
+      type: string
+      enum: [scene, sequel, transition, exposition]
+
+    PressureTag:
+      type: object
+      required: [tag]
+      properties:
+        tag:
+          type: string
+        source:
+          type: string
+        weight:
+          type: integer
+          minimum: 0
+          default: 1
+
+    SceneBeat:
+      type: object
+      required:
+        - id
+        - project_id
+        - chapter_id
+        - beat_key
+        - summary
+        - sort_order
+        - completed
+        - goal
+        - conflict
+        - outcome
+        - pressure_tags
+        - scene_type
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        chapter_id:
+          type: string
+          format: uuid
+        beat_key:
+          type: string
+        summary:
+          type: string
+        sort_order:
+          type: integer
+        completed:
+          type: boolean
+        goal:
+          type: string
+        conflict:
+          type: string
+        outcome:
+          type: string
+        stakes_level:
+          type: integer
+          minimum: 0
+          maximum: 5
+          nullable: true
+        pressure_tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/PressureTag"
+        pov_character_id:
+          type: string
+          format: uuid
+          nullable: true
+        scene_type:
+          $ref: "#/components/schemas/SceneType"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    SceneBeatCreateRequest:
+      type: object
+      required: [beat_key, summary, sort_order]
+      properties:
+        beat_key:
+          type: string
+        summary:
+          type: string
+        sort_order:
+          type: integer
+          minimum: 0
+        completed:
+          type: boolean
+          default: false
+        goal:
+          type: string
+        conflict:
+          type: string
+        outcome:
+          type: string
+        stakes_level:
+          type: integer
+          minimum: 0
+          maximum: 5
+        pressure_tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/PressureTag"
+        pov_character_id:
+          type: string
+          format: uuid
+        scene_type:
+          $ref: "#/components/schemas/SceneType"
+
+    SceneBeatUpdateRequest:
+      type: object
+      properties:
+        beat_key:
+          type: string
+        summary:
+          type: string
+        sort_order:
+          type: integer
+        completed:
+          type: boolean
+        goal:
+          type: string
+        conflict:
+          type: string
+        outcome:
+          type: string
+        stakes_level:
+          type: integer
+          minimum: 0
+          maximum: 5
+          nullable: true
+        pressure_tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/PressureTag"
+        pov_character_id:
+          type: string
+          format: uuid
+          nullable: true
+        scene_type:
+          $ref: "#/components/schemas/SceneType"
+
+    SceneBeatListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SceneBeat"
+
+    SceneEngineSettings:
+      type: object
+      required:
+        - project_id
+        - enabled
+        - require_conflict
+        - require_outcome_on_complete
+        - min_goal_length
+        - llm_auditor_enabled
+        - strictness
+        - updated_at
+      properties:
+        project_id:
+          type: string
+          format: uuid
+        enabled:
+          type: boolean
+        require_conflict:
+          type: boolean
+        require_outcome_on_complete:
+          type: boolean
+        min_goal_length:
+          type: integer
+        llm_auditor_enabled:
+          type: boolean
+        strictness:
+          type: string
+          enum: [relaxed, standard, strict]
+        updated_at:
+          type: string
+          format: date-time
+
+    SceneEngineSettingsUpdateRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        require_conflict:
+          type: boolean
+        require_outcome_on_complete:
+          type: boolean
+        min_goal_length:
+          type: integer
+          minimum: 1
+        llm_auditor_enabled:
+          type: boolean
+        strictness:
+          type: string
+          enum: [relaxed, standard, strict]
+
+    SceneLintStats:
+      type: object
+      required: [fail, warn, pass]
+      properties:
+        fail:
+          type: integer
+        warn:
+          type: integer
+        pass:
+          type: integer
+
+    SceneLintResponse:
+      type: object
+      required: [chapter_id, result, issues, stats]
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+        result:
+          type: string
+          enum: [pass, warn, fail]
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContinuityIssue"
+        stats:
+          $ref: "#/components/schemas/SceneLintStats"
+
+    RelationType:
+      type: string
+      enum: [ally, rival, mentor, family, romantic, enemy, custom]
+
+    Relationship:
+      type: object
+      required:
+        - id
+        - project_id
+        - character_a_id
+        - character_b_id
+        - relation_type
+        - baseline_intensity
+        - current_intensity
+        - notes_md
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        character_a_id:
+          type: string
+          format: uuid
+        character_b_id:
+          type: string
+          format: uuid
+        character_a_name:
+          type: string
+        character_b_name:
+          type: string
+        relation_type:
+          $ref: "#/components/schemas/RelationType"
+        custom_label:
+          type: string
+          nullable: true
+        baseline_intensity:
+          type: integer
+          minimum: -5
+          maximum: 5
+        current_intensity:
+          type: integer
+          minimum: -5
+          maximum: 5
+        notes_md:
+          type: string
+        event_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    RelationshipCreateRequest:
+      type: object
+      required: [character_a_id, character_b_id, relation_type]
+      properties:
+        character_a_id:
+          type: string
+          format: uuid
+        character_b_id:
+          type: string
+          format: uuid
+        relation_type:
+          $ref: "#/components/schemas/RelationType"
+        custom_label:
+          type: string
+        baseline_intensity:
+          type: integer
+          minimum: -5
+          maximum: 5
+          default: 0
+        notes_md:
+          type: string
+
+    RelationshipUpdateRequest:
+      type: object
+      properties:
+        relation_type:
+          $ref: "#/components/schemas/RelationType"
+        custom_label:
+          type: string
+        baseline_intensity:
+          type: integer
+          minimum: -5
+          maximum: 5
+        notes_md:
+          type: string
+
+    RelationshipListResponse:
+      type: object
+      required: [items, page, page_size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Relationship"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+
+    RelationshipEvent:
+      type: object
+      required:
+        - id
+        - relationship_id
+        - event_type
+        - intensity_delta
+        - intensity_after
+        - chapter_number
+        - payload
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        relationship_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+        intensity_delta:
+          type: integer
+        intensity_after:
+          type: integer
+        relation_type_after:
+          type: string
+          nullable: true
+        chapter_id:
+          type: string
+          format: uuid
+        chapter_number:
+          type: integer
+        prose_version:
+          type: integer
+        settled_at:
+          type: string
+          format: date-time
+          nullable: true
+        payload:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+
+    RelationshipEventListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationshipEvent"
+
+    RelationshipGraphNode:
+      type: object
+      required: [id, display_name, tier, degree]
+      properties:
+        id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+        tier:
+          type: integer
+        degree:
+          type: integer
+
+    RelationshipGraphEdge:
+      type: object
+      required: [id, source_id, target_id, relation_type, intensity, event_count]
+      properties:
+        id:
+          type: string
+          format: uuid
+        source_id:
+          type: string
+          format: uuid
+        target_id:
+          type: string
+          format: uuid
+        relation_type:
+          $ref: "#/components/schemas/RelationType"
+        intensity:
+          type: integer
+        event_count:
+          type: integer
+        last_event:
+          type: object
+          additionalProperties: true
+
+    RelationshipGraphMeta:
+      type: object
+      properties:
+        filtered_character_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        act_number:
+          type: integer
+          nullable: true
+        generated_at:
+          type: string
+          format: date-time
+
+    RelationshipGraphResponse:
+      type: object
+      required: [nodes, edges, meta]
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationshipGraphNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationshipGraphEdge"
+        meta:
+          $ref: "#/components/schemas/RelationshipGraphMeta"
+
+    ActChapterBoundary:
+      type: object
+      required: [act_number, start_chapter, end_chapter]
+      properties:
+        act_number:
+          type: integer
+        start_chapter:
+          type: integer
+        end_chapter:
+          type: integer
+        label:
+          type: string
+
+    ActStructureSettings:
+      type: object
+      required:
+        - project_id
+        - act_count
+        - chapters_per_act
+        - enabled
+        - flat_middle_window_chapters
+        - updated_at
+      properties:
+        project_id:
+          type: string
+          format: uuid
+        act_count:
+          type: integer
+          minimum: 1
+          maximum: 7
+        chapters_per_act:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActChapterBoundary"
+        enabled:
+          type: boolean
+        flat_middle_window_chapters:
+          type: integer
+        updated_at:
+          type: string
+          format: date-time
+
+    ActStructureSettingsUpdateRequest:
+      type: object
+      properties:
+        act_count:
+          type: integer
+          minimum: 1
+          maximum: 7
+        chapters_per_act:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActChapterBoundary"
+        enabled:
+          type: boolean
+        flat_middle_window_chapters:
+          type: integer
+          minimum: 1
+
+    StakesEntryStatus:
+      type: string
+      enum: [planned, planted, resolved, abandoned]
+
+    StakesLedgerEntry:
+      type: object
+      required:
+        - id
+        - project_id
+        - act_number
+        - checkpoint_key
+        - title
+        - description_md
+        - target_level
+        - status
+        - sort_order
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        act_number:
+          type: integer
+        checkpoint_key:
+          type: string
+        title:
+          type: string
+        description_md:
+          type: string
+        target_level:
+          type: integer
+          minimum: 0
+          maximum: 5
+        status:
+          $ref: "#/components/schemas/StakesEntryStatus"
+        plant_chapter_id:
+          type: string
+          format: uuid
+          nullable: true
+        resolve_chapter_id:
+          type: string
+          format: uuid
+          nullable: true
+        linked_twist_id:
+          type: string
+          format: uuid
+          nullable: true
+        sort_order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    StakesEntryCreateRequest:
+      type: object
+      required: [act_number, checkpoint_key, title, target_level]
+      properties:
+        act_number:
+          type: integer
+          minimum: 1
+        checkpoint_key:
+          type: string
+        title:
+          type: string
+        description_md:
+          type: string
+        target_level:
+          type: integer
+          minimum: 0
+          maximum: 5
+        sort_order:
+          type: integer
+        linked_twist_id:
+          type: string
+          format: uuid
+
+    StakesEntryUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description_md:
+          type: string
+        target_level:
+          type: integer
+          minimum: 0
+          maximum: 5
+        status:
+          $ref: "#/components/schemas/StakesEntryStatus"
+        plant_chapter_id:
+          type: string
+          format: uuid
+        resolve_chapter_id:
+          type: string
+          format: uuid
+        linked_twist_id:
+          type: string
+          format: uuid
+        sort_order:
+          type: integer
+
+    StakesEntryListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StakesLedgerEntry"
+
+    StakesActColumn:
+      type: object
+      required: [act_number, entries]
+      properties:
+        act_number:
+          type: integer
+        label:
+          type: string
+        start_chapter:
+          type: integer
+        end_chapter:
+          type: integer
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/StakesLedgerEntry"
+
+    StakesBoardWarnings:
+      type: object
+      properties:
+        flat_middle:
+          type: boolean
+        open_fail_count:
+          type: integer
+
+    StakesBoardResponse:
+      type: object
+      required: [settings, acts]
+      properties:
+        settings:
+          type: object
+          properties:
+            act_count:
+              type: integer
+            enabled:
+              type: boolean
+        acts:
+          type: array
+          items:
+            $ref: "#/components/schemas/StakesActColumn"
+        warnings:
+          $ref: "#/components/schemas/StakesBoardWarnings"
+
+    SceneContextPackRequest:
+      type: object
+      required: [chapter_id]
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+        beat_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        include_empty:
+          type: boolean
+          default: false
+
+    SceneContextPackBeat:
+      type: object
+      required: [beat_key, goal, conflict, outcome]
+      properties:
+        beat_key:
+          type: string
+        goal:
+          type: string
+        conflict:
+          type: string
+        outcome:
+          type: string
+        stakes_level:
+          type: integer
+          nullable: true
+        pressure_tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/PressureTag"
+
+    SceneContextPackResponse:
+      type: object
+      required: [beats]
+      properties:
+        beats:
+          type: array
+          items:
+            $ref: "#/components/schemas/SceneContextPackBeat"
+
+    RelationshipsContextPackRequest:
+      type: object
+      required: [chapter_id, character_ids]
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+        character_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    RelationshipsContextPackEdge:
+      type: object
+      required: [relationship_id, character_a_id, character_b_id, relation_type, intensity]
+      properties:
+        relationship_id:
+          type: string
+          format: uuid
+        character_a_id:
+          type: string
+          format: uuid
+        character_b_id:
+          type: string
+          format: uuid
+        relation_type:
+          $ref: "#/components/schemas/RelationType"
+        intensity:
+          type: integer
+        recent_events:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationshipEvent"
+
+    RelationshipsContextPackResponse:
+      type: object
+      required: [edges]
+      properties:
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/RelationshipsContextPackEdge"
+
+    StakesContextPackRequest:
+      type: object
+      required: [chapter_id]
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+
+    StakesContextPackCheckpoint:
+      type: object
+      required: [checkpoint_key, target_level, status]
+      properties:
+        checkpoint_key:
+          type: string
+        title:
+          type: string
+        target_level:
+          type: integer
+        status:
+          $ref: "#/components/schemas/StakesEntryStatus"
+
+    StakesContextPackResponse:
+      type: object
+      required: [act_number, checkpoints]
+      properties:
+        act_number:
+          type: integer
+        current_peak_level:
+          type: integer
+        checkpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/StakesContextPackCheckpoint"
+
+    StateDiffPhase8Extensions:
+      type: object
+      description: Phase 8 fields merged into existing StateDiff on continuity-check
+      properties:
+        relationship_event_proposals:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        stakes_ledger_proposals:
+          type: array
+          items:
+            type: object
+            additionalProperties: true

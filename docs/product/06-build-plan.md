@@ -22,7 +22,8 @@ gantt
     Phase 6 Power Genre       :p6, 2025-03, 2025-05
     section Polish Scale
     Phase 7 UI Polish         :p7, 2025-05, 2025-07
-    Phase 8 Plus              :p8, 2025-07, 2026-01
+    Phase 8 Story Quality     :p8, 2025-07, 2025-10
+    Phase 9 Plus              :p9, 2025-10, 2026-01
 ```
 
 *(Timeline illustrative — không cam kết calendar; thứ tự phase và deps mới là binding.)*
@@ -311,27 +312,69 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ---
 
-## Phase 8+ — Scene Engine, Relationships, Research, Series
+## Phase 8 — Story Quality (Slice 1)
 
-**Goal:** Advanced story quality modules; export; scale.
+**Goal:** Scene structure lint, relationship arcs, and stakes escalation — extending chapter / continuity / settle loops (deterministic first).
 
-### Deliverables (incremental)
+### Deliverables (Slice 1 — in scope)
 
 | Module | Notes |
 |--------|-------|
-| Scene engine | beat goal/conflict/outcome lint |
-| Relationship arcs | graph view, ledger events |
-| Stakes ledger | act-level escalation |
+| Scene engine | Beat `goal` / `conflict` / `outcome`; deterministic lint; Continuity Gate category `scene_structure` |
+| Relationship arcs | `relationships` + `relationship_events` ledger; Postgres graph read model (no Neo4j) |
+| Stakes ledger | Act checkpoints; flat-middle lint; bible snapshot `world.stakes` on settle |
+
+### Out of scope (Phase 9+)
+
+| Module | Notes |
+|--------|-------|
 | Research module | notes → promote to bible |
 | Series projects | parent bible slice |
 | Git mirror | markdown export jobs |
 | Neo4j | optional if relationship queries painful |
 | Export | EPUB/DOCX |
 | Collaboration | realtime optional |
+| Full Outline tree + Timeline swimlane | advanced planning UI |
 
 ### Dependencies
 
-- MVP shipped (Phases 1–7)
+- Phases 1–7 complete (MVP + UI polish)
+
+### Definition of done
+
+- Scene beats carry structure fields; lint FAIL/WARN in Gate under `scene_structure`
+- Relationship graph from settled events; settle appends `relationship_change`
+- Stakes board with act columns; flat-middle WARN; snapshot on settle
+- `make test-api-cov` / `make test-web-cov` ≥ 90% on Phase 8 modules locally
+
+### Suggested PR order
+
+1. **`specs/phase-8`** — schema, OpenAPI, web screens, scene/relationship/stakes rules, test strategy ([docs/specs/phase-8/README.md](../specs/phase-8/README.md))
+2. **`api/phase-8-implementation`** — migrations `020`–`023`, scene lint, relationship + stakes routes, continuity categories, settle extract, Testcontainers tests, coverage ≥90%
+3. **`web/phase-8-implementation`** — Scene lint panel, Relationship graph, Stakes board against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
+
+**Skill focus:** `storyforge-architecture`, `storyforge-domain-canon`, `storyforge-continuity`, `storyforge-db-design`, `storyforge-api-python`, `storyforge-web-next`
+
+---
+
+## Phase 9+ — Research, Series, Export, Scale
+
+**Goal:** Research workflow, multi-book series, export pipelines, optional graph DB — deferred until Phase 8 Slice 1 ships.
+
+| Module | Notes |
+|--------|-------|
+| Research module | notes → promote to bible |
+| Series projects | parent bible slice |
+| Git mirror | markdown export jobs |
+| Neo4j | optional if Postgres graph queries painful |
+| Export | EPUB/DOCX |
+| Collaboration | realtime optional |
+
+### Dependencies
+
+- Phase 8 Slice 1
 
 ---
 
@@ -364,7 +407,8 @@ PRs **2** and **3** run **in parallel** after specs merge.
 | 5 | Psych panels | US-C03 |
 | 6 | Prompt Edit, Power bible | US-W03, PW01 |
 | 7 | Polish all | all UX AC |
-| 8+ | Outline/Timeline advanced, export | US-O02, E01 |
+| 8 | Scene lint, Relationship graph, Stakes board | US-C03, US-O01 (partial) |
+| 9+ | Outline/Timeline advanced, export | US-O02, E01 |
 
 ---
 
