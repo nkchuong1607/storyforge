@@ -38,6 +38,7 @@ from app.services.continuity.engine import _normalize_content, _snapshot_entries
 from app.services.continuity.power import build_power_snapshot
 from app.services.continuity.relationship import compute_intensity
 from app.services.continuity.stakes import build_stakes_snapshot
+from app.services.series import SeriesService
 from app.utils.psyche_validation import merge_psyche_card
 
 
@@ -381,6 +382,10 @@ class SettleService:
         )
         project.bible_version_current = bible_after
         await self._reconcile_staging(project.id, merged_snapshot, bible_after)
+
+        await SeriesService(self.session).publish_slice_from_hub(
+            project, merged_snapshot, bible_after
+        )
 
         chapter.status = ChapterStatus.locked
         chapter.settled_at = now

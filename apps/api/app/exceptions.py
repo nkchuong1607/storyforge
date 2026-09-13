@@ -299,6 +299,56 @@ class SceneLLMAuditorError(AppError):
         super().__init__(status_code=502, code="scene_llm_auditor_error", message=message)
 
 
+class NoteNotEditableError(AppError):
+    def __init__(self, message: str = "Note is not editable") -> None:
+        super().__init__(status_code=409, code="note_not_editable", message=message)
+
+
+class NoteAlreadyPromotedError(AppError):
+    def __init__(self, message: str = "Note already promoted") -> None:
+        super().__init__(status_code=409, code="note_already_promoted", message=message)
+
+
+class ResearchLinkDuplicateError(AppError):
+    def __init__(self, message: str = "Link already exists") -> None:
+        super().__init__(status_code=409, code="link_duplicate", message=message)
+
+
+class InvalidLinkTargetError(AppError):
+    def __init__(self, message: str = "Link type/target mismatch") -> None:
+        super().__init__(status_code=422, code="invalid_link_target", message=message)
+
+
+class InvalidBibleSectionError(AppError):
+    def __init__(self, message: str = "Invalid bible section for promote") -> None:
+        super().__init__(status_code=422, code="invalid_bible_section", message=message)
+
+
+class ProjectAlreadyInSeriesError(AppError):
+    def __init__(self, message: str = "Project already belongs to a series") -> None:
+        super().__init__(status_code=409, code="project_already_in_series", message=message)
+
+
+class SeriesNotAttachedError(AppError):
+    def __init__(self, message: str = "Project is not attached to a series") -> None:
+        super().__init__(status_code=422, code="series_not_attached", message=message)
+
+
+class InvalidExportOptionsError(AppError):
+    def __init__(self, message: str = "Invalid export options") -> None:
+        super().__init__(status_code=422, code="invalid_export_options", message=message)
+
+
+class ExportJobNotDoneError(AppError):
+    def __init__(self, message: str = "Export job is not done") -> None:
+        super().__init__(status_code=409, code="export_job_not_done", message=message)
+
+
+class ExportJobRunningError(AppError):
+    def __init__(self, message: str = "Export job is running") -> None:
+        super().__init__(status_code=409, code="export_job_running", message=message)
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

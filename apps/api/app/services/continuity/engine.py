@@ -13,7 +13,8 @@ from app.models.character import Character
 from app.models.enums import ContinuityCategory, ContinuityResult, ContinuitySeverity
 
 RULE_PACK_VERSION = (
-    "deterministic-v1+foreshadow-v1+psychology-v1+power-v1+scene-v1+relationship-v1+stakes-v1"
+    "deterministic-v1+foreshadow-v1+psychology-v1+power-v1+scene-v1+"
+    "relationship-v1+stakes-v1+research-v1+series-v1"
 )
 
 DEATH_KEYWORDS = ("chết", "tử vong", "băng hà", "mất mạng")
@@ -398,6 +399,8 @@ def run_continuity_checks(
     relationship_event_proposals: list[dict] | None = None,
     stakes_ledger_proposals: list[dict] | None = None,
     scene_structure_summary: dict | None = None,
+    research_issues: list[ContinuityIssue] | None = None,
+    series_issues: list[ContinuityIssue] | None = None,
 ) -> tuple[list[dict], dict, dict, ContinuityResult]:
     """Run all Phase 2 + Phase 4 + Phase 5 rules; return issues, state_diff, stats, result."""
     raw_issues: list[ContinuityIssue] = []
@@ -448,6 +451,10 @@ def run_continuity_checks(
         raw_issues.extend(relationship_issues)
     if stakes_issues:
         raw_issues.extend(stakes_issues)
+    if research_issues:
+        raw_issues.extend(research_issues)
+    if series_issues:
+        raw_issues.extend(series_issues)
 
     state_diff = build_state_diff_stub(
         prose=prose,

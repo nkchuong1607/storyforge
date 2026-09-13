@@ -14,10 +14,14 @@ from app.models.enums import (
     ContinuityCategory,
     ContinuityResult,
     ContinuitySeverity,
+    ExportChapterScope,
+    ExportJobStatus,
+    ExportJobType,
     ExtractorSource,
     GenreProfile,
     LedgerEntityType,
     LedgerEventType,
+    Phase9BibleSection,
     PlantSalience,
     ProjectLanguage,
     ProjectMemberRole,
@@ -26,20 +30,25 @@ from app.models.enums import (
     ProseSource,
     ProvisionalStatus,
     RelationType,
+    ResearchNoteLinkType,
+    ResearchNoteStatus,
     SceneStrictness,
     SceneType,
     StakesEntryStatus,
     TwistPlanKind,
     TwistPlanStatus,
 )
+from app.models.export_job import ExportJob
 from app.models.ledger_event import LedgerEvent
 from app.models.project import Project, ProjectMember
 from app.models.prose_version import ProseVersion
 from app.models.psych_state import PsychState
 from app.models.relationship import Relationship
 from app.models.relationship_event import RelationshipEvent
+from app.models.research import ResearchNote, ResearchNoteLink
 from app.models.scene_beat import SceneBeat
 from app.models.scene_engine_settings import SceneEngineSettings
+from app.models.series import Series, SeriesBibleSlice, SeriesProject
 from app.models.stakes_ledger_entry import StakesLedgerEntry
 from app.models.twist import TwistPayoff, TwistPlan, TwistPlant
 
@@ -59,6 +68,10 @@ __all__ = [
     "ContinuityReport",
     "ContinuityResult",
     "ContinuitySeverity",
+    "ExportChapterScope",
+    "ExportJob",
+    "ExportJobStatus",
+    "ExportJobType",
     "ExtractorSource",
     "GenreProfile",
     "LedgerEntityType",
@@ -70,8 +83,16 @@ __all__ = [
     "ProjectMemberRole",
     "ProjectStatus",
     "ProjectTemplate",
+    "Phase9BibleSection",
     "ProseSource",
     "ProvisionalStatus",
+    "ResearchNote",
+    "ResearchNoteLink",
+    "ResearchNoteLinkType",
+    "ResearchNoteStatus",
+    "Series",
+    "SeriesBibleSlice",
+    "SeriesProject",
     "ProseVersion",
     "PsychState",
     "RelationType",

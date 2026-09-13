@@ -42,6 +42,12 @@ class ChapterRepository:
         await self.session.flush()
         return chapter
 
+    async def list_all_for_project(self, project_id: uuid.UUID) -> list[Chapter]:
+        rows = await self.session.scalars(
+            select(Chapter).where(Chapter.project_id == project_id).order_by(Chapter.number.asc())
+        )
+        return list(rows.all())
+
     async def list_for_project(
         self, project_id: uuid.UUID, page: PageParams
     ) -> tuple[list[Chapter], int]:

@@ -25,7 +25,9 @@ from app.repositories.power import PowerRepository
 from app.repositories.prose import ProseRepository
 from app.repositories.psych_state import PsychStateRepository
 from app.repositories.relationship import RelationshipRepository
+from app.repositories.research import ResearchRepository
 from app.repositories.scene_engine import SceneEngineRepository
+from app.repositories.series import SeriesRepository
 from app.repositories.stakes import StakesRepository
 from app.repositories.twist import TwistRepository
 from app.schemas.continuity import (
@@ -63,7 +65,9 @@ from app.services.continuity.relationship import (
     build_relationship_event_proposals,
     run_relationship_checks,
 )
+from app.services.continuity.research import run_research_checks
 from app.services.continuity.scene import build_scene_structure_summary, run_scene_structure_checks
+from app.services.continuity.series_rules import inherited_keys_from_slice, run_series_checks
 from app.services.continuity.stakes import (
     build_stakes_ledger_proposals,
     resolve_act_for_chapter,
@@ -88,6 +92,8 @@ class ContinuityService:
         self.scene_engine = SceneEngineRepository(session)
         self.relationships = RelationshipRepository(session)
         self.stakes = StakesRepository(session)
+        self.research = ResearchRepository(session)
+        self.series = SeriesRepository(session)
 
     def _report_schema(self, report: ContinuityReport) -> ContinuityReportSchema:
         return ContinuityReportSchema(
@@ -340,6 +346,27 @@ class ContinuityService:
         )
         scene_summary = build_scene_structure_summary(beat_rows)
 
+        research_links = await self.research.list_all_links_for_project(project.id)
+        research_raw = run_research_checks(
+            links=research_links,
+            characters=characters,
+            snapshot_json=snapshot,
+        )
+
+        slice_version = 0
+        inherited_keys: set[str] = set()
+        if project.series_id:
+            latest_slice = await self.series.get_latest_slice(project.series_id)
+            if latest_slice:
+                slice_version = latest_slice.version
+                inherited_keys = inherited_keys_from_slice(latest_slice.slice_json)
+        series_raw = run_series_checks(
+            project=project,
+            slice_version=slice_version,
+            staging_rows=staging,
+            inherited_keys=inherited_keys,
+        )
+
         for proposal in relationship_proposals:
             rel_id = proposal.get("relationship_id")
             if rel_id:
@@ -383,6 +410,8 @@ class ContinuityService:
             relationship_event_proposals=relationship_proposals,
             stakes_ledger_proposals=stakes_proposals,
             scene_structure_summary=scene_summary,
+            research_issues=research_raw,
+            series_issues=series_raw,
         )
 
         report = ContinuityReport(

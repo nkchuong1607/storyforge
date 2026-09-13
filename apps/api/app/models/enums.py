@@ -82,6 +82,50 @@ class ContinuityCategory(StrEnum):
     scene_structure = "scene_structure"
     relationship_arc = "relationship_arc"
     stakes = "stakes"
+    research = "research"
+    series = "series"
+
+
+class ResearchNoteStatus(StrEnum):
+    active = "active"
+    archived = "archived"
+    promoted = "promoted"
+
+
+class ResearchNoteLinkType(StrEnum):
+    character = "character"
+    place = "place"
+    fact = "fact"
+    chapter = "chapter"
+
+
+class Phase9BibleSection(StrEnum):
+    world = "world"
+    characters = "characters"
+    timeline = "timeline"
+    glossary = "glossary"
+    objects = "objects"
+    style = "style"
+    power_system = "power_system"
+
+
+class ExportJobType(StrEnum):
+    epub = "epub"
+    docx = "docx"
+    git_md_mirror = "git_md_mirror"
+
+
+class ExportJobStatus(StrEnum):
+    pending = "pending"
+    running = "running"
+    done = "done"
+    failed = "failed"
+
+
+class ExportChapterScope(StrEnum):
+    settled_only = "settled_only"
+    include_drafts = "include_drafts"
+    selected = "selected"
 
 
 class TwistPlanStatus(StrEnum):
