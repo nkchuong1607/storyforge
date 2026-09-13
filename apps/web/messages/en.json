@@ -1,0 +1,256 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "retry": "Retry",
+    "loading": "Loading…",
+    "back": "Back",
+    "close": "Close",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "clearSearch": "Clear search",
+    "notFound": "Not found",
+    "errorLoad": "Failed to load data",
+    "backToDashboard": "← Back to Dashboard",
+    "skipToMain": "Skip to main content",
+    "offline": "You are offline. Some actions may be delayed.",
+    "dismiss": "Dismiss",
+    "userAvatar": "User avatar",
+    "creating": "Creating…",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "words": "words"
+  },
+  "theme": {
+    "toggle": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "switchTo": "Switch to {mode}",
+    "current": "Theme: {mode}"
+  },
+  "locale": {
+    "toggle": "Language",
+    "vi": "VI",
+    "en": "EN",
+    "switchTo": "Switch to {locale}",
+    "current": "Language: {locale}"
+  },
+  "nav": {
+    "projects": "Projects",
+    "templates": "Templates (coming soon)",
+    "settings": "Settings",
+    "hub": "Overview",
+    "chapters": "Chapters",
+    "bible": "Story Bible",
+    "characters": "Characters",
+    "outline": "Outline",
+    "genreSettings": "Genre"
+  },
+  "dashboard": {
+    "title": "My Projects",
+    "empty": "No projects yet",
+    "emptyDescription": "Start your writing journey with your first project.",
+    "emptyCta": "+ Create new project",
+    "errorLoad": "Failed to load projects",
+    "filteredEmpty": "No results for '{query}'",
+    "newProject": "New project",
+    "searchPlaceholder": "Search projects…",
+    "searchLabel": "Search projects",
+    "progress": "Progress",
+    "updated": "Updated {date}"
+  },
+  "hub": {
+    "notFound": "Project not found",
+    "errorLoad": "Failed to load project",
+    "emptyChapters": "No chapters yet",
+    "addChapter": "+ Add chapter",
+    "continuityWarn": "Continuity warning",
+    "chapterNumber": "#",
+    "chapterTitle": "Title",
+    "chapterStatus": "Status",
+    "chapterWords": "Words",
+    "chapterUpdated": "Updated",
+    "summaryChapters": "Chapters",
+    "summaryBible": "Bible entries",
+    "summaryProgress": "Writing progress",
+    "recentActivity": "Recent activity",
+    "noActivity": "No recent activity"
+  },
+  "chapter": {
+    "status": {
+      "planned": "Planned",
+      "drafting": "Drafting",
+      "reviewing": "Reviewing",
+      "settled": "Written",
+      "locked": "Locked"
+    },
+    "emptyProse": "Start writing or use Prompt Edit…",
+    "saving": "Saving…",
+    "saved": "Saved at {time}",
+    "lockedBanner": "Chapter locked — read only",
+    "errorLoad": "Failed to load chapter",
+    "backToHub": "← Back to Hub",
+    "beats": "Scenes",
+    "versions": "Versions",
+    "promptEdit": "Prompt Edit"
+  },
+  "bible": {
+    "title": "Story Bible",
+    "noSelection": "Select an entry from the table of contents",
+    "errorLoad": "Failed to load Bible",
+    "editMode": "Editing",
+    "save": "Save entry",
+    "sections": {
+      "world_rules": "World rules",
+      "locations": "Locations",
+      "factions": "Factions",
+      "glossary": "Glossary",
+      "timeline": "Timeline",
+      "characters": "Characters",
+      "objects": "Objects"
+    }
+  },
+  "continuity": {
+    "title": "Continuity Gate",
+    "level": {
+      "pass": "PASS",
+      "warn": "WARN",
+      "fail": "FAIL"
+    },
+    "running": "Running check…",
+    "staleBanner": "Draft changed — re-run check",
+    "settleDisabled": "Cannot settle — unresolved FAIL issues",
+    "settleSuccess": "Chapter settled successfully",
+    "settleError": "Failed to settle",
+    "errorLoad": "Failed to load report",
+    "notFound": "Chapter not found",
+    "markIntentional": "Mark intentional",
+    "approveSettle": "Approve & Settle",
+    "reject": "Reject",
+    "requestRevise": "Request revision",
+    "stateDiff": "State diff preview",
+    "issueTable": "Continuity issues table"
+  },
+  "wizard": {
+    "title": "Create new project",
+    "stepBasics": "Basics",
+    "stepGenre": "Genre",
+    "stepTemplate": "Template",
+    "stepConfirm": "Confirm",
+    "next": "Next",
+    "back": "Back",
+    "create": "Create project",
+    "creating": "Creating…",
+    "slugConflict": "Slug already exists — try another",
+    "errorCreate": "Failed to create project",
+    "validation": {
+      "titleRequired": "Title is required",
+      "slugRequired": "Slug is required",
+      "slugInvalid": "Slug must contain only lowercase letters, numbers, and hyphens"
+    }
+  },
+  "characters": {
+    "title": "Characters",
+    "empty": "Add seed characters or write prose to extract",
+    "emptyCta": "Add character",
+    "errorLoad": "Failed to load characters",
+    "notFound": "Character not found",
+    "inbox": "Provisional inbox",
+    "inboxEmpty": "No provisional suggestions",
+    "merge": "Merge into existing character",
+    "promote": "Promote tier",
+    "archive": "Archive",
+    "addCharacter": "Add character",
+    "displayName": "Display name",
+    "role": "Role",
+    "tier": "Tier",
+    "status": "Status",
+    "filterTier": "Filter by tier",
+    "filterStatus": "Filter by status",
+    "searchPlaceholder": "Search characters…",
+    "searchLabel": "Search characters",
+    "selectCharacter": "Select character",
+    "toastCreated": "Character created",
+    "toastSaved": "Character saved",
+    "toastPromoted": "Tier promoted",
+    "toastArchived": "Character archived",
+    "toastError": "Failed to save",
+    "toastCreateError": "Failed to create character",
+    "tabs": {
+      "overview": "Overview",
+      "psyche": "Psyche",
+      "relationships": "Relationships",
+      "ledger": "Ledger",
+      "appearances": "Appearances"
+    },
+    "relationshipsEmpty": "No relationships recorded yet."
+  },
+  "twist": {
+    "title": "Twist Board",
+    "columns": {
+      "secrets": "Secrets",
+      "plants": "Plants",
+      "payoffs": "Payoffs",
+      "revealed": "Revealed"
+    },
+    "empty": "No twists yet",
+    "emptyCta": "Add twist",
+    "fairnessFail": "Missing plant for payoff",
+    "errorLoad": "Failed to load twist board",
+    "outlineStub": "Detailed outline — coming soon (Phase 8+)",
+    "timelineStub": "Timeline — coming soon (Phase 8+)"
+  },
+  "power": {
+    "title": "Power System",
+    "disabled": "Genre does not use power system",
+    "disabledLink": "Change genre",
+    "emptyRanks": "No ranks yet",
+    "addRank": "Add first rank",
+    "errorLoad": "Failed to load power system",
+    "validationMonotonic": "Rank order must be monotonic",
+    "ranks": "Ranks",
+    "techniques": "Techniques"
+  },
+  "psych": {
+    "emptyPsyche": "No psyche card yet",
+    "seedPsyche": "Create psyche card",
+    "timelineEmpty": "No psych events yet",
+    "errorLoad": "Failed to load psych data",
+    "toastSaved": "Psyche card saved"
+  },
+  "labels": {
+    "genre": {
+      "xianxia": "Xianxia",
+      "mystery": "Mystery",
+      "literary": "Literary",
+      "romance": "Romance",
+      "custom": "Custom"
+    },
+    "template": {
+      "blank": "Blank",
+      "xianxia_starter": "Xianxia starter",
+      "mystery_starter": "Mystery starter"
+    },
+    "characterStatus": {
+      "established": "Established",
+      "provisional": "Provisional",
+      "archived": "Archived"
+    },
+    "characterTier": {
+      "0": "T0",
+      "1": "T1",
+      "2": "T2",
+      "3": "T3"
+    }
+  },
+  "errors": {
+    "not_found": "Not found",
+    "network": "Network error",
+    "boundary": "Something went wrong",
+    "boundaryRetry": "Reload page"
+  }
+}

@@ -1,4 +1,9 @@
+"use client";
+
 import type { Chapter } from "@/lib/api/types";
+import { useTranslations } from "@/lib/i18n/use-translations";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 
 interface SummaryCardsProps {
   chapterCount: number;
@@ -7,37 +12,44 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ chapterCount, bibleEntryCount, chapters }: SummaryCardsProps) {
+  const t = useTranslations();
   const inProgress = chapters.filter((c) => c.status !== "planned").length;
   const reviewingCount = chapters.filter((c) => c.status === "reviewing").length;
 
   return (
     <div className="mb-6 grid gap-4 sm:grid-cols-3">
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Chương</p>
-        <p className="mt-1 text-2xl font-bold text-slate-900">
+      <Card>
+        <p className="text-xs font-medium uppercase tracking-wide text-sf-text-secondary">
+          {t("hub.summaryChapters")}
+        </p>
+        <p className="mt-1 text-2xl font-bold text-sf-text-primary">
           {inProgress}/{chapterCount}
         </p>
-        <p className="mt-1 text-xs text-slate-500">Tiến độ viết</p>
-      </div>
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Bible</p>
-        <p className="mt-1 text-2xl font-bold text-slate-900">{bibleEntryCount}</p>
-        <p className="mt-1 text-xs text-slate-500">Mục staging</p>
-      </div>
-      <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Continuity</p>
+        <p className="mt-1 text-xs text-sf-text-secondary">{t("hub.summaryProgress")}</p>
+      </Card>
+      <Card>
+        <p className="text-xs font-medium uppercase tracking-wide text-sf-text-secondary">
+          {t("hub.summaryBible")}
+        </p>
+        <p className="mt-1 text-2xl font-bold text-sf-text-primary">{bibleEntryCount}</p>
+      </Card>
+      <Card>
+        <p className="text-xs font-medium uppercase tracking-wide text-sf-text-secondary">
+          Continuity
+        </p>
         {reviewingCount > 0 ? (
           <>
-            <p className="mt-1 text-2xl font-bold text-amber-600">{reviewingCount}</p>
-            <p className="mt-1 text-xs text-slate-500">Chương đang xem xét</p>
+            <p className="mt-1 text-2xl font-bold text-sf-warning">{reviewingCount}</p>
+            <Badge variant="warning" className="mt-1">
+              {t("hub.continuityWarn")}
+            </Badge>
           </>
         ) : (
-          <>
-            <p className="mt-1 text-2xl font-bold text-emerald-600">PASS</p>
-            <p className="mt-1 text-xs text-slate-500">Không có chương chờ review</p>
-          </>
+          <Badge variant="success" className="mt-3">
+            PASS
+          </Badge>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

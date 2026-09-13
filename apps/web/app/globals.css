@@ -1,5 +1,88 @@
 @import "tailwindcss";
 
+/* Design tokens — light (default) */
+:root,
+[data-theme="light"] {
+  --sf-bg-base: #fafaf9;
+  --sf-bg-surface: #ffffff;
+  --sf-bg-muted: #f4f4f5;
+  --sf-border: #e4e4e7;
+  --sf-text-primary: #18181b;
+  --sf-text-secondary: #71717a;
+  --sf-accent: #2563eb;
+  --sf-accent-hover: #1d4ed8;
+  --sf-success: #16a34a;
+  --sf-warning: #ca8a04;
+  --sf-danger: #dc2626;
+  --sf-info: #0891b2;
+
+  --sf-font-sans: Inter, system-ui, sans-serif;
+  --sf-font-serif: Literata, Georgia, serif;
+  --sf-font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --sf-space-1: 4px;
+  --sf-space-2: 8px;
+  --sf-space-3: 12px;
+  --sf-space-4: 16px;
+  --sf-space-6: 24px;
+  --sf-space-8: 32px;
+
+  --sf-radius-sm: 4px;
+  --sf-radius-md: 8px;
+  --sf-radius-lg: 12px;
+  --sf-radius-full: 9999px;
+
+  --sf-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+  --sf-shadow-md: 0 4px 12px rgb(0 0 0 / 0.08);
+}
+
+[data-theme="dark"] {
+  --sf-bg-base: #0c0c0d;
+  --sf-bg-surface: #161618;
+  --sf-bg-muted: #1f1f23;
+  --sf-border: #2a2a2e;
+  --sf-text-primary: #fafafa;
+  --sf-text-secondary: #a1a1aa;
+  --sf-accent: #3b82f6;
+  --sf-accent-hover: #60a5fa;
+  --sf-success: #22c55e;
+  --sf-warning: #eab308;
+  --sf-danger: #ef4444;
+  --sf-info: #06b6d4;
+}
+
+@theme inline {
+  --color-sf-bg-base: var(--sf-bg-base);
+  --color-sf-bg-surface: var(--sf-bg-surface);
+  --color-sf-bg-muted: var(--sf-bg-muted);
+  --color-sf-border: var(--sf-border);
+  --color-sf-text-primary: var(--sf-text-primary);
+  --color-sf-text-secondary: var(--sf-text-secondary);
+  --color-sf-accent: var(--sf-accent);
+  --color-sf-accent-hover: var(--sf-accent-hover);
+  --color-sf-success: var(--sf-success);
+  --color-sf-warning: var(--sf-warning);
+  --color-sf-danger: var(--sf-danger);
+  --color-sf-info: var(--sf-info);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  background-color: var(--sf-bg-base);
+  color: var(--sf-text-primary);
+  font-family: var(--sf-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sf-accent);
+  outline-offset: 2px;
 }

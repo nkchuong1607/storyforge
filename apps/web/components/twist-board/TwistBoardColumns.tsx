@@ -20,13 +20,7 @@ export function TwistBoardColumns({
   onCreateSecret,
 }: TwistBoardColumnsProps) {
   if (loading) {
-    return (
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <LoadingSkeleton key={index} variant="content" count={3} />
-        ))}
-      </div>
-    );
+    return <LoadingSkeleton variant="kanban" count={4} />;
   }
 
   if (!board) return null;
