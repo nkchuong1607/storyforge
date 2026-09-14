@@ -28,10 +28,27 @@ class Settings(BaseSettings):
     )
     export_sync: bool = Field(default=False, validation_alias="STORYFORGE_EXPORT_SYNC")
     export_queue_name: str = "storyforge:export_jobs"
+    fact_check_sync: bool = Field(default=False, validation_alias="STORYFORGE_FACT_CHECK_SYNC")
+    fact_check_queue_name: str = "storyforge:fact_check_runs"
+    fact_check_http: bool = Field(default=False, validation_alias="STORYFORGE_FACT_CHECK_HTTP")
+    fact_check_live_wiki: bool = Field(
+        default=False, validation_alias="STORYFORGE_FACT_CHECK_LIVE_WIKI"
+    )
+    fact_check_cache: bool = Field(default=True, validation_alias="STORYFORGE_FACT_CHECK_CACHE")
+    fact_check_provider: str = Field(
+        default="fake", validation_alias="STORYFORGE_FACT_CHECK_PROVIDER"
+    )
 
-    @field_validator("export_sync", mode="before")
+    @field_validator(
+        "export_sync",
+        "fact_check_sync",
+        "fact_check_http",
+        "fact_check_live_wiki",
+        "fact_check_cache",
+        mode="before",
+    )
     @classmethod
-    def parse_export_sync(cls, value: object) -> bool:
+    def parse_bool_env(cls, value: object) -> bool:
         if isinstance(value, str):
             return value.strip().lower() in {"1", "true", "yes", "on"}
         return bool(value)
