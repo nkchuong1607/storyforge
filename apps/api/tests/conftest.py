@@ -94,10 +94,13 @@ async def client(engine, postgres_url: str) -> AsyncGenerator[AsyncClient, None]
     get_settings.cache_clear()
     os.environ["DATABASE_URL"] = postgres_url
     os.environ["STORYFORGE_EXPORT_SYNC"] = "1"
+    os.environ["STORYFORGE_FACT_CHECK_SYNC"] = "1"
     os.environ["STORYFORGE_EXPORT_ARTIFACT_DIR"] = "/tmp/storyforge-exports-test"
     from app.services.export.queue import reset_export_queue
+    from app.services.fact_check.queue import reset_fact_check_queue
 
     reset_export_queue()
+    reset_fact_check_queue()
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:

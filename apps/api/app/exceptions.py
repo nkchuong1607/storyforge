@@ -349,6 +349,51 @@ class ExportJobRunningError(AppError):
         super().__init__(status_code=409, code="export_job_running", message=message)
 
 
+class InvalidRealityAnchorsError(AppError):
+    def __init__(self, message: str = "Unknown reality_anchors mode") -> None:
+        super().__init__(status_code=422, code="invalid_reality_anchors", message=message)
+
+
+class InvalidClaimCategoryError(AppError):
+    def __init__(self, message: str = "Unknown claim category") -> None:
+        super().__init__(status_code=422, code="invalid_claim_category", message=message)
+
+
+class FactCheckRunPendingError(AppError):
+    def __init__(self, message: str = "Fact-check run already pending for prose version") -> None:
+        super().__init__(status_code=409, code="fact_check_run_pending", message=message)
+
+
+class FactCheckRunNotDoneError(AppError):
+    def __init__(self, message: str = "Fact-check run is not done") -> None:
+        super().__init__(status_code=409, code="fact_check_run_not_done", message=message)
+
+
+class ClaimNoProposedCorrectionError(AppError):
+    def __init__(self, message: str = "Claim has no proposed correction") -> None:
+        super().__init__(status_code=409, code="claim_no_proposed_correction", message=message)
+
+
+class ClaimNoCitationsError(AppError):
+    def __init__(self, message: str = "Claim has no citations") -> None:
+        super().__init__(status_code=409, code="claim_no_citations", message=message)
+
+
+class ClaimAlreadyPromotedError(AppError):
+    def __init__(self, message: str = "Claim evidence already promoted") -> None:
+        super().__init__(status_code=409, code="claim_already_promoted", message=message)
+
+
+class FactCheckFailBlocksSettleError(AppError):
+    def __init__(self, details: list[dict[str, Any]] | None = None) -> None:
+        super().__init__(
+            status_code=409,
+            code="fact_check_fail_blocks_settle",
+            message="Unresolved fact-check FAIL blocks settle (project setting enabled)",
+            details=details,
+        )
+
+
 def error_body(
     code: str, message: str, details: list[dict[str, Any]] | None = None
 ) -> dict[str, Any]:

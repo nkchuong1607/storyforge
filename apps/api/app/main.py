@@ -19,11 +19,13 @@ from app.routers import (
     characters,
     context_packs,
     export,
+    fact_check,
     genre,
     health,
     power,
     projects,
     prompt_edit,
+    reality_settings,
     relationships,
     research,
     scene_engine,
@@ -67,3 +69,5 @@ app.include_router(stakes.router)
 app.include_router(research.router)
 app.include_router(series.router)
 app.include_router(export.router)
+app.include_router(reality_settings.router)
+app.include_router(fact_check.router)

@@ -13,17 +13,19 @@ from app.exceptions import (
 )
 from app.models.chapter import Chapter
 from app.models.continuity import ContinuityOverride, ContinuityReport
-from app.models.enums import ChapterStatus, ContinuitySeverity
+from app.models.enums import ChapterStatus, ContinuitySeverity, RealityAnchorsMode
 from app.models.project import Project
 from app.repositories.beat import BeatRepository
 from app.repositories.bible import BibleRepository
 from app.repositories.chapter import ChapterRepository
 from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
+from app.repositories.fact_check import FactCheckRepository
 from app.repositories.ledger import LedgerRepository
 from app.repositories.power import PowerRepository
 from app.repositories.prose import ProseRepository
 from app.repositories.psych_state import PsychStateRepository
+from app.repositories.reality_settings import RealitySettingsRepository
 from app.repositories.relationship import RelationshipRepository
 from app.repositories.research import ResearchRepository
 from app.repositories.scene_engine import SceneEngineRepository
@@ -44,6 +46,7 @@ from app.schemas.continuity import (
 )
 from app.services.chapter_status import is_chapter_locked
 from app.services.continuity.engine import RULE_PACK_VERSION, run_continuity_checks
+from app.services.continuity.fact_check import run_fact_check_bridge
 from app.services.continuity.foreshadow import (
     ForeshadowPayoffContext,
     ForeshadowPlantContext,
@@ -94,6 +97,8 @@ class ContinuityService:
         self.stakes = StakesRepository(session)
         self.research = ResearchRepository(session)
         self.series = SeriesRepository(session)
+        self.reality = RealitySettingsRepository(session)
+        self.fact_check = FactCheckRepository(session)
 
     def _report_schema(self, report: ContinuityReport) -> ContinuityReportSchema:
         return ContinuityReportSchema(
@@ -367,6 +372,15 @@ class ContinuityService:
             inherited_keys=inherited_keys,
         )
 
+        fact_check_raw: list = []
+        reality_settings = await self.reality.ensure_settings(project.id)
+        if reality_settings.reality_anchors == RealityAnchorsMode.strict.value:
+            bridge_claims = await self.fact_check.bridge_claims_for_chapter(project.id, chapter.id)
+            fact_check_raw = run_fact_check_bridge(
+                claims=bridge_claims,
+                chapter_id=chapter.id,
+            )
+
         for proposal in relationship_proposals:
             rel_id = proposal.get("relationship_id")
             if rel_id:
@@ -412,6 +426,7 @@ class ContinuityService:
             scene_structure_summary=scene_summary,
             research_issues=research_raw,
             series_issues=series_raw,
+            fact_check_issues=fact_check_raw,
         )
 
         report = ContinuityReport(

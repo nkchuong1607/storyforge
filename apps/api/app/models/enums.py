@@ -84,6 +84,50 @@ class ContinuityCategory(StrEnum):
     stakes = "stakes"
     research = "research"
     series = "series"
+    fact_check = "fact_check"
+
+
+class RealityAnchorsMode(StrEnum):
+    off = "off"
+    soft = "soft"
+    strict = "strict"
+
+
+class FactClaimCategory(StrEnum):
+    date = "date"
+    place = "place"
+    organization = "organization"
+    technology = "technology"
+    historical_event = "historical_event"
+    scientific_medical = "scientific_medical"
+    public_figure = "public_figure"
+
+
+class FactClaimDisposition(StrEnum):
+    open = "open"
+    intentional_fiction = "intentional_fiction"
+    dismissed = "dismissed"
+    accepted_fix = "accepted_fix"
+    evidence_promoted = "evidence_promoted"
+
+
+class FactClaimSeverity(StrEnum):
+    pass_ = "pass"
+    warn = "warn"
+    fail = "fail"
+
+
+class FactCheckRunStatus(StrEnum):
+    pending = "pending"
+    running = "running"
+    done = "done"
+    failed = "failed"
+
+
+class FactClaimSourceType(StrEnum):
+    prose = "prose"
+    research_note = "research_note"
+    anchor_marker = "anchor_marker"
 
 
 class ResearchNoteStatus(StrEnum):

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions import (
     ContinuityCheckRequiredError,
     ContinuityFailBlocksSettleError,
+    FactCheckFailBlocksSettleError,
     InvalidChapterStatusTransitionError,
     NotFoundError,
 )
@@ -27,9 +28,11 @@ from app.models.relationship_event import RelationshipEvent
 from app.repositories.bible import BibleRepository
 from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
+from app.repositories.fact_check import FactCheckRepository
 from app.repositories.ledger import LedgerRepository
 from app.repositories.power import PowerRepository
 from app.repositories.psych_state import PsychStateRepository
+from app.repositories.reality_settings import RealitySettingsRepository
 from app.repositories.relationship import RelationshipRepository
 from app.repositories.stakes import StakesRepository
 from app.repositories.twist import TwistRepository
@@ -54,6 +57,8 @@ class SettleService:
         self.power = PowerRepository(session)
         self.relationships = RelationshipRepository(session)
         self.stakes = StakesRepository(session)
+        self.fact_check = FactCheckRepository(session)
+        self.reality = RealitySettingsRepository(session)
 
     async def _get_cached_response(
         self, chapter_id: uuid.UUID, idempotency_key: uuid.UUID | None
@@ -151,6 +156,22 @@ class SettleService:
                     for i in fail_issues
                 ]
             )
+
+        reality = await self.reality.ensure_settings(project.id)
+        if reality.fact_check_blocks_settle is True:
+            open_fails = await self.fact_check.open_fail_claims_for_chapter(project.id, chapter.id)
+            if open_fails:
+                latest_run = await self.fact_check.latest_done_run_for_chapter(
+                    project.id, chapter.id
+                )
+                raise FactCheckFailBlocksSettleError(
+                    details=[
+                        {
+                            "open_fail_count": len(open_fails),
+                            "run_id": str(latest_run.id) if latest_run else None,
+                        }
+                    ]
+                )
 
         bible_before = project.bible_version_current
         current_bible = await self.bible.get_version(project.id, bible_before)
