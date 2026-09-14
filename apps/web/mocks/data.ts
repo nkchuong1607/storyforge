@@ -19,6 +19,7 @@ import { resetPhase5MockData } from "./phase5-data";
 import { ensurePhase6MockData, resetPhase6MockData } from "./phase6-data";
 import { ensurePhase8MockData, resetPhase8MockData } from "./phase8-data";
 import { ensurePhase9MockData, resetPhase9MockData, SERIES_1_ID } from "./phase9-data";
+import { ensurePhase10MockData, resetPhase10MockData } from "./phase10-data";
 
 export const MOCK_USER_ID = DEFAULT_USER_ID;
 export { CHAPTER_1_ID, CHAPTER_2_ID, CHAPTER_3_ID, PROJECT_1_ID };
@@ -192,7 +193,9 @@ export function resetMockData(): void {
   resetPhase6MockData();
   resetPhase8MockData();
   resetPhase9MockData();
+  resetPhase10MockData();
   ensurePhase9MockData(PROJECT_1_ID);
+  ensurePhase10MockData(PROJECT_1_ID);
 }
 
 export function toSummary(project: ProjectDetail): ProjectSummary {

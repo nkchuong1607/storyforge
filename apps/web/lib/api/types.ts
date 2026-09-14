@@ -1337,3 +1337,154 @@ export interface ExportJobListResponse {
   page_size: number;
   total: number;
 }
+
+// Phase 10 — Fact Check
+
+export type RealityAnchorsMode = "off" | "soft" | "strict";
+
+export type FactClaimCategory =
+  | "date"
+  | "place"
+  | "organization"
+  | "technology"
+  | "historical_event"
+  | "scientific_medical"
+  | "public_figure";
+
+export type FactClaimSeverity = "pass" | "warn" | "fail";
+
+export type FactCheckRunStatus = "pending" | "running" | "done" | "failed";
+
+export type FactClaimDisposition =
+  | "open"
+  | "intentional_fiction"
+  | "dismissed"
+  | "accepted_fix"
+  | "evidence_promoted";
+
+export interface FactClaimSpan {
+  start: number;
+  end: number;
+  excerpt: string;
+}
+
+export interface FactCitation {
+  id: string;
+  provider_id: string;
+  url: string;
+  title: string;
+  snippet: string;
+  retrieved_at: string;
+  research_note_id?: string | null;
+}
+
+export interface FactClaim {
+  id: string;
+  run_id: string;
+  project_id: string;
+  category: FactClaimCategory;
+  text: string;
+  normalized_text?: string | null;
+  span?: FactClaimSpan | null;
+  source_type: "prose" | "research_note" | "anchor_marker";
+  source_research_note_id?: string | null;
+  severity: FactClaimSeverity;
+  confidence?: number | null;
+  summary?: string | null;
+  proposed_correction?: string | null;
+  author_disposition: FactClaimDisposition;
+  disposition_at?: string | null;
+  promoted_research_note_id?: string | null;
+  citations: FactCitation[];
+  created_at: string;
+}
+
+export interface FactCheckRunSummary {
+  total_claims: number;
+  pass: number;
+  warn: number;
+  fail: number;
+  skipped: number;
+}
+
+export interface FactCheckRun {
+  id: string;
+  project_id: string;
+  chapter_id: string;
+  prose_version_id: string;
+  requested_by_user_id?: string;
+  status: FactCheckRunStatus;
+  skipped_reason?: string | null;
+  error_message?: string | null;
+  summary?: FactCheckRunSummary | null;
+  started_at?: string | null;
+  finished_at?: string | null;
+  created_at: string;
+}
+
+export interface FactCheckRunDetail extends FactCheckRun {
+  claims: FactClaim[];
+}
+
+export interface FactCheckRunListResponse {
+  items: FactCheckRun[];
+  page: number;
+  page_size: number;
+  total: number;
+}
+
+export interface FactCheckRunCreateRequest {
+  prose_version_id?: string;
+  force_refresh?: boolean;
+  categories?: FactClaimCategory[];
+}
+
+export interface ProjectRealitySettings {
+  project_id: string;
+  reality_anchors: RealityAnchorsMode;
+  enabled_categories: FactClaimCategory[];
+  fact_check_blocks_settle: boolean;
+  auto_run_on_save: boolean;
+  include_research_notes: boolean;
+  updated_at: string;
+}
+
+export interface ProjectRealitySettingsUpdate {
+  reality_anchors?: RealityAnchorsMode;
+  enabled_categories?: FactClaimCategory[];
+  fact_check_blocks_settle?: boolean;
+  auto_run_on_save?: boolean;
+  include_research_notes?: boolean;
+}
+
+export interface FactClaimDispositionRequest {
+  disposition: "intentional_fiction" | "dismissed" | "open";
+  note?: string;
+}
+
+export interface FactClaimAcceptFixRequest {
+  handoff_target?: "prompt_edit" | "staging_note";
+  correction_override?: string;
+}
+
+export interface FactClaimAcceptFixResponse {
+  claim_id: string;
+  handoff_target: "prompt_edit" | "staging_note";
+  handoff_payload: {
+    instruction?: string;
+    base_prose_version_id?: string;
+    span_hint?: FactClaimSpan;
+  };
+}
+
+export interface FactClaimPromoteEvidenceRequest {
+  citation_id?: string;
+  note_title?: string;
+  tags?: string[];
+}
+
+export interface FactClaimPromoteEvidenceResponse {
+  claim_id: string;
+  research_note_id: string;
+  research_note: ResearchNote;
+}

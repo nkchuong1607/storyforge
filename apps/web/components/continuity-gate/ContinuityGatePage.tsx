@@ -58,6 +58,8 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
     return acc;
   }, {});
 
+  const hasFactCheckBridge = (report?.issues ?? []).some((i) => i.category === "fact_check");
+
   const loadGate = useCallback(async () => {
     setLoadState("loading");
     try {
@@ -186,10 +188,16 @@ export function ContinuityGatePage({ projectId, chapterId }: ContinuityGatePageP
       {loadState === "success" && chapter && report && stateDiff ? (
         <>
           <ContinuityReportHeader chapterTitle={chapter.title} report={report} />
+          {hasFactCheckBridge ? (
+            <div className="mb-4 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-800">
+              {t("factCheck.gate.bridge_hint")}
+            </div>
+          ) : null}
           <ContinuityCategoryFilter
             selected={categoryFilter}
             onChange={setCategoryFilter}
             issueCounts={issueCounts}
+            showFactCheck={hasFactCheckBridge}
           />
           <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
             <ContinuityIssueTable

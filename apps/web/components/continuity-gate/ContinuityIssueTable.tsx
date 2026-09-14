@@ -62,6 +62,12 @@ function issueDeepLink(
       labelKey: "continuity.issues.linkSeries",
     };
   }
+  if (issue.category === "fact_check") {
+    return {
+      href: `/projects/${projectId}/chapters/${chapterId}?tab=fact-check`,
+      labelKey: "factCheck.gate.openInFactCheck",
+    };
+  }
   return {
     href: `/projects/${projectId}/chapters/${chapterId}?highlight=${issue.fingerprint}`,
     labelKey: "continuity.issues.linkFixInEditor",

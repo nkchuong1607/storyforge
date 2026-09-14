@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { CHAPTER_1_ID, CHAPTER_2_ID, PROJECT_1_ID } from "@/mocks/data";
+import { CHAPTER_1_ID, CHAPTER_2_ID, CHAPTER_3_ID, PROJECT_1_ID } from "@/mocks/data";
 import { ChapterEditorPage } from "./ChapterEditorPage";
 
 const push = vi.fn();
@@ -64,6 +64,17 @@ describe("ChapterEditorPage", () => {
     render(<ChapterEditorPage projectId={PROJECT_1_ID} chapterId={CHAPTER_2_ID} />);
     expect(await screen.findByText("Chương 2 — Tu luyện")).toBeInTheDocument();
     expect(await screen.findByText("Cấu trúc cảnh")).toBeInTheDocument();
+  });
+
+  it("renders fact-check tab panel", async () => {
+    render(
+      <ChapterEditorPage
+        projectId={PROJECT_1_ID}
+        chapterId={CHAPTER_3_ID}
+        activeTab="fact-check"
+      />,
+    );
+    expect(await screen.findByText(/Mâu thuẫn: 1/)).toBeInTheDocument();
   });
 
   it("shows not found for unknown chapter", async () => {

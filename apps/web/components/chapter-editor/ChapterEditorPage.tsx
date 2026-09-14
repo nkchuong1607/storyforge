@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { getRealitySettings } from "@/lib/api/fact-check";
 import { useCallback, useEffect, useState } from "react";
 import { createBeat, listBeats, updateBeat } from "@/lib/api/beats";
 import { extractCharactersFromChapter, listCharacters } from "@/lib/api/characters";
@@ -24,15 +25,22 @@ import { ProseEditor } from "./ProseEditor";
 import { SceneBeatsPanel } from "./SceneBeatsPanel";
 import { VersionDropdown } from "./VersionDropdown";
 import { useTranslations } from "@/lib/i18n/use-translations";
+import { ChapterEditorTabBar, type ChapterEditorTab } from "./ChapterEditorTabBar";
+import { FactCheckPanel } from "@/components/fact-check/FactCheckPanel";
 
 type LoadState = "loading" | "success" | "error" | "not_found";
 
 interface ChapterEditorPageProps {
   projectId: string;
   chapterId: string;
+  activeTab?: ChapterEditorTab;
 }
 
-export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPageProps) {
+export function ChapterEditorPage({
+  projectId,
+  chapterId,
+  activeTab = "editor",
+}: ChapterEditorPageProps) {
   const t = useTranslations();
   const router = useRouter();
   const [projectTitle, setProjectTitle] = useState("");
@@ -50,6 +58,8 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
   const [checkingContinuity, setCheckingContinuity] = useState(false);
   const [extractingCharacters, setExtractingCharacters] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [realityStrict, setRealityStrict] = useState(false);
+  const [promptEditHandoff, setPromptEditHandoff] = useState<string | null>(null);
 
   const readOnly = chapter?.status === "locked";
 
@@ -93,6 +103,8 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
       } else {
         setProseContent("");
       }
+      const realitySettings = await getRealitySettings(projectId).catch(() => null);
+      setRealityStrict(realitySettings?.reality_anchors === "strict");
       setLoadState("success");
       void refreshSceneLint();
     } catch (err: unknown) {
@@ -293,6 +305,19 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
             onContinuityCheck={() => void handleContinuityCheck()}
             onExtractCharacters={() => void handleExtractCharacters()}
           />
+          <ChapterEditorTabBar projectId={projectId} chapterId={chapterId} activeTab={activeTab} />
+          {activeTab === "fact-check" ? (
+            <FactCheckPanel
+              projectId={projectId}
+              chapterId={chapterId}
+              readOnly={readOnly}
+              realityStrict={realityStrict}
+              onPromptEditHandoff={(instruction) => {
+                setPromptEditHandoff(instruction);
+                router.push(`/projects/${projectId}/chapters/${chapterId}?tab=editor`);
+              }}
+            />
+          ) : (
           <div className="grid gap-4 lg:grid-cols-[240px_1fr_240px]">
             <SceneBeatsPanel
               projectId={projectId}
@@ -336,6 +361,8 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
               chapterId={chapterId}
               baseProseVersion={selectedVersion}
               readOnly={readOnly}
+              prefillInstruction={promptEditHandoff}
+              onPrefillConsumed={() => setPromptEditHandoff(null)}
               onApplied={(version) => {
                 setVersions((prev) => [version, ...prev]);
                 setSelectedVersion(version.version);
@@ -346,6 +373,7 @@ export function ChapterEditorPage({ projectId, chapterId }: ChapterEditorPagePro
               onToast={setToast}
             />
           </div>
+          )}
         </>
       ) : null}
     </AppShell>

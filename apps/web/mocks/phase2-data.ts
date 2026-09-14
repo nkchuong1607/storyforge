@@ -150,6 +150,15 @@ export const mockContinuityReports: Record<string, ContinuityReport[]> = {
           chapter_refs: [2],
           entity_ids: ["aa0e8400-e29b-41d4-a716-446655440001"],
         },
+        {
+          fingerprint: "fact_check:c3000000:fact_check_contradiction:berlin1985",
+          severity: "warn",
+          category: "fact_check",
+          code: "fact_check_contradiction",
+          message: "Berlin Wall fell in 1989, not 1985 — open in Fact Check",
+          chapter_refs: [3],
+          entity_ids: ["c3000000-0000-4000-8000-000000000401"],
+        },
       ],
       state_diff: {
         ledger_proposals: [
