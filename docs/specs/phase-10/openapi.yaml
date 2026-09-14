@@ -1,0 +1,728 @@
+openapi: 3.1.0
+info:
+  title: StoryForge API
+  version: 0.10.0-phase10
+  description: |
+    Phase 10 contract — extends Phase 9 with real-world fact-check: claim extraction from chapter prose,
+    async verification jobs (Redis), pluggable providers (FakeVerifier default), author dispositions,
+    and project reality settings (`reality_anchors`: off | soft | strict).
+
+    Phase 1–9 routes remain authoritative in prior phase OpenAPI files.
+
+    **Auth (MVP stub):** Send `X-User-Id: <uuid>` on every request except `/health`.
+
+    **Canon rule:** Fact-check is advisory by default — never auto-edits prose or auto-settles.
+    Accept-fix handoff creates Prompt Edit / staging note only. Citations are immutable snapshots.
+
+    **Jobs:** Fact-check enqueue returns `202`; poll run status until `done` or `failed`.
+    **Providers:** Default FakeVerifier; live HTTP behind `STORYFORGE_FACT_CHECK_HTTP=1` (off in CI).
+servers:
+  - url: http://localhost:8000
+    description: Local API dev
+tags:
+  - name: Health
+  - name: FactCheck
+  - name: RealitySettings
+paths:
+  /health:
+    get:
+      tags: [Health]
+      operationId: getHealth
+      summary: Health check
+      security: []
+      responses:
+        "200":
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /projects/{project_id}/reality-settings:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [RealitySettings]
+      operationId: getProjectRealitySettings
+      summary: Get project reality / fact-check settings
+      responses:
+        "200":
+          description: Reality settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectRealitySettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [RealitySettings]
+      operationId: updateProjectRealitySettings
+      summary: Update project reality / fact-check settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectRealitySettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectRealitySettings"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/chapters/{chapter_id}/fact-check/runs:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [FactCheck]
+      operationId: listFactCheckRuns
+      summary: List fact-check runs for chapter
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "200":
+          description: Paginated run list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FactCheckRunListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      tags: [FactCheck]
+      operationId: enqueueFactCheckRun
+      summary: Enqueue fact-check run for chapter
+      description: |
+        Uses latest prose version unless `prose_version_id` specified.
+        Returns `202` with run in `pending` status. Respects `reality_anchors=off` (immediate done with skip).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FactCheckRunCreateRequest"
+      responses:
+        "202":
+          description: Run enqueued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FactCheckRunDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: Run already pending for same prose version
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/chapters/{chapter_id}/fact-check/runs/{run_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ChapterId"
+      - $ref: "#/components/parameters/RunId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [FactCheck]
+      operationId: getFactCheckRun
+      summary: Get fact-check run with claims and citations
+      responses:
+        "200":
+          description: Run detail with issues
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FactCheckRunDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/fact-check/runs/{run_id}:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/RunId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    get:
+      tags: [FactCheck]
+      operationId: getFactCheckRunByProject
+      summary: Get fact-check run (project-scoped alias)
+      responses:
+        "200":
+          description: Run detail with issues
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FactCheckRunDetail"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /projects/{project_id}/fact-check/claims/{claim_id}/disposition:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ClaimId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [FactCheck]
+      operationId: setFactClaimDisposition
+      summary: Set author disposition on claim
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FactClaimDispositionRequest"
+      responses:
+        "200":
+          description: Updated claim
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FactClaim"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/fact-check/claims/{claim_id}/accept-fix:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ClaimId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [FactCheck]
+      operationId: acceptFactClaimFix
+      summary: Accept proposed correction — Prompt Edit / staging handoff
+      description: Does not mutate prose directly. Returns handoff payload for Prompt Edit or staging note.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FactClaimAcceptFixRequest"
+      responses:
+        "200":
+          description: Handoff created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FactClaimAcceptFixResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: No proposed correction on claim
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /projects/{project_id}/fact-check/claims/{claim_id}/promote-evidence:
+    parameters:
+      - $ref: "#/components/parameters/ProjectId"
+      - $ref: "#/components/parameters/ClaimId"
+      - $ref: "#/components/parameters/UserIdHeader"
+    post:
+      tags: [FactCheck]
+      operationId: promoteFactClaimEvidence
+      summary: Promote primary citation to research note
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FactClaimPromoteEvidenceRequest"
+      responses:
+        "201":
+          description: Research note created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FactClaimPromoteEvidenceResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: No citations or already promoted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+components:
+  parameters:
+    UserIdHeader:
+      name: X-User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ChapterId:
+      name: chapter_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ClaimId:
+      name: claim_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    PageSize:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid X-User-Id
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found or cross-tenant
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    UnprocessableEntity:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
+
+    RealityAnchorsMode:
+      type: string
+      enum: [off, soft, strict]
+
+    FactClaimCategory:
+      type: string
+      enum:
+        - date
+        - place
+        - organization
+        - technology
+        - historical_event
+        - scientific_medical
+        - public_figure
+
+    FactClaimDisposition:
+      type: string
+      enum: [open, intentional_fiction, dismissed, accepted_fix, evidence_promoted]
+
+    FactCheckRunStatus:
+      type: string
+      enum: [pending, running, done, failed]
+
+    FactClaimSeverity:
+      type: string
+      enum: [pass, warn, fail]
+
+    ProjectRealitySettings:
+      type: object
+      required:
+        - project_id
+        - reality_anchors
+        - enabled_categories
+        - fact_check_blocks_settle
+        - auto_run_on_save
+        - include_research_notes
+        - updated_at
+      properties:
+        project_id:
+          type: string
+          format: uuid
+        reality_anchors:
+          $ref: "#/components/schemas/RealityAnchorsMode"
+        enabled_categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/FactClaimCategory"
+          description: Empty array means all categories enabled
+        fact_check_blocks_settle:
+          type: boolean
+          default: false
+        auto_run_on_save:
+          type: boolean
+          default: false
+        include_research_notes:
+          type: boolean
+          default: true
+        updated_at:
+          type: string
+          format: date-time
+
+    ProjectRealitySettingsUpdate:
+      type: object
+      properties:
+        reality_anchors:
+          $ref: "#/components/schemas/RealityAnchorsMode"
+        enabled_categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/FactClaimCategory"
+        fact_check_blocks_settle:
+          type: boolean
+        auto_run_on_save:
+          type: boolean
+        include_research_notes:
+          type: boolean
+
+    FactCheckRunCreateRequest:
+      type: object
+      properties:
+        prose_version_id:
+          type: string
+          format: uuid
+          description: Default latest prose version for chapter
+        force_refresh:
+          type: boolean
+          default: false
+          description: Bypass provider cache
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/FactClaimCategory"
+          description: Override project enabled categories for this run
+
+    FactCitation:
+      type: object
+      required: [id, provider_id, url, title, snippet, retrieved_at]
+      properties:
+        id:
+          type: string
+          format: uuid
+        provider_id:
+          type: string
+        url:
+          type: string
+          format: uri
+        title:
+          type: string
+        snippet:
+          type: string
+        retrieved_at:
+          type: string
+          format: date-time
+        research_note_id:
+          type: string
+          format: uuid
+          nullable: true
+
+    FactClaim:
+      type: object
+      required:
+        - id
+        - run_id
+        - project_id
+        - category
+        - text
+        - source_type
+        - severity
+        - author_disposition
+        - citations
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        run_id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        category:
+          $ref: "#/components/schemas/FactClaimCategory"
+        text:
+          type: string
+        normalized_text:
+          type: string
+          nullable: true
+        span:
+          type: object
+          nullable: true
+          properties:
+            start:
+              type: integer
+            end:
+              type: integer
+            excerpt:
+              type: string
+        source_type:
+          type: string
+          enum: [prose, research_note, anchor_marker]
+        source_research_note_id:
+          type: string
+          format: uuid
+          nullable: true
+        severity:
+          $ref: "#/components/schemas/FactClaimSeverity"
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+        proposed_correction:
+          type: string
+          nullable: true
+        author_disposition:
+          $ref: "#/components/schemas/FactClaimDisposition"
+        disposition_at:
+          type: string
+          format: date-time
+          nullable: true
+        promoted_research_note_id:
+          type: string
+          format: uuid
+          nullable: true
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/FactCitation"
+        created_at:
+          type: string
+          format: date-time
+
+    FactCheckRunSummary:
+      type: object
+      properties:
+        total_claims:
+          type: integer
+        pass:
+          type: integer
+        warn:
+          type: integer
+        fail:
+          type: integer
+        skipped:
+          type: integer
+
+    FactCheckRun:
+      type: object
+      required:
+        - id
+        - project_id
+        - chapter_id
+        - prose_version_id
+        - status
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        project_id:
+          type: string
+          format: uuid
+        chapter_id:
+          type: string
+          format: uuid
+        prose_version_id:
+          type: string
+          format: uuid
+        requested_by_user_id:
+          type: string
+          format: uuid
+        status:
+          $ref: "#/components/schemas/FactCheckRunStatus"
+        skipped_reason:
+          type: string
+          nullable: true
+        error_message:
+          type: string
+          nullable: true
+        summary:
+          $ref: "#/components/schemas/FactCheckRunSummary"
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        finished_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    FactCheckRunDetail:
+      allOf:
+        - $ref: "#/components/schemas/FactCheckRun"
+        - type: object
+          properties:
+            claims:
+              type: array
+              items:
+                $ref: "#/components/schemas/FactClaim"
+
+    FactCheckRunListResponse:
+      type: object
+      required: [items, page, page_size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/FactCheckRun"
+        page:
+          type: integer
+        page_size:
+          type: integer
+        total:
+          type: integer
+
+    FactClaimDispositionRequest:
+      type: object
+      required: [disposition]
+      properties:
+        disposition:
+          type: string
+          enum: [intentional_fiction, dismissed, open]
+        note:
+          type: string
+          description: Optional author note for audit
+
+    FactClaimAcceptFixRequest:
+      type: object
+      properties:
+        handoff_target:
+          type: string
+          enum: [prompt_edit, staging_note]
+          default: prompt_edit
+        correction_override:
+          type: string
+          description: Author-edited correction text; default proposed_correction
+
+    FactClaimAcceptFixResponse:
+      type: object
+      required: [claim_id, handoff_target, handoff_payload]
+      properties:
+        claim_id:
+          type: string
+          format: uuid
+        handoff_target:
+          type: string
+          enum: [prompt_edit, staging_note]
+        handoff_payload:
+          type: object
+          description: Prompt Edit prefill or staging note draft
+          additionalProperties: true
+
+    FactClaimPromoteEvidenceRequest:
+      type: object
+      properties:
+        citation_id:
+          type: string
+          format: uuid
+          description: Default primary citation (first by confidence)
+        note_title:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    FactClaimPromoteEvidenceResponse:
+      type: object
+      required: [claim_id, research_note_id, research_note]
+      properties:
+        claim_id:
+          type: string
+          format: uuid
+        research_note_id:
+          type: string
+          format: uuid
+        research_note:
+          type: object
+          description: Phase 9 ResearchNote shape (subset)
+          additionalProperties: true

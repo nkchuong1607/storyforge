@@ -78,7 +78,7 @@ scripts/harness/ check.sh, agent-preflight.sh
 3. **Tests** — unit + integration (API: Testcontainers Postgres)
 4. **Coverage** — line ≥ **90%** hard gate for `apps/api` and phase-scoped web modules
 
-See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md), [docs/specs/phase-2/README.md](docs/specs/phase-2/README.md), [docs/specs/phase-3/README.md](docs/specs/phase-3/README.md), [docs/specs/phase-4/README.md](docs/specs/phase-4/README.md), [docs/specs/phase-5/README.md](docs/specs/phase-5/README.md), [docs/specs/phase-6/README.md](docs/specs/phase-6/README.md), [docs/specs/phase-7/README.md](docs/specs/phase-7/README.md), [docs/specs/phase-8/README.md](docs/specs/phase-8/README.md), and [docs/specs/phase-9/README.md](docs/specs/phase-9/README.md).
+See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md), [docs/specs/phase-2/README.md](docs/specs/phase-2/README.md), [docs/specs/phase-3/README.md](docs/specs/phase-3/README.md), [docs/specs/phase-4/README.md](docs/specs/phase-4/README.md), [docs/specs/phase-5/README.md](docs/specs/phase-5/README.md), [docs/specs/phase-6/README.md](docs/specs/phase-6/README.md), [docs/specs/phase-7/README.md](docs/specs/phase-7/README.md), [docs/specs/phase-8/README.md](docs/specs/phase-8/README.md), [docs/specs/phase-9/README.md](docs/specs/phase-9/README.md), and [docs/specs/phase-10/README.md](docs/specs/phase-10/README.md).
 
 ## Docs Index
 
@@ -106,5 +106,6 @@ See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [doc
 - [Phase 7 specs (UI polish, design system, a11n, i18n)](docs/specs/phase-7/README.md)
 - [Phase 8 specs (scene engine, relationships, stakes — Slice 1)](docs/specs/phase-8/README.md)
 - [Phase 9 specs (research, series, export — Slice 1)](docs/specs/phase-9/README.md)
+- [Phase 10 specs (real-world fact check)](docs/specs/phase-10/README.md)
 - [Quality gates](docs/engineering/quality-gates.md)
 - [Agent setup](docs/agent-setup.md)
