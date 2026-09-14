@@ -24,7 +24,8 @@ gantt
     Phase 7 UI Polish         :p7, 2025-05, 2025-07
     Phase 8 Story Quality     :p8, 2025-07, 2025-10
     Phase 9 Research Export   :p9, 2025-10, 2026-01
-    Phase 10 Plus             :p10, 2026-01, 2026-04
+    Phase 10 Fact Check       :p10, 2026-01, 2026-03
+    Phase 11 Plus             :p11, 2026-03, 2026-06
 ```
 
 *(Timeline illustrative — không cam kết calendar; thứ tự phase và deps mới là binding.)*
@@ -409,12 +410,63 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ---
 
-## Phase 10+ — Scale & Collaboration
+## Phase 10 — Real-World Fact Check
 
-**Goal:** Graph DB option, collaboration, advanced planning UI, cloud export — deferred until Phase 9 Slice 1 ships.
+**Goal:** Verify chapter claims against external sources (history, geography, tech, dates, public figures) — **distinct from** internal Continuity Gate (canon/bible/ledgers). Ships **before** genre craft LLM writing packs (Phase 11+).
+
+### Deliverables (in scope)
 
 | Module | Notes |
 |--------|-------|
+| Claim extraction | From chapter prose + optional research notes; configurable categories |
+| Verification jobs | Async Redis queue (export pattern); FakeVerifier + Wikipedia/Wikidata stub + research-note evidence |
+| Fact Check report | Severity, claim span, proposed correction, citation snapshots, confidence |
+| Project reality mode | `reality_anchors`: `off` \| `soft` \| `strict` |
+| Integration | Separate Fact Check panel; optional WARN-only Gate bridge when strict; default advisory (never blocks settle) |
+| Research link | Promote citation → Phase 9 research note |
+
+### Out of scope (Phase 11+)
+
+| Module | Notes |
+|--------|-------|
+| Genre craft LLM packs | Snowflake, Hero's Journey, style enhancer |
+| Neo4j | optional graph backend |
+| Realtime collaboration | presence / multi-user editing |
+| Paid search APIs | hard dependencies |
+| Automatic prose rewrite | without human apply |
+| LLM research autofill | optional overlap with Phase 9 deferred items |
+
+### Dependencies
+
+- Phases 1–9 complete (Research module provides evidence store)
+
+### Definition of done
+
+- FakeVerifier completes deterministically in tests; no live HTTP in CI
+- Author actions: accept fix → Prompt Edit handoff, intentional fiction, dismiss, promote evidence
+- `reality_anchors` modes filter extraction/verification correctly
+- Continuity bridge WARN-only when strict; default never blocks settle
+- `make test-api-cov` / `make test-web-cov` ≥ 90% on Phase 10 modules locally
+
+### Suggested PR order
+
+1. **`specs/phase-10`** — schema, OpenAPI, web screens, provider contracts, test strategy ([docs/specs/phase-10/README.md](../specs/phase-10/README.md))
+2. **`api/phase-10-implementation`** — migrations `028`–`031`, extraction, providers, Redis worker, Testcontainers tests, coverage ≥90%
+3. **`web/phase-10-implementation`** — Fact Check panel, reality settings against OpenAPI
+
+PRs **2** and **3** run **in parallel** after specs merge.
+
+**Skill focus:** `storyforge-architecture`, `storyforge-domain-canon`, `storyforge-continuity`, `storyforge-db-design`, `storyforge-api-python`, `storyforge-web-next`
+
+---
+
+## Phase 11+ — Genre Craft & Scale
+
+**Goal:** Genre craft LLM writing packs, graph DB option, collaboration, advanced planning UI, cloud export — deferred until Phase 10 ships.
+
+| Module | Notes |
+|--------|-------|
+| Genre craft LLM packs | Snowflake, Hero's Journey, style enhancer |
 | Neo4j | optional relationship / knowledge graph |
 | Realtime collaboration | optional |
 | Full multi-user ACL | beyond stub |
@@ -426,7 +478,7 @@ PRs **2** and **3** run **in parallel** after specs merge.
 
 ### Dependencies
 
-- Phase 9 Slice 1
+- Phase 10 Fact Check
 
 ---
 
@@ -461,7 +513,8 @@ PRs **2** and **3** run **in parallel** after specs merge.
 | 7 | Polish all | all UX AC |
 | 8 | Scene lint, Relationship graph, Stakes board | US-C03, US-O01 (partial) |
 | 9 | Research inbox, Series hub, Export panel | US-E01, US-E02 |
-| 10+ | Outline/Timeline advanced, collaboration | US-O02, E03 |
+| 10 | Fact Check panel, Reality settings | US-W01 (external verify) |
+| 11+ | Outline/Timeline advanced, genre craft packs, collaboration | US-O02, E03 |
 
 ---
 
