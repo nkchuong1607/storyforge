@@ -46,4 +46,30 @@ describe("ContinuityIssueTable", () => {
       "/projects/p/chapters/c?highlight=fp1",
     );
   });
+
+  it("renders fact_check deep link to Fact Check tab", () => {
+    render(
+      <ContinuityIssueTable
+        projectId="p"
+        chapterId="c"
+        issues={[
+          {
+            fingerprint: "fact_check:abc",
+            severity: "warn",
+            category: "fact_check",
+            code: "fact_check_contradiction",
+            message: "Bridge issue",
+            chapter_refs: [3],
+          },
+        ]}
+        overrides={[]}
+        readOnly={false}
+        onMarkIntentional={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Mở Fact Check" })).toHaveAttribute(
+      "href",
+      "/projects/p/chapters/c?tab=fact-check",
+    );
+  });
 });

@@ -16,4 +16,16 @@ describe("continuity gate phase9", () => {
     await user.click(screen.getByRole("button", { name: /Nghiên cứu \(2\)/ }));
     expect(onChange).toHaveBeenCalledWith("research");
   });
+
+  it("shows fact_check chip only when bridge rows present", () => {
+    renderWithProviders(
+      <ContinuityCategoryFilter
+        selected="all"
+        onChange={vi.fn()}
+        issueCounts={{ fact_check: 1 }}
+        showFactCheck
+      />,
+    );
+    expect(screen.getByRole("button", { name: /Kiểm tra sự thật \(1\)/ })).toBeInTheDocument();
+  });
 });

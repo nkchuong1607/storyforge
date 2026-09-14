@@ -524,6 +524,10 @@
     "boundaryRetry": "Reload page"
   },
   "editor": {
+    "tab": {
+      "editor": "Editor",
+      "label": "Chapter tabs"
+    },
     "notFound": "Chapter not found",
     "backToHub": "← Back to Project Hub",
     "errorLoad": "Failed to load chapter",
@@ -864,6 +868,88 @@
     "hub": {
       "quickAction": "Export",
       "recent": "Recent exports"
+    }
+  },
+  "factCheck": {
+    "panel": {
+      "title": "Fact Check",
+      "subtitle": "Verify against external sources",
+      "empty": "No check run yet",
+      "run": "Run check",
+      "running": "Checking…",
+      "skipped_off": "Reality anchors off — no check",
+      "last_run": "Last run",
+      "noIssues": "No issues found",
+      "summary": "Results summary",
+      "filters": "Filter issues",
+      "filterAll": "All"
+    },
+    "severity": {
+      "pass": "Match",
+      "warn": "Review",
+      "fail": "Contradiction"
+    },
+    "category": {
+      "date": "Dates",
+      "place": "Places",
+      "organization": "Organizations",
+      "technology": "Technology",
+      "historical_event": "Historical events",
+      "scientific_medical": "Science / medicine",
+      "public_figure": "Public figures"
+    },
+    "claim": {
+      "excerpt": "Excerpt",
+      "confidence": "Confidence {percent}%",
+      "proposed_fix": "Proposed fix"
+    },
+    "citations": {
+      "title": "References",
+      "retrieved": "Retrieved {date}"
+    },
+    "actions": {
+      "accept_fix": "Apply fix",
+      "intentional": "Intentional / fiction",
+      "dismiss": "Dismiss",
+      "promote_evidence": "Save to research",
+      "open_research": "Open research note"
+    },
+    "disposition": {
+      "intentional_fiction": "Marked fiction",
+      "dismissed": "Dismissed",
+      "accepted_fix": "Fix accepted",
+      "evidence_promoted": "Evidence saved",
+      "open": "Open",
+      "note": "Note (optional)"
+    },
+    "error": {
+      "run_failed": "Check failed: {message}",
+      "load_failed": "Failed to load report"
+    },
+    "gate": {
+      "bridge_hint": "Also shown in Continuity Gate (WARN)",
+      "category": "Fact check",
+      "openInFactCheck": "Open Fact Check"
+    },
+    "settings": {
+      "title": "Reality anchors",
+      "subtitle": "Configure fact-check settings for this project",
+      "reality_anchors": "Reality anchor mode",
+      "mode": {
+        "off": "Off",
+        "soft": "Soft (marked spans only)",
+        "strict": "Strict (full chapter)"
+      },
+      "categories": "Check categories",
+      "blocks_settle": "Block settle on FAIL",
+      "blocks_settle_warn": "Fact-check FAIL will block settle",
+      "auto_run": "Auto-run on save",
+      "include_research": "Use research notes as evidence",
+      "saved": "Settings saved",
+      "advanced": "Advanced options",
+      "validation": {
+        "categories": "Select at least one category when reality anchors are enabled"
+      }
     }
   }
 }

@@ -25,6 +25,8 @@ interface PromptEditPanelProps {
   chapterId: string;
   baseProseVersion: number | null;
   readOnly: boolean;
+  prefillInstruction?: string | null;
+  onPrefillConsumed?: () => void;
   onApplied: (version: ProseVersionSummary) => void;
   onToast: (message: string) => void;
 }
@@ -34,6 +36,8 @@ export function PromptEditPanel({
   chapterId,
   baseProseVersion,
   readOnly,
+  prefillInstruction,
+  onPrefillConsumed,
   onApplied,
   onToast,
 }: PromptEditPanelProps) {
@@ -62,6 +66,13 @@ export function PromptEditPanel({
   useEffect(() => {
     void loadSessions();
   }, [loadSessions]);
+
+  useEffect(() => {
+    if (prefillInstruction) {
+      setInstruction(prefillInstruction);
+      onPrefillConsumed?.();
+    }
+  }, [prefillInstruction, onPrefillConsumed]);
 
   const handleSend = async () => {
     if (!instruction.trim() || readOnly) return;

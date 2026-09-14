@@ -524,6 +524,10 @@
     "boundaryRetry": "Tải lại trang"
   },
   "editor": {
+    "tab": {
+      "editor": "Biên tập",
+      "label": "Tab chương"
+    },
     "notFound": "Không tìm thấy chương",
     "backToHub": "← Về Project Hub",
     "errorLoad": "Không tải được chương",
@@ -864,6 +868,88 @@
     "hub": {
       "quickAction": "Xuất bản",
       "recent": "Xuất gần đây"
+    }
+  },
+  "factCheck": {
+    "panel": {
+      "title": "Kiểm tra sự thật",
+      "subtitle": "Đối chiếu với nguồn bên ngoài",
+      "empty": "Chưa chạy kiểm tra",
+      "run": "Chạy kiểm tra",
+      "running": "Đang kiểm tra...",
+      "skipped_off": "Reality anchors tắt — không kiểm tra",
+      "last_run": "Lần chạy gần nhất",
+      "noIssues": "Không phát hiện vấn đề",
+      "summary": "Tóm tắt kết quả",
+      "filters": "Lọc vấn đề",
+      "filterAll": "Tất cả"
+    },
+    "severity": {
+      "pass": "Khớp",
+      "warn": "Cần xem lại",
+      "fail": "Mâu thuẫn"
+    },
+    "category": {
+      "date": "Ngày tháng",
+      "place": "Địa điểm",
+      "organization": "Tổ chức",
+      "technology": "Công nghệ",
+      "historical_event": "Sự kiện lịch sử",
+      "scientific_medical": "Khoa học / y học",
+      "public_figure": "Nhân vật thực"
+    },
+    "claim": {
+      "excerpt": "Trích đoạn",
+      "confidence": "Độ tin cậy {percent}%",
+      "proposed_fix": "Đề xuất sửa"
+    },
+    "citations": {
+      "title": "Nguồn tham khảo",
+      "retrieved": "Lấy lúc {date}"
+    },
+    "actions": {
+      "accept_fix": "Áp dụng đề xuất",
+      "intentional": "Cố ý / hư cấu",
+      "dismiss": "Bỏ qua",
+      "promote_evidence": "Lưu vào nghiên cứu",
+      "open_research": "Mở ghi chú nghiên cứu"
+    },
+    "disposition": {
+      "intentional_fiction": "Đánh dấu hư cấu",
+      "dismissed": "Đã bỏ qua",
+      "accepted_fix": "Đã chấp nhận sửa",
+      "evidence_promoted": "Đã lưu nguồn",
+      "open": "Mở",
+      "note": "Ghi chú (tùy chọn)"
+    },
+    "error": {
+      "run_failed": "Kiểm tra thất bại: {message}",
+      "load_failed": "Không tải được báo cáo"
+    },
+    "gate": {
+      "bridge_hint": "Cũng hiện ở Continuity Gate (WARN)",
+      "category": "Kiểm tra sự thật",
+      "openInFactCheck": "Mở Fact Check"
+    },
+    "settings": {
+      "title": "Reality anchors",
+      "subtitle": "Cấu hình kiểm tra sự thật cho dự án",
+      "reality_anchors": "Chế độ neo thực tế",
+      "mode": {
+        "off": "Tắt",
+        "soft": "Mềm (chỉ đoạn đánh dấu)",
+        "strict": "Nghiêm (toàn chương)"
+      },
+      "categories": "Danh mục kiểm tra",
+      "blocks_settle": "Chặn settle khi FAIL",
+      "blocks_settle_warn": "FAIL kiểm tra sự thật sẽ chặn settle",
+      "auto_run": "Tự chạy khi lưu",
+      "include_research": "Dùng ghi chú nghiên cứu làm bằng chứng",
+      "saved": "Đã lưu cài đặt",
+      "advanced": "Tùy chọn nâng cao",
+      "validation": {
+        "categories": "Chọn ít nhất một danh mục khi bật reality anchors"
+      }
     }
   }
 }

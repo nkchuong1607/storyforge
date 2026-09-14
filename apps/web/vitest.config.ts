@@ -44,6 +44,8 @@ export default defineConfig({
         "lib/twist-utils.ts",
         "components/power-system/**/*.tsx",
         "components/settings/**/*.tsx",
+        "components/fact-check/**/*.tsx",
+        "lib/fact-check-utils.ts",
         "lib/genre-utils.ts",
         "lib/power-utils.ts",
         "lib/prompt-edit-utils.ts",

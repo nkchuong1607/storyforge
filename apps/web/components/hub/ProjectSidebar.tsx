@@ -71,6 +71,12 @@ export function ProjectSidebar({
       >
         Genre Settings
       </Link>
+      <Link
+        href={`/projects/${projectId}/settings/reality`}
+        className={linkClass(active === "settings")}
+      >
+        Reality anchors
+      </Link>
     </>
   );
 }
