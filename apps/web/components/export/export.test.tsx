@@ -7,11 +7,13 @@ import { PROJECT_1_ID } from "@/mocks/data";
 import { resetMockData } from "@/mocks/data";
 import { renderWithProviders } from "@/lib/test/render-with-providers";
 import exportJobFixture from "@/tests/fixtures/phase9/export-job-done.json";
+import exportJobFailedFixture from "@/tests/fixtures/phase11/export-job-failed.json";
 import type { Chapter, ExportJob } from "@/lib/api/types";
 import { ExportDownloadLink } from "./ExportDownloadLink";
 import { ExportJobForm } from "./ExportJobForm";
 import { ExportJobTable } from "./ExportJobTable";
 import { ExportEnqueueButton } from "./ExportEnqueueButton";
+import { ExportRetryButton } from "./ExportRetryButton";
 import { ExportHubSection } from "./ExportHubSection";
 import { ExportPanelPage } from "./ExportPanelPage";
 import { useExportJobPoll } from "@/lib/hooks/useExportJobPoll";
@@ -166,6 +168,51 @@ describe("export components", () => {
     await waitFor(() => {
       expect(screen.getAllByText("Đang chờ").length + screen.getAllByText("Hoàn tất").length).toBeGreaterThan(0);
     });
+  });
+
+  it("ExportJobTable shows failed error and retry", async () => {
+    const failedJob = exportJobFailedFixture as ExportJob;
+    const onRetried = vi.fn();
+    renderWithProviders(
+      <ExportJobTable
+        projectId={PROJECT_1_ID}
+        jobs={[failedJob]}
+        onJobRetried={onRetried}
+      />,
+    );
+    expect(screen.getByText("Lỗi")).toBeInTheDocument();
+    expect(screen.getByText(/No settled chapters match scope/)).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Thử lại" }));
+    await waitFor(() => expect(onRetried).toHaveBeenCalled());
+  });
+
+  it("ExportRetryButton re-enqueues with same options", async () => {
+    const user = userEvent.setup();
+    const failedJob = exportJobFailedFixture as ExportJob;
+    const onRetried = vi.fn();
+    renderWithProviders(
+      <ExportRetryButton projectId={PROJECT_1_ID} job={failedJob} onRetried={onRetried} />,
+    );
+    await user.click(screen.getByRole("button", { name: "Thử lại" }));
+    await waitFor(() => expect(onRetried).toHaveBeenCalled());
+  });
+
+  it("ExportEnqueueButton shows error when enqueue fails", async () => {
+    const user = userEvent.setup();
+    server.use(
+      http.post("http://localhost:8000/projects/:id/export/jobs", () =>
+        HttpResponse.json({ error: { code: "error", message: "fail" } }, { status: 500 }),
+      ),
+    );
+    renderWithProviders(
+      <ExportEnqueueButton
+        projectId={PROJECT_1_ID}
+        request={{ job_type: "docx", options: { chapter_scope: "settled_only" } }}
+        onEnqueued={vi.fn()}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Bắt đầu xuất" }));
+    expect(await screen.findByText("Không thể tạo job xuất")).toBeInTheDocument();
   });
 
   it("ExportHubSection shows recent jobs", async () => {

@@ -1,0 +1,16 @@
+{
+  "required_suffixes": [
+    "README.md",
+    "bible/world.md",
+    "bible/glossary.md",
+    "bible/characters/hero.md",
+    "chapters/01-opening-chapter.md",
+    "manifest.json"
+  ],
+  "docx_parts": [
+    "[Content_Types].xml",
+    "word/document.xml",
+    "word/styles.xml",
+    "word/_rels/document.xml.rels"
+  ]
+}

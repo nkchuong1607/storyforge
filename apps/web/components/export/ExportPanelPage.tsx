@@ -23,7 +23,7 @@ interface ExportPanelPageProps {
 }
 
 const defaultForm: ExportFormState = {
-  job_type: "epub",
+  job_type: "docx",
   options: {
     chapter_scope: "settled_only",
     include_bible: true,
@@ -115,7 +115,14 @@ export function ExportPanelPage({ projectId }: ExportPanelPageProps) {
           </div>
           <div>
             <h2 className="mb-3 text-lg font-semibold">{t("export.jobs.title")}</h2>
-            <ExportJobTable projectId={projectId} jobs={jobs} />
+            <ExportJobTable
+              projectId={projectId}
+              jobs={jobs}
+              onJobRetried={(job) => {
+                setJobs((prev) => [job, ...prev]);
+                setActiveJobId(job.id);
+              }}
+            />
           </div>
         </div>
       ) : null}

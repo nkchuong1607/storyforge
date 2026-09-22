@@ -854,6 +854,7 @@
         "failed": "Failed"
       },
       "download": "Download",
+      "retry": "Retry",
       "error": "{message}",
       "empty": "No export jobs yet",
       "type": "Format",
@@ -862,6 +863,8 @@
       "size": "Size"
     },
     "enqueue": "Start export",
+    "enqueueing": "Enqueueing…",
+    "enqueueError": "Could not start export job",
     "polling": "Generating file…",
     "noSettled": "No settled chapters — export may be empty",
     "errorLoad": "Failed to load export jobs",
