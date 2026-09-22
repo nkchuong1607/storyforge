@@ -40,6 +40,16 @@ export async function activateCraftPack(
   );
 }
 
+export async function deactivateCraftPack(
+  projectId: string,
+  craftPackId: string,
+): Promise<ProjectCraftPackBinding> {
+  return apiFetch<ProjectCraftPackBinding>(
+    `/projects/${projectId}/craft-packs/${encodeURIComponent(craftPackId)}/deactivate`,
+    { method: "POST" },
+  );
+}
+
 export async function buildCraftContextPack(
   projectId: string,
   payload: CraftContextPackRequest,

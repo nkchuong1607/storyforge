@@ -956,8 +956,25 @@
     "settings": {
       "title": "Craft pack",
       "subtitle": "Genre structure and fair-play checklist (separate from rule pack thresholds)",
-      "install": "Install Mystery — Fair Play",
-      "active": "Active craft pack"
+      "genreHint": "Rule pack (Genre Settings) tunes continuity severity; craft pack adds beats and fair-play checklist.",
+      "genreLink": "Genre Settings",
+      "catalog": "Available packs",
+      "installedSection": "Installed on this project",
+      "install": "Install & activate Mystery — Fair Play",
+      "installGeneric": "Install & activate",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "active": "Active craft pack",
+      "installed": "Installed and activated",
+      "activated": "Craft pack activated",
+      "deactivated": "Craft pack deactivated",
+      "loadError": "Failed to load craft pack settings",
+      "genreTags": "Genre tags",
+      "statusActive": "Active",
+      "statusInstalled": "Installed",
+      "checklistTitle": "Fair-play checklist",
+      "checklistHint": "Rules run at Continuity Gate per chapter when this pack is active.",
+      "checklistEnforced": "Enforced at continuity check"
     },
     "gate": {
       "category": "Craft"
