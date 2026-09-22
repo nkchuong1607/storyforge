@@ -80,7 +80,7 @@ See [export-harden.md](./export-harden.md).
 | `expected_paths.json` | Required git-md zip paths |
 | `expected_manifest.json` | Manifest keys after export |
 
-### Integration tests (`test_phase11_export_golden.py`)
+### Integration tests (`test_phase11_export_golden_integration.py`)
 
 | Test | Assert |
 |------|--------|
