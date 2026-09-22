@@ -240,6 +240,18 @@ class InvalidGenreRulePackError(AppError):
         super().__init__(status_code=422, code="invalid_genre_rule_pack", message=message)
 
 
+class CraftPackGenreIncompatibleError(AppError):
+    def __init__(self, craft_pack_id: str, genre_profile: str) -> None:
+        super().__init__(
+            status_code=409,
+            code="genre_incompatible",
+            message=(
+                f"Craft pack '{craft_pack_id}' is not compatible with "
+                f"genre profile '{genre_profile}'"
+            ),
+        )
+
+
 class LLMProviderError(AppError):
     def __init__(self, message: str = "LLM provider error") -> None:
         super().__init__(status_code=502, code="llm_provider_error", message=message)

@@ -1,0 +1,10 @@
+{
+  "craft_pack_id": "mystery.fair_play.v1",
+  "display_name": "Mystery — Fair Play",
+  "required_codes": [
+    "craft_mystery_clue_after_reveal",
+    "craft_mystery_insufficient_plants",
+    "craft_mystery_unlabeled_misdirection"
+  ],
+  "min_seeded_flags": 3
+}

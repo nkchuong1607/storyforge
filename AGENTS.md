@@ -78,7 +78,7 @@ scripts/harness/ check.sh, agent-preflight.sh
 3. **Tests** — unit + integration (API: Testcontainers Postgres)
 4. **Coverage** — line ≥ **90%** hard gate for `apps/api` and phase-scoped web modules
 
-See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md), [docs/specs/phase-2/README.md](docs/specs/phase-2/README.md), [docs/specs/phase-3/README.md](docs/specs/phase-3/README.md), [docs/specs/phase-4/README.md](docs/specs/phase-4/README.md), [docs/specs/phase-5/README.md](docs/specs/phase-5/README.md), [docs/specs/phase-6/README.md](docs/specs/phase-6/README.md), [docs/specs/phase-7/README.md](docs/specs/phase-7/README.md), [docs/specs/phase-8/README.md](docs/specs/phase-8/README.md), [docs/specs/phase-9/README.md](docs/specs/phase-9/README.md), and [docs/specs/phase-10/README.md](docs/specs/phase-10/README.md).
+See [docs/engineering/quality-gates.md](docs/engineering/quality-gates.md), [docs/specs/phase-1/README.md](docs/specs/phase-1/README.md), [docs/specs/phase-2/README.md](docs/specs/phase-2/README.md), [docs/specs/phase-3/README.md](docs/specs/phase-3/README.md), [docs/specs/phase-4/README.md](docs/specs/phase-4/README.md), [docs/specs/phase-5/README.md](docs/specs/phase-5/README.md), [docs/specs/phase-6/README.md](docs/specs/phase-6/README.md), [docs/specs/phase-7/README.md](docs/specs/phase-7/README.md), [docs/specs/phase-8/README.md](docs/specs/phase-8/README.md), [docs/specs/phase-9/README.md](docs/specs/phase-9/README.md), [docs/specs/phase-10/README.md](docs/specs/phase-10/README.md), and [docs/specs/phase-11/README.md](docs/specs/phase-11/README.md).
 
 ## Docs Index
 

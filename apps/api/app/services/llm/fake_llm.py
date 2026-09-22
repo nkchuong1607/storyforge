@@ -29,7 +29,12 @@ def _instruction_hash(instruction: str) -> str:
     return hashlib.sha256(instruction.encode()).hexdigest()[:12]
 
 
-def fake_complete(*, prose: str, instruction: str) -> LLMCompletionResult:
+def fake_complete(
+    *,
+    prose: str,
+    instruction: str,
+    craft_context: dict | None = None,
+) -> LLMCompletionResult:
     """Deterministic prose transformation — no network."""
     start = time.perf_counter()
     safe_instruction = sanitize_instruction(instruction)
@@ -41,6 +46,8 @@ def fake_complete(*, prose: str, instruction: str) -> LLMCompletionResult:
         revised = prose.replace("。", "！").replace(".", "!")
     if "ngắn" in lower or "short" in lower:
         revised = prose[: max(len(prose) // 2, 50)]
+    if craft_context and craft_context.get("craft_checklist_open"):
+        revised = f"{revised}\n\n[CRAFT_CONTEXT: injected]"
 
     marker = f"\n\n[AI_EDIT: {edit_hash}]"
     if marker not in revised:

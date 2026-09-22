@@ -14,7 +14,7 @@ from app.models.enums import ContinuityCategory, ContinuityResult, ContinuitySev
 
 RULE_PACK_VERSION = (
     "deterministic-v1+foreshadow-v1+psychology-v1+power-v1+scene-v1+"
-    "relationship-v1+stakes-v1+research-v1+series-v1+fact-check-v1"
+    "relationship-v1+stakes-v1+research-v1+series-v1+fact-check-v1+craft-v1"
 )
 
 DEATH_KEYWORDS = ("chết", "tử vong", "băng hà", "mất mạng")
@@ -402,6 +402,7 @@ def run_continuity_checks(
     research_issues: list[ContinuityIssue] | None = None,
     series_issues: list[ContinuityIssue] | None = None,
     fact_check_issues: list[ContinuityIssue] | None = None,
+    craft_issues: list[ContinuityIssue] | None = None,
 ) -> tuple[list[dict], dict, dict, ContinuityResult]:
     """Run all Phase 2 + Phase 4 + Phase 5 rules; return issues, state_diff, stats, result."""
     raw_issues: list[ContinuityIssue] = []
@@ -458,6 +459,8 @@ def run_continuity_checks(
         raw_issues.extend(series_issues)
     if fact_check_issues:
         raw_issues.extend(fact_check_issues)
+    if craft_issues:
+        raw_issues.extend(craft_issues)
 
     state_diff = build_state_diff_stub(
         prose=prose,

@@ -951,5 +951,16 @@
         "categories": "Chọn ít nhất một danh mục khi bật reality anchors"
       }
     }
+  },
+  "craft": {
+    "settings": {
+      "title": "Craft pack",
+      "subtitle": "Cấu trúc thể loại và checklist fair-play (tách khỏi ngưỡng rule pack)",
+      "install": "Cài Mystery — Fair Play",
+      "active": "Craft pack đang bật"
+    },
+    "gate": {
+      "category": "Craft"
+    }
   }
 }

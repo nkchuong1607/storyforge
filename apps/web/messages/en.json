@@ -951,5 +951,16 @@
         "categories": "Select at least one category when reality anchors are enabled"
       }
     }
+  },
+  "craft": {
+    "settings": {
+      "title": "Craft pack",
+      "subtitle": "Genre structure and fair-play checklist (separate from rule pack thresholds)",
+      "install": "Install Mystery — Fair Play",
+      "active": "Active craft pack"
+    },
+    "gate": {
+      "category": "Craft"
+    }
   }
 }

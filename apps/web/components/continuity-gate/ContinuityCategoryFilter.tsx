@@ -14,11 +14,14 @@ export const PHASE9_CATEGORIES: ContinuityCategory[] = ["research", "series"];
 
 export const PHASE10_CATEGORIES: ContinuityCategory[] = ["fact_check"];
 
+export const PHASE11_CATEGORIES: ContinuityCategory[] = ["craft"];
+
 interface ContinuityCategoryFilterProps {
   selected: ContinuityCategory | "all";
   onChange: (category: ContinuityCategory | "all") => void;
   issueCounts: Record<string, number>;
   showFactCheck?: boolean;
+  showCraft?: boolean;
 }
 
 export function ContinuityCategoryFilter({
@@ -26,6 +29,7 @@ export function ContinuityCategoryFilter({
   onChange,
   issueCounts,
   showFactCheck = false,
+  showCraft = false,
 }: ContinuityCategoryFilterProps) {
   const t = useTranslations();
 
@@ -39,6 +43,7 @@ export function ContinuityCategoryFilter({
     ...(showFactCheck
       ? [{ key: "fact_check" as const, label: t("factCheck.gate.category") }]
       : []),
+    ...(showCraft ? [{ key: "craft" as const, label: t("craft.gate.category") }] : []),
   ];
 
   return (

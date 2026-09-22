@@ -7,16 +7,28 @@ from app.exceptions import LLMProviderError
 from app.services.llm.fake_llm import LLMCompletionResult, fake_complete, sanitize_instruction
 
 
-async def complete_prose_edit(*, prose: str, instruction: str) -> LLMCompletionResult:
+async def complete_prose_edit(
+    *,
+    prose: str,
+    instruction: str,
+    craft_context: dict | None = None,
+) -> LLMCompletionResult:
     """Run prose edit completion via configured provider."""
     settings = get_settings()
     safe_instruction = sanitize_instruction(instruction)
     if settings.llm_provider == "litellm":
-        return await _litellm_complete(prose=prose, instruction=safe_instruction)
-    return fake_complete(prose=prose, instruction=safe_instruction)
+        return await _litellm_complete(
+            prose=prose, instruction=safe_instruction, craft_context=craft_context
+        )
+    return fake_complete(prose=prose, instruction=safe_instruction, craft_context=craft_context)
 
 
-async def _litellm_complete(*, prose: str, instruction: str) -> LLMCompletionResult:
+async def _litellm_complete(
+    *,
+    prose: str,
+    instruction: str,
+    craft_context: dict | None = None,
+) -> LLMCompletionResult:
     import time
 
     settings = get_settings()
@@ -27,10 +39,19 @@ async def _litellm_complete(*, prose: str, instruction: str) -> LLMCompletionRes
     except ImportError as exc:
         raise LLMProviderError("litellm package not installed") from exc
 
+    craft_block = ""
+    if craft_context:
+        beats = craft_context.get("craft_beats") or []
+        open_items = craft_context.get("craft_checklist_open") or []
+        clues = craft_context.get("active_clues") or []
+        craft_block = (
+            f"\nCraft beats: {beats}\nOpen checklist: {open_items}\nActive clues: {clues}\n"
+        )
     prompt = (
         "You are StoryForge Editor. Revise the chapter prose per author instruction.\n"
         "Preserve canon facts. Output full revised chapter text only.\n"
         f"Instruction: {instruction}\n"
+        f"{craft_block}"
         f"Current prose:\n{prose}"
     )
     start = time.perf_counter()
