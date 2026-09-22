@@ -16,7 +16,8 @@ from app.services.continuity.foreshadow import (
     count_eligible_plants,
 )
 
-CRAFT_RULE_PACK_SUFFIX = "+craft-v1"
+# Continuity engine version token for craft-pack checklist module (not genre rule pack).
+CRAFT_PACK_VERSION_SUFFIX = "+craft-v1"
 
 RED_HERRING_MARKERS = (
     "red herring",
