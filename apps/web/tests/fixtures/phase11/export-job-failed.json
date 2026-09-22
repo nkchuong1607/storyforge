@@ -1,0 +1,18 @@
+{
+  "id": "ee0e8400-e29b-41d4-a716-446655440099",
+  "project_id": "660e8400-e29b-41d4-a716-446655440001",
+  "job_type": "docx",
+  "status": "failed",
+  "options": {
+    "chapter_scope": "settled_only",
+    "include_bible": true,
+    "strip_secrets": true
+  },
+  "artifact_filename": null,
+  "artifact_size_bytes": null,
+  "download_url": null,
+  "error_message": "No settled chapters match scope",
+  "started_at": "2026-09-12T10:01:00Z",
+  "finished_at": "2026-09-12T10:01:30Z",
+  "created_at": "2026-09-12T10:00:00Z"
+}

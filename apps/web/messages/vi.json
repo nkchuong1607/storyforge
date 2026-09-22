@@ -854,6 +854,7 @@
         "failed": "Lỗi"
       },
       "download": "Tải xuống",
+      "retry": "Thử lại",
       "error": "{message}",
       "empty": "Chưa có job xuất",
       "type": "Định dạng",
@@ -862,6 +863,8 @@
       "size": "Kích thước"
     },
     "enqueue": "Bắt đầu xuất",
+    "enqueueing": "Đang gửi job...",
+    "enqueueError": "Không thể tạo job xuất",
     "polling": "Đang tạo file...",
     "noSettled": "Chưa có chương settled — file xuất có thể trống",
     "errorLoad": "Không thể tải lịch sử xuất",

@@ -66,7 +66,42 @@ Existing Phase 4 foreshadow + Phase 10 fact-check integration tests must pass un
 
 ---
 
+## P11b — Export harden (addendum)
+
+See [export-harden.md](./export-harden.md).
+
+### Golden fixture
+
+**API:** `apps/api/tests/fixtures/golden/export_golden/`
+
+| File | Purpose |
+|------|---------|
+| `scenario.json` | Settled chapter prose + bible entry with `secret_truth` |
+| `expected_paths.json` | Required git-md zip paths |
+| `expected_manifest.json` | Manifest keys after export |
+
+### Integration tests (`test_phase11_export_golden_integration.py`)
+
+| Test | Assert |
+|------|--------|
+| Golden DOCX + git-md | Default options; download 200; OOXML parts present |
+| Secret strip | No `secret_truth` in artifact bytes |
+| EPUB regression | Non-empty `.epub` download |
+| Settled-only default | Draft chapter excluded |
+
+### Web (Vitest + MSW)
+
+| Component | Test |
+|-----------|------|
+| `ExportJobTable` | Failed row shows error + retry |
+| `ExportEnqueueButton` | Loading state while enqueueing |
+
+Run export tests with `STORYFORGE_EXPORT_SYNC=1` (default in API `conftest.py`).
+
+---
+
 ## Links
 
 - [mystery-craft-pack.md](./mystery-craft-pack.md)
+- [export-harden.md](./export-harden.md)
 - [Quality gates](../../engineering/quality-gates.md)

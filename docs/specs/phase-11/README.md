@@ -1,7 +1,7 @@
 # Phase 11 Specifications — Mystery CraftPack (P11a)
 
 > **Status:** Canonical contract for Phase 11a implementation.  
-> **Scope:** CraftPack catalog + project binding, Mystery fair-play checklist, `craft` continuity category, Prompt Edit context hooks, golden fixtures — **not** Phase 11b export harden.
+> **Scope:** P11a = Mystery CraftPack (merged). **P11b** = export harden — see [export-harden.md](./export-harden.md).
 
 Phase 11a delivers **`mystery.fair_play.v1`** as a **new CraftPack domain** distinct from Phase 6 `genre_rule_pack_json`.
 
@@ -19,6 +19,7 @@ Phase 11a delivers **`mystery.fair_play.v1`** as a **new CraftPack domain** dist
 | 4 | [web-screens.md](./web-screens.md) | Project settings craft pack panel, checklist UI |
 | 5 | [test-strategy.md](./test-strategy.md) | Golden MS, FakeLLM ≥90%, regression |
 | 6 | [mystery-craft-pack.md](./mystery-craft-pack.md) | Pack JSON schema v1, checklist rules |
+| 7 | [export-harden.md](./export-harden.md) | P11b DOCX/git-md UX + quality AC |
 
 ---
 
@@ -41,7 +42,7 @@ Phase 11a delivers **`mystery.fair_play.v1`** as a **new CraftPack domain** dist
 
 | Item | Deferred |
 |------|----------|
-| Export harden (DOCX/MD UX) | P11b |
+| Export harden (DOCX/MD UX) | **P11b** — [export-harden.md](./export-harden.md) |
 | Video, Neo4j, multi-model zoo | Non-goals |
 | Merge craft into `genre_rule_pack_json` | Forbidden |
 | Romance / other craft packs | Future |

@@ -1,0 +1,4 @@
+{
+  "required_keys": ["project_slug", "bible_version", "chapter_count", "chapters"],
+  "min_chapter_count": 1
+}

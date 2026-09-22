@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -16,7 +17,55 @@ from app.services.export.secret_strip import strip_secrets_from_snapshot, strip_
 
 def _chapter_filename(chapter: Chapter) -> str:
     slug = chapter.title.lower().replace(" ", "-")[:40] if chapter.title else "chapter"
+    slug = re.sub(r"[^a-z0-9-]", "", slug) or "chapter"
     return f"{chapter.number:02d}-{slug}.md"
+
+
+def _character_slug(entry: dict[str, Any]) -> str:
+    raw = str(entry.get("entry_key", "character")).split(".")[-1]
+    slug = raw.lower().replace(" ", "-")[:40]
+    return re.sub(r"[^a-z0-9-]", "", slug) or "character"
+
+
+def _yaml_frontmatter(data: dict[str, Any]) -> str:
+    lines = ["---"]
+    for key, value in data.items():
+        if isinstance(value, bool):
+            lines.append(f"{key}: {'true' if value else 'false'}")
+        elif isinstance(value, (int, float)):
+            lines.append(f"{key}: {value}")
+        else:
+            escaped = str(value).replace('"', '\\"')
+            lines.append(f'{key}: "{escaped}"')
+    lines.append("---")
+    return "\n".join(lines)
+
+
+def _escape_xml(text: str) -> str:
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&apos;")
+    )
+
+
+def _docx_text_paragraph(text: str) -> str:
+    escaped = _escape_xml(text)
+    return f'<w:p><w:r><w:t xml:space="preserve">{escaped}</w:t></w:r></w:p>'
+
+
+def _docx_heading(text: str) -> str:
+    escaped = _escape_xml(text)
+    return f'<w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>{escaped}</w:t></w:r></w:p>'
+
+
+def _docx_body_paragraphs(text: str) -> str:
+    chunks = text.split("\n")
+    if not chunks:
+        return _docx_text_paragraph("")
+    return "".join(_docx_text_paragraph(chunk) for chunk in chunks)
 
 
 def build_git_md_tree(
@@ -43,32 +92,39 @@ def build_git_md_tree(
 
     if include_bible:
         world_md = "## World\n\n"
+        glossary_md = "# Glossary\n\n"
         for entry in snapshot.get("entries", []):
-            if isinstance(entry, dict) and str(entry.get("entry_key", "")).startswith("world"):
-                content = entry.get("content_md", "")
-                if strip_secrets:
-                    content = strip_secrets_from_text(content)
-                world_md += f"### {entry.get('title', '')}\n\n{content}\n\n"
+            if not isinstance(entry, dict):
+                continue
+            entry_key = str(entry.get("entry_key", ""))
+            content = entry.get("content_md", "")
+            if strip_secrets:
+                content = strip_secrets_from_text(content)
+            title = entry.get("title", "")
+            if entry_key.startswith("world"):
+                world_md += f"### {title}\n\n{content}\n\n"
+            elif entry_key.startswith("glossary"):
+                glossary_md += f"### {title}\n\n{content}\n\n"
+            elif entry_key.startswith("character"):
+                slug = _character_slug(entry)
+                char_body = f"# {title}\n\n{content}\n"
+                files[f"{root}/bible/characters/{slug}.md"] = char_body.encode("utf-8")
         files[f"{root}/bible/world.md"] = world_md.encode("utf-8")
-        files[f"{root}/bible/glossary.md"] = b"# Glossary\n"
+        files[f"{root}/bible/glossary.md"] = glossary_md.encode("utf-8")
 
     for chapter in chapters:
         prose = prose_by_chapter.get(str(chapter.id), "")
         if strip_secrets:
             prose = strip_secrets_from_text(prose)
-        frontmatter = {
-            "number": chapter.number,
-            "title": chapter.title,
-            "status": chapter.status.value,
-            "draft": is_draft_chapter(chapter),
-        }
-        body = (
-            "---\n"
-            + json.dumps(frontmatter, ensure_ascii=False)
-            + "\n---\n\n"
-            + f"# {chapter.title}\n\n"
-            + prose
+        frontmatter = _yaml_frontmatter(
+            {
+                "number": chapter.number,
+                "title": chapter.title,
+                "status": chapter.status.value,
+                "draft": is_draft_chapter(chapter),
+            }
         )
+        body = frontmatter + "\n\n" + f"# {chapter.title}\n\n" + prose
         files[f"{root}/chapters/{_chapter_filename(chapter)}"] = body.encode("utf-8")
 
     manifest = {
@@ -114,17 +170,20 @@ def build_epub_bytes(
                 prose = strip_secrets_from_text(prose)
             name = f"chapter{idx:03d}.xhtml"
             draft_attr = ' epub:type="draft"' if is_draft_chapter(chapter) else ""
+            title_escaped = _escape_xml(chapter.title)
+            prose_escaped = _escape_xml(prose)
             xhtml = (
                 f'<?xml version="1.0"?><html xmlns="http://www.w3.org/1999/xhtml">'
-                f"<head><title>{chapter.title}</title></head>"
-                f"<body{draft_attr}><h1>{chapter.title}</h1><p>{prose}</p></body></html>"
+                f"<head><title>{title_escaped}</title></head>"
+                f"<body{draft_attr}><h1>{title_escaped}</h1><p>{prose_escaped}</p></body></html>"
             )
             zf.writestr(f"OEBPS/{name}", xhtml)
             items.append(f'<item id="c{idx}" href="{name}" media-type="application/xhtml+xml"/>')
             spine.append(f'<itemref idref="c{idx}"/>')
+        title_escaped = _escape_xml(project.title)
         opf = (
             '<?xml version="1.0"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0">'
-            f"<metadata><dc:title xmlns:dc='http://purl.org/dc/elements/1.1/'>{project.title}"
+            f"<metadata><dc:title xmlns:dc='http://purl.org/dc/elements/1.1/'>{title_escaped}"
             "</dc:title></metadata>"
             f"<manifest>{''.join(items)}</manifest>"
             f"<spine>{''.join(spine)}</spine></package>"
@@ -140,7 +199,7 @@ def build_docx_bytes(
     *,
     strip_secrets: bool,
 ) -> bytes:
-    """Minimal DOCX (Office Open XML zip with word/document.xml)."""
+    """DOCX (Office Open XML) with styles and escaped text for Word/Google Docs."""
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
         zf.writestr(
@@ -151,7 +210,11 @@ def build_docx_bytes(
             'ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
             '<Default Extension="xml" ContentType="application/xml"/>'
             '<Override PartName="/word/document.xml" '
-            'ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+            'ContentType="application/vnd.openxmlformats-officedocument.'
+            'wordprocessingml.document.main+xml"/>'
+            '<Override PartName="/word/styles.xml" '
+            'ContentType="application/vnd.openxmlformats-officedocument.'
+            'wordprocessingml.styles+xml"/>'
             "</Types>",
         )
         zf.writestr(
@@ -161,18 +224,42 @@ def build_docx_bytes(
             '<Relationship Id="rId1" '
             'Type="http://schemas.openxmlformats.org/officeDocument/2006/'
             'relationships/officeDocument" '
-            'Target="word/document.xml"/></Relationships>',
+            'Target="word/document.xml"/>'
+            "</Relationships>",
         )
-        parts = [f"<w:p><w:r><w:t>{project.title}</w:t></w:r></w:p>"]
+        zf.writestr(
+            "word/_rels/document.xml.rels",
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Id="rId1" '
+            'Type="http://schemas.openxmlformats.org/officeDocument/2006/'
+            'relationships/styles" Target="styles.xml"/>'
+            "</Relationships>",
+        )
+        zf.writestr(
+            "word/styles.xml",
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+            '<w:style w:type="paragraph" w:styleId="Normal" w:default="1">'
+            '<w:name w:val="Normal"/>'
+            "</w:style>"
+            '<w:style w:type="paragraph" w:styleId="Heading1">'
+            '<w:name w:val="heading 1"/>'
+            '<w:basedOn w:val="Normal"/>'
+            '<w:uiPriority w:val="9"/>'
+            "</w:style>"
+            "</w:styles>",
+        )
+
+        parts = [_docx_heading(project.title)]
         for chapter in chapters:
             prose = prose_by_chapter.get(str(chapter.id), "")
             if strip_secrets:
                 prose = strip_secrets_from_text(prose)
             draft = " [DRAFT]" if is_draft_chapter(chapter) else ""
-            parts.append(
-                f"<w:p><w:r><w:t>{chapter.number}. {chapter.title}{draft}</w:t></w:r></w:p>"
-            )
-            parts.append(f"<w:p><w:r><w:t>{prose}</w:t></w:r></w:p>")
+            parts.append(_docx_heading(f"{chapter.number}. {chapter.title}{draft}"))
+            parts.append(_docx_body_paragraphs(prose))
+
         document = (
             '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
             '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'

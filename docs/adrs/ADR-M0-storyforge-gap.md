@@ -57,8 +57,25 @@ Canonical contract: [mystery-craft-pack.md](../specs/phase-11/mystery-craft-pack
 
 ---
 
-## 5–10. Export harden, build sequence, consequences, alternatives, review asks
+## 5. Export harden (P11b)
 
-Unchanged from accepted ADR — P11b export harden follows P11a schema freeze. See full ADR in repo history or Product brief v0.2.
+Canonical contract: [export-harden.md](../specs/phase-11/export-harden.md).
+
+| Lock | Value |
+|------|-------|
+| Primary formats | DOCX + git-md (Markdown zip) |
+| Keep-alive | EPUB must not regress |
+| Defaults | `settled_only`, `strip_secrets=true` |
+| Job UX | Enqueue → poll → downloadable artifact; failed state + retry |
+| Storage | Local path only — no S3 |
+| Git push | Stub only — no real push |
+
+**P11b AC:** golden export opens in Word/Docs; git-md layout matches Phase 9; no `secret_truth` leak; EPUB integration green.
+
+---
+
+## 6–10. Build sequence, consequences, alternatives, review asks
+
+P11a (CraftPack) precedes P11b (export harden). Bible / continuity / fact-check specs remain frozen.
 
 **P11a AC:** bind without rule-pack overwrite; golden ≥3 seeded craft/foreshadow flags; FakeLLM hooks ≥90%; Prompt Edit inject-only.

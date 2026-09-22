@@ -1,0 +1,15 @@
+{
+  "project_title": "Golden Export Novel",
+  "prose_settled": "The hero crossed the river at dawn.\nsecret_truth: unrevealed killer identity",
+  "prose_draft": "Draft chapter should be excluded from settled_only export.",
+  "bible_world_entry": {
+    "entry_key": "world.realm",
+    "title": "Central Realm",
+    "content_md": "A vast cultivation realm.\nsecret_truth: hidden sect master"
+  },
+  "bible_character_entry": {
+    "entry_key": "character.hero",
+    "title": "Lin Feng",
+    "content_md": "Protagonist of the golden export scenario."
+  }
+}

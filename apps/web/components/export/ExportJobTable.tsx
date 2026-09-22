@@ -7,14 +7,16 @@ import { Badge } from "@/components/ui/Badge";
 import { Empty } from "@/components/ui/EmptyState";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { ExportDownloadLink } from "./ExportDownloadLink";
+import { ExportRetryButton } from "./ExportRetryButton";
 
 interface ExportJobTableProps {
   projectId: string;
   jobs: ExportJob[];
   compact?: boolean;
+  onJobRetried?: (job: ExportJob) => void;
 }
 
-export function ExportJobTable({ projectId, jobs, compact }: ExportJobTableProps) {
+export function ExportJobTable({ projectId, jobs, compact, onJobRetried }: ExportJobTableProps) {
   const t = useTranslations();
   const displayJobs = compact ? jobs.slice(0, 3) : jobs;
 
@@ -38,11 +40,16 @@ export function ExportJobTable({ projectId, jobs, compact }: ExportJobTableProps
           <TableRow key={job.id}>
             <TableCell>{t(exportTypeLabelKey(job.job_type))}</TableCell>
             <TableCell>
-              <Badge variant={exportStatusVariant(job.status)}>
-                <span title={job.error_message ?? undefined}>
+              <div className="flex flex-col gap-1">
+                <Badge variant={exportStatusVariant(job.status)}>
                   {t(`export.jobs.status.${job.status}`)}
-                </span>
-              </Badge>
+                </Badge>
+                {job.status === "failed" && job.error_message ? (
+                  <span className="max-w-[14rem] text-xs text-sf-danger" title={job.error_message}>
+                    {t("export.jobs.error", { message: job.error_message })}
+                  </span>
+                ) : null}
+              </div>
             </TableCell>
             {!compact ? (
               <TableCell>{formatFileSize(job.artifact_size_bytes)}</TableCell>
@@ -51,7 +58,16 @@ export function ExportJobTable({ projectId, jobs, compact }: ExportJobTableProps
               {new Date(job.created_at).toLocaleString()}
             </TableCell>
             <TableCell>
-              <ExportDownloadLink projectId={projectId} job={job} />
+              <div className="flex flex-wrap items-center gap-2">
+                <ExportDownloadLink projectId={projectId} job={job} />
+                {job.status === "failed" && onJobRetried ? (
+                  <ExportRetryButton
+                    projectId={projectId}
+                    job={job}
+                    onRetried={onJobRetried}
+                  />
+                ) : null}
+              </div>
             </TableCell>
           </TableRow>
         ))}

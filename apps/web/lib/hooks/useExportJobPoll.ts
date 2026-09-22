@@ -17,6 +17,14 @@ export function useExportJobPoll(
   const [error, setError] = useState<string | null>(null);
   const timerRef = useRef<number | null>(null);
 
+  const stopPolling = useCallback(() => {
+    if (timerRef.current !== null) {
+      window.clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setPolling(false);
+  }, []);
+
   const fetchJob = useCallback(async () => {
     if (!jobId) return;
     setPolling(true);
@@ -25,41 +33,30 @@ export function useExportJobPoll(
       setJob(data);
       setError(null);
       if (TERMINAL.includes(data.status)) {
-        setPolling(false);
+        stopPolling();
       }
     } catch {
       setError("export.errorLoad");
-      setPolling(false);
+      stopPolling();
     }
-  }, [projectId, jobId]);
+  }, [jobId, projectId, stopPolling]);
 
   useEffect(() => {
     if (!enabled || !jobId) {
       setJob(null);
-      setPolling(false);
+      stopPolling();
       return;
     }
 
     void fetchJob();
-
     timerRef.current = window.setInterval(() => {
       void fetchJob();
     }, POLL_MS);
 
     return () => {
-      if (timerRef.current !== null) {
-        window.clearInterval(timerRef.current);
-      }
+      stopPolling();
     };
-  }, [enabled, jobId, fetchJob]);
-
-  useEffect(() => {
-    if (job && TERMINAL.includes(job.status) && timerRef.current !== null) {
-      window.clearInterval(timerRef.current);
-      timerRef.current = null;
-      setPolling(false);
-    }
-  }, [job]);
+  }, [enabled, jobId, fetchJob, stopPolling]);
 
   return { job, polling, error, refresh: () => void fetchJob() };
 }
