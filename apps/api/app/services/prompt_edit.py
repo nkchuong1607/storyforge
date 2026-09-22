@@ -23,6 +23,7 @@ from app.models.prompt_edit import PromptEditSession, PromptEditTurn
 from app.models.prose_version import ProseVersion
 from app.repositories.prompt_edit import PromptEditRepository
 from app.repositories.prose import ProseRepository
+from app.schemas.craft_pack import CraftContextPackRequest
 from app.schemas.prompt_edit import (
     PromptEditApplyChapterSummary,
     PromptEditApplyRequest,
@@ -38,6 +39,7 @@ from app.schemas.prompt_edit import (
     PromptEditTurn as PromptEditTurnSchema,
 )
 from app.services.chapter_status import is_chapter_locked
+from app.services.craft_context_pack import CraftContextPackService
 from app.services.llm.provider import complete_prose_edit
 from app.utils.word_count import count_words
 
@@ -68,6 +70,25 @@ class PromptEditService:
     def _turn_schema(self, turn: PromptEditTurn) -> PromptEditTurnSchema:
         return PromptEditTurnSchema.model_validate(turn)
 
+    async def _craft_context_slice(self, project: Project, chapter: Chapter) -> dict | None:
+        try:
+            pack = await CraftContextPackService(self.session).build_context_pack(
+                project,
+                CraftContextPackRequest(
+                    chapter_id=chapter.id,
+                    chapter_number=chapter.number,
+                ),
+            )
+        except NotFoundError:
+            return None
+        return {
+            "craft_pack_id": pack.craft_pack_id,
+            "craft_beats": [b.model_dump() for b in pack.craft_beats],
+            "craft_checklist_open": [c.model_dump() for c in pack.craft_checklist_open],
+            "active_clues": [c.model_dump(mode="json") for c in pack.active_clues],
+            "active_misdirections": [m.model_dump(mode="json") for m in pack.active_misdirections],
+        }
+
     async def _resolve_base_prose(
         self, chapter: Chapter, base_prose_version: int | None
     ) -> tuple[int, str]:
@@ -92,9 +113,12 @@ class PromptEditService:
             chapter, payload.base_prose_version
         )
 
+        craft_context = await self._craft_context_slice(project, chapter)
         try:
             llm_result = await complete_prose_edit(
-                prose=prose_content, instruction=payload.instruction
+                prose=prose_content,
+                instruction=payload.instruction,
+                craft_context=craft_context,
             )
         except LLMProviderError:
             raise
@@ -144,9 +168,12 @@ class PromptEditService:
         base_version, prose_content = await self._resolve_base_prose(
             chapter, session.base_prose_version
         )
+        craft_context = await self._craft_context_slice(project, chapter)
         try:
             llm_result = await complete_prose_edit(
-                prose=prose_content, instruction=source_turn.instruction
+                prose=prose_content,
+                instruction=source_turn.instruction,
+                craft_context=craft_context,
             )
         except LLMProviderError:
             raise

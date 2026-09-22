@@ -22,6 +22,7 @@ import { phase9Handlers } from "./phase9-handlers";
 import { ensurePhase9MockData } from "./phase9-data";
 import { phase10Handlers } from "./phase10-handlers";
 import { ensurePhase10MockData } from "./phase10-data";
+import { phase11Handlers } from "./phase11-handlers";
 
 const BASE = "http://localhost:8000";
 
@@ -264,4 +265,5 @@ export const handlers = [
   ...phase8Handlers,
   ...phase9Handlers,
   ...phase10Handlers,
+  ...phase11Handlers,
 ];

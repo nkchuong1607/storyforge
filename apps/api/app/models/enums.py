@@ -85,6 +85,7 @@ class ContinuityCategory(StrEnum):
     research = "research"
     series = "series"
     fact_check = "fact_check"
+    craft = "craft"
 
 
 class RealityAnchorsMode(StrEnum):

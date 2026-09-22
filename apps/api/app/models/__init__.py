@@ -7,6 +7,7 @@ from app.models.chapter import Chapter
 from app.models.character import Character
 from app.models.character_provisional import CharacterProvisional
 from app.models.continuity import ContinuityOverride, ContinuityReport, SettleIdempotencyKey
+from app.models.craft_pack import CraftPack, ProjectCraftPack
 from app.models.enums import (
     BibleSection,
     ChapterStatus,
@@ -63,6 +64,7 @@ __all__ = [
     "Character",
     "CharacterProvisional",
     "CharacterStatus",
+    "CraftPack",
     "ContinuityCategory",
     "ContinuityOverride",
     "ContinuityReport",
@@ -77,6 +79,7 @@ __all__ = [
     "LedgerEntityType",
     "LedgerEvent",
     "LedgerEventType",
+    "ProjectCraftPack",
     "Project",
     "ProjectLanguage",
     "ProjectMember",

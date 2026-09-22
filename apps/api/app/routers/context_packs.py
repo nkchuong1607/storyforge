@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from app.deps import DbSession, ProjectAccess
 from app.schemas.character import CharacterContextPackRequest, CharacterContextPackResponse
+from app.schemas.craft_pack import CraftContextPackRequest, CraftContextPackResponse
 from app.schemas.psychology import PsychContextPackRequest, PsychContextPackResponse
 from app.schemas.relationship import (
     RelationshipContextPackRequest,
@@ -13,6 +14,7 @@ from app.schemas.scene_engine import SceneContextPackRequest, SceneContextPackRe
 from app.schemas.stakes import StakesContextPackRequest, StakesContextPackResponse
 from app.schemas.twist import TwistContextPackRequest, TwistContextPackResponse
 from app.services.context_pack import CharacterContextPackService
+from app.services.craft_context_pack import CraftContextPackService
 from app.services.psych_context_pack import PsychContextPackService
 from app.services.relationship_context_pack import RelationshipContextPackService
 from app.services.scene_context_pack import SceneContextPackService
@@ -79,4 +81,14 @@ async def build_stakes_context_pack(
     session: DbSession,
 ) -> StakesContextPackResponse:
     service = StakesContextPackService(session)
+    return await service.build_context_pack(project, payload)
+
+
+@router.post("/craft", response_model=CraftContextPackResponse)
+async def build_craft_context_pack(
+    payload: CraftContextPackRequest,
+    project: ProjectAccess,
+    session: DbSession,
+) -> CraftContextPackResponse:
+    service = CraftContextPackService(session)
     return await service.build_context_pack(project, payload)

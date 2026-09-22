@@ -123,6 +123,7 @@ export type ContinuityCategory =
   | "world"
   | "foreshadow"
   | "psychology"
+  | "craft"
   | string;
 
 export interface ContinuityIssue {
@@ -841,6 +842,76 @@ export interface GenreRulePackResponse {
 
 export interface GenreRulePackPatch {
   pack?: GenreRulePack;
+}
+
+export interface CraftPackSummary {
+  id: string;
+  display_name: string;
+  genre_tags: string[];
+  schema_version: number;
+}
+
+export interface CraftPackListResponse {
+  items: CraftPackSummary[];
+}
+
+export interface CraftPackDetail {
+  id: string;
+  pack: Record<string, unknown>;
+}
+
+export interface ProjectCraftPackBinding {
+  craft_pack_id: string;
+  active: boolean;
+  bound_at: string;
+  display_name: string;
+}
+
+export interface ProjectCraftPackResponse {
+  project_id: string;
+  active_pack_id?: string | null;
+  bindings: ProjectCraftPackBinding[];
+}
+
+export interface CraftContextPackRequest {
+  chapter_id: string;
+  chapter_number: number;
+  audience?: "author" | "writer";
+}
+
+export interface CraftBeatEntry {
+  key: string;
+  act: number;
+  required: boolean;
+}
+
+export interface CraftChecklistOpenItem {
+  id: string;
+  code: string;
+  description?: string | null;
+}
+
+export interface CraftClueEntry {
+  plant_id: string;
+  twist_id: string;
+  twist_title: string;
+  chapter_number: number;
+  snippet: string;
+}
+
+export interface CraftMisdirectionEntry {
+  twist_id: string;
+  twist_title: string;
+  misdirection: string;
+}
+
+export interface CraftContextPackResponse {
+  craft_pack_id: string;
+  craft_beats: CraftBeatEntry[];
+  craft_checklist_open: CraftChecklistOpenItem[];
+  active_clues: CraftClueEntry[];
+  active_misdirections: CraftMisdirectionEntry[];
+  meta: Record<string, unknown>;
 }
 
 export interface PromptEditTurn {

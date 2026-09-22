@@ -18,6 +18,7 @@ from app.routers import (
     chapters,
     characters,
     context_packs,
+    craft_pack,
     export,
     fact_check,
     genre,
@@ -71,3 +72,5 @@ app.include_router(series.router)
 app.include_router(export.router)
 app.include_router(reality_settings.router)
 app.include_router(fact_check.router)
+app.include_router(craft_pack.router)
+app.include_router(craft_pack.project_router)

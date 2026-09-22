@@ -20,6 +20,7 @@ class ForeshadowTwistContext:
     status: TwistPlanStatus
     constraints_json: dict[str, Any]
     genre_strictness: str | None
+    misdirection: str | None = None
 
 
 @dataclass(frozen=True)

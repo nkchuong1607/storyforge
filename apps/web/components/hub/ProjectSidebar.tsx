@@ -72,6 +72,12 @@ export function ProjectSidebar({
         Genre Settings
       </Link>
       <Link
+        href={`/projects/${projectId}/settings/craft-pack`}
+        className={linkClass(active === "settings")}
+      >
+        Craft pack
+      </Link>
+      <Link
         href={`/projects/${projectId}/settings/reality`}
         className={linkClass(active === "settings")}
       >

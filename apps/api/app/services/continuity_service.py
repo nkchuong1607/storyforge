@@ -20,6 +20,7 @@ from app.repositories.bible import BibleRepository
 from app.repositories.chapter import ChapterRepository
 from app.repositories.character import CharacterRepository
 from app.repositories.continuity import ContinuityRepository
+from app.repositories.craft_pack import CraftPackRepository
 from app.repositories.fact_check import FactCheckRepository
 from app.repositories.ledger import LedgerRepository
 from app.repositories.power import PowerRepository
@@ -45,6 +46,7 @@ from app.schemas.continuity import (
     ContinuityReport as ContinuityReportSchema,
 )
 from app.services.chapter_status import is_chapter_locked
+from app.services.continuity.craft import run_craft_checks
 from app.services.continuity.engine import RULE_PACK_VERSION, run_continuity_checks
 from app.services.continuity.fact_check import run_fact_check_bridge
 from app.services.continuity.foreshadow import (
@@ -99,6 +101,7 @@ class ContinuityService:
         self.series = SeriesRepository(session)
         self.reality = RealitySettingsRepository(session)
         self.fact_check = FactCheckRepository(session)
+        self.craft_packs = CraftPackRepository(session)
 
     def _report_schema(self, report: ContinuityReport) -> ContinuityReportSchema:
         return ContinuityReportSchema(
@@ -208,6 +211,7 @@ class ContinuityService:
                         status=twist.status,
                         constraints_json=dict(twist.constraints_json or {}),
                         genre_strictness=twist.genre_strictness,
+                        misdirection=twist.misdirection,
                     ),
                     target_chapter_id=payoff.target_chapter_id,
                     target_chapter_number=target_ch.number,
@@ -223,6 +227,7 @@ class ContinuityService:
                 status=t.status,
                 constraints_json=dict(t.constraints_json or {}),
                 genre_strictness=t.genre_strictness,
+                misdirection=t.misdirection,
             )
             for t in all_twists
         ]
@@ -381,6 +386,23 @@ class ContinuityService:
                 chapter_id=chapter.id,
             )
 
+        craft_raw: list = []
+        active_craft = await self.craft_packs.get_active_binding(project.id)
+        if active_craft is not None:
+            catalog = await self.craft_packs.get_catalog_pack(active_craft.craft_pack_id)
+            if catalog is not None:
+                craft_raw = run_craft_checks(
+                    chapter_id=chapter.id,
+                    chapter_number=chapter.number,
+                    prose=prose_row.content,
+                    genre_profile=project.genre_profile,
+                    pack_json=catalog.pack_json,
+                    payoffs=foreshadow_payoffs,
+                    plants=foreshadow_plants,
+                    all_twists=foreshadow_twists,
+                    genre_pack=genre_pack,
+                )
+
         for proposal in relationship_proposals:
             rel_id = proposal.get("relationship_id")
             if rel_id:
@@ -427,6 +449,7 @@ class ContinuityService:
             research_issues=research_raw,
             series_issues=series_raw,
             fact_check_issues=fact_check_raw,
+            craft_issues=craft_raw,
         )
 
         report = ContinuityReport(

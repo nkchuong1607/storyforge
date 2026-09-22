@@ -1,0 +1,328 @@
+openapi: 3.1.0
+info:
+  title: StoryForge API
+  version: 0.11.0-phase11
+  description: |
+    Phase 11 contract — CraftPack catalog, project binding, craft context pack,
+    and craft continuity category extension. Extends Phase 10.
+
+    **Auth (MVP stub):** Send `X-User-Id: <uuid>` on every request except `/health`.
+
+    **Separation:** Craft packs are distinct from `genre_rule_pack_json` (Phase 6).
+servers:
+  - url: http://localhost:8000
+    description: Local API dev
+tags:
+  - name: Health
+  - name: CraftPacks
+  - name: Context
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      operationId: getHealth
+      summary: Health check
+      security: []
+      responses:
+        '200':
+          description: Service healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /craft-packs:
+    get:
+      tags:
+        - CraftPacks
+      operationId: listCraftPacks
+      summary: List craft pack catalog
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      responses:
+        '200':
+          description: Catalog list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraftPackListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /craft-packs/{craft_pack_id}:
+    get:
+      tags:
+        - CraftPacks
+      operationId: getCraftPack
+      summary: Get craft pack by id
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: craft_pack_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Full pack document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraftPackDetail'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /projects/{project_id}/craft-packs:
+    get:
+      tags:
+        - CraftPacks
+      operationId: getProjectCraftPacks
+      summary: List project craft pack bindings
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project bindings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCraftPackResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /projects/{project_id}/craft-packs/{craft_pack_id}/install:
+    post:
+      tags:
+        - CraftPacks
+      operationId: installCraftPack
+      summary: Install craft pack on project
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - $ref: '#/components/parameters/ProjectId'
+        - name: craft_pack_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Installed binding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCraftPackBinding'
+        '409':
+          description: Genre incompatible
+  /projects/{project_id}/craft-packs/{craft_pack_id}/activate:
+    post:
+      tags:
+        - CraftPacks
+      operationId: activateCraftPack
+      summary: Activate craft pack
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - $ref: '#/components/parameters/ProjectId'
+        - name: craft_pack_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Active binding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCraftPackBinding'
+  /projects/{project_id}/craft-packs/{craft_pack_id}/deactivate:
+    post:
+      tags:
+        - CraftPacks
+      operationId: deactivateCraftPack
+      summary: Deactivate craft pack
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - $ref: '#/components/parameters/ProjectId'
+        - name: craft_pack_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deactivated binding
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCraftPackBinding'
+  /projects/{project_id}/context-packs/craft:
+    post:
+      tags:
+        - Context
+      operationId: buildCraftContextPack
+      summary: Build craft context pack for chapter
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CraftContextPackRequest'
+      responses:
+        '200':
+          description: Craft context slice
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CraftContextPackResponse'
+components:
+  parameters:
+    UserIdHeader:
+      name: X-User-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    Unauthorized:
+      description: Missing X-User-Id
+    NotFound:
+      description: Resource not found
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+    CraftPackSummary:
+      type: object
+      required:
+        - id
+        - display_name
+        - genre_tags
+        - schema_version
+      properties:
+        id:
+          type: string
+        display_name:
+          type: string
+        genre_tags:
+          type: array
+          items:
+            type: string
+        schema_version:
+          type: integer
+    CraftPackListResponse:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CraftPackSummary'
+    CraftPackDetail:
+      type: object
+      required:
+        - id
+        - pack
+      properties:
+        id:
+          type: string
+        pack:
+          type: object
+          additionalProperties: true
+    ProjectCraftPackBinding:
+      type: object
+      required:
+        - craft_pack_id
+        - active
+        - bound_at
+        - display_name
+      properties:
+        craft_pack_id:
+          type: string
+        active:
+          type: boolean
+        bound_at:
+          type: string
+          format: date-time
+        display_name:
+          type: string
+    ProjectCraftPackResponse:
+      type: object
+      required:
+        - project_id
+        - bindings
+      properties:
+        project_id:
+          type: string
+          format: uuid
+        active_pack_id:
+          type: string
+          nullable: true
+        bindings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCraftPackBinding'
+    CraftContextPackRequest:
+      type: object
+      required:
+        - chapter_id
+        - chapter_number
+      properties:
+        chapter_id:
+          type: string
+          format: uuid
+        chapter_number:
+          type: integer
+        audience:
+          type: string
+          enum:
+            - author
+            - writer
+    CraftContextPackResponse:
+      type: object
+      required:
+        - craft_pack_id
+        - craft_beats
+        - craft_checklist_open
+        - active_clues
+        - active_misdirections
+        - meta
+      properties:
+        craft_pack_id:
+          type: string
+        craft_beats:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        craft_checklist_open:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        active_clues:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        active_misdirections:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        meta:
+          type: object
+          additionalProperties: true

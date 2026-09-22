@@ -951,5 +951,33 @@
         "categories": "Chọn ít nhất một danh mục khi bật reality anchors"
       }
     }
+  },
+  "craft": {
+    "settings": {
+      "title": "Craft pack",
+      "subtitle": "Cấu trúc thể loại và checklist fair-play (tách khỏi ngưỡng rule pack)",
+      "genreHint": "Rule pack (Genre Settings) chỉnh ngưỡng continuity; craft pack thêm beat và checklist fair-play.",
+      "genreLink": "Genre Settings",
+      "catalog": "Gói có sẵn",
+      "installedSection": "Đã cài trên dự án",
+      "install": "Cài & kích hoạt Mystery — Fair Play",
+      "installGeneric": "Cài & kích hoạt",
+      "activate": "Kích hoạt",
+      "deactivate": "Tắt kích hoạt",
+      "active": "Craft pack đang bật",
+      "installed": "Đã cài và kích hoạt",
+      "activated": "Đã kích hoạt craft pack",
+      "deactivated": "Đã tắt craft pack",
+      "loadError": "Không tải được cài đặt craft pack",
+      "genreTags": "Thể loại",
+      "statusActive": "Đang bật",
+      "statusInstalled": "Đã cài",
+      "checklistTitle": "Checklist fair-play",
+      "checklistHint": "Quy tắc chạy ở Continuity Gate theo từng chương khi pack đang bật.",
+      "checklistEnforced": "Áp dụng khi kiểm tra continuity"
+    },
+    "gate": {
+      "category": "Craft"
+    }
   }
 }
