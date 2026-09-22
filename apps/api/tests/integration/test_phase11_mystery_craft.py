@@ -92,6 +92,14 @@ async def test_craft_continuity_golden_flags(
     )
     twist_id = twist_resp.json()["id"]
 
+    plant_count = int(scenario.get("plant_count", 0))
+    for _ in range(plant_count):
+        await client.post(
+            f"/projects/{project_id}/twists/{twist_id}/plants",
+            json={"chapter_id": ch1_id, "snippet": "Partial clue", "salience": "hard"},
+            headers=user_a_headers,
+        )
+
     await client.post(
         f"/projects/{project_id}/twists/{twist_id}/payoffs",
         json={"target_chapter_id": payoff_ch_id, "min_plants": scenario["min_plants"]},
@@ -134,6 +142,31 @@ async def test_craft_context_pack_no_secret_truth(
     assert resp.status_code == 200
     text = json.dumps(resp.json())
     assert "secret_truth" not in text
+
+
+@pytest.mark.integration
+async def test_phase11_fact_check_regression(
+    client: AsyncClient,
+    user_a_headers: dict[str, str],
+) -> None:
+    """Craft pack active must not emit fact_check on non-strict projects (P10 bridge unchanged)."""
+    project_id, _, payoff_ch_id = await _golden_mystery_project(client, user_a_headers)
+    settings = await client.get(f"/projects/{project_id}/reality-settings", headers=user_a_headers)
+    assert settings.status_code == 200
+    assert settings.json()["reality_anchors"] != "strict"
+
+    await client.post(
+        f"/projects/{project_id}/chapters/{payoff_ch_id}/prose-versions",
+        json={"content": "9 November 1985 in Berlin — red herring nghi phạm giả."},
+        headers=user_a_headers,
+    )
+    check = await client.post(
+        f"/projects/{project_id}/chapters/{payoff_ch_id}/continuity-check",
+        headers=user_a_headers,
+    )
+    assert check.status_code == 200
+    issues = check.json()["issues"]
+    assert [i for i in issues if i.get("category") == "fact_check"] == []
 
 
 @pytest.mark.integration

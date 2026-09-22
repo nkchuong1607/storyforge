@@ -1,13 +1,13 @@
 {
   "min_seeded_flags": 3,
   "required_codes": [
-    "craft_mystery_clue_after_reveal",
     "craft_mystery_insufficient_plants",
-    "craft_mystery_unlabeled_misdirection"
+    "craft_mystery_unlabeled_misdirection",
+    "foreshadow_plant_count_below_minimum"
   ],
   "severities": {
-    "craft_mystery_clue_after_reveal": "fail",
     "craft_mystery_insufficient_plants": "fail",
-    "craft_mystery_unlabeled_misdirection": "warn"
+    "craft_mystery_unlabeled_misdirection": "warn",
+    "foreshadow_plant_count_below_minimum": "fail"
   }
 }

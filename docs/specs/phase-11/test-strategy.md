@@ -33,9 +33,11 @@ GHA: `make check` only (light).
 
 ## Golden scenario (minimum flags)
 
-1. **FAIL** `craft_mystery_clue_after_reveal` — payoff ch.5, zero prior plants
-2. **FAIL** `craft_mystery_insufficient_plants` — payoff min_plants=2, count=1
-3. **WARN** `craft_mystery_unlabeled_misdirection` — prose red-herring marker, no twist.misdirection
+Fixture `scenario.json` uses `plant_count: 1`, `min_plants: 2` on payoff ch.5:
+
+1. **FAIL** `craft_mystery_insufficient_plants` — payoff min_plants=2, eligible count=1
+2. **WARN** `craft_mystery_unlabeled_misdirection` — prose red-herring marker, no twist.misdirection
+3. **FAIL** `foreshadow_plant_count_below_minimum` — Phase 4 foreshadow (same plant gap; unchanged by craft pack)
 
 ---
 
